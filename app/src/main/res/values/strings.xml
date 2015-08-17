@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Surveyor</string>
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="preference_key_file">io.rapidpro.surveyor.prefs</string>
+    <string name="token">token</string>
+    <string name="pref_title_server">Server</string>
+    <string name="pref_key_server">pref_default_server</string>
+    <string name="pref_key_current_org">pref_current_org</string>
+    <string name="action_sync">Sync</string>
+    <string name="action_logout">Logout</string>
+    <string name="title_activity_org_list">Organizations</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_org_home">OrgHomeActivity</string>
+    <string name="title_activity_org">OrgActivity</string>
+    <string name="title_activity_flow_list">FlowListActivity</string>
+    <string name="error_org_missing">Org couldn\'t be found</string>
+    <string name="pref_default_server">http://192.168.0.185:8000</string>
+
+</resources>

@@ -1,0 +1,13 @@
+<resources>
+
+    <!--
+    Layout alias to replace the single-pane version of the layout with a
+    two-pane version on Large screens.
+
+    For more on layout aliases, see:
+    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
+    -->
+    <item name="fragment_org" type="layout">@layout/fragment_org_list</item>
+    <item name="fragment_flow" type="layout">@layout/fragment_flow_list</item>
+
+</resources>
