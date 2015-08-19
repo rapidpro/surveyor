@@ -24,6 +24,7 @@ public interface RapidProAPI {
     @GET("/api/v1/flows.json")
     void getFlows(
             @Header("Authorization") String token,
+            @Query("type") String type,
             Callback<FlowList> callback);
 
     @GET("/api/v1/flowdefinition.json")
