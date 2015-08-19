@@ -5,24 +5,22 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
-
-import java.util.List;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.adapter.ListItem;
+import io.rapidpro.surveyor.adapter.RapidFlowListAdapter;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
 import io.rapidpro.surveyor.fragment.OrgListFragment;
 import io.rapidpro.surveyor.fragment.RapidFlowsFragment;
+import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.net.FlowList;
 import io.realm.Realm;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class RapidFlowsActivity extends BaseActivity implements OrgListFragment.OnFragmentInteractionListener {
+public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragment.RapidFlowListener {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -76,19 +74,34 @@ public class RapidFlowsActivity extends BaseActivity implements OrgListFragment.
     }
 
     @Override
-    public void onFragmentInteraction(ListItem item) {
+    public void onRapidFlowSelection(final Flow flow) {
 
-        Flow flow = (Flow) item;
         logDebug("Flow selected: " + flow.getName());
 
         // save which org this flow came from
         flow.setOrgId(getOrg().getId());
 
-        Realm realm = getRealm();
+        final Realm realm = getRealm();
         realm.beginTransaction();
         realm.copyToRealm(flow);
         realm.commitTransaction();
         finish();
+
+        // go fetch our flow defintion async
+        getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
+            @Override
+            public void success(FlowDefinition flowDefinition, Response response) {
+                realm.beginTransaction();
+                flow.setDefinition(flowDefinition.results.toString());
+                realm.copyToRealmOrUpdate(flow);
+                realm.commitTransaction();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                logError("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error.getCause());
+            }
+        });
 
     }
 }

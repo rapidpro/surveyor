@@ -8,6 +8,7 @@ import android.util.Log;
 
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.net.RapidProService;
 import io.realm.Realm;
@@ -75,10 +76,14 @@ public class BaseActivity extends AppCompatActivity {
 
     public Org getOrg() {
         if (m_org == null) {
-            String orgId = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_ID);
+            int orgId = getIntent().getIntExtra(SurveyorIntent.EXTRA_ORG_ID, 0);
             m_org = getRealm().where(Org.class).equalTo("id", orgId).findFirst();
         }
         return m_org;
+    }
+
+    public Flow getFlow(String id) {
+        return getRealm().where(Flow.class).equalTo("id", id).findFirst();
     }
 
     public Intent getIntent(Activity from, Class to) {

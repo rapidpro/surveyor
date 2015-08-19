@@ -12,6 +12,7 @@ import java.util.List;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.Flow;
+import io.realm.Realm;
 import io.realm.RealmObject;
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -25,15 +26,21 @@ public class RapidProService {
     private String m_token;
 
     private FlowList m_flowList;
+    private Surveyor m_surveyor;
 
-    public RapidProService() {
+    public RapidProService(Surveyor app) {
         m_api = getAPIAccessor();
+        m_surveyor = app;
     }
 
     public FlowList getLastFlows() { return m_flowList; }
 
     public void setToken(String token) {
-        m_token = token;
+        m_token = "Token " + token;
+    }
+
+    public String getToken() {
+        return m_token;
     }
 
     public void getOrgs(String email, String password, Callback<List<Org>> callback) {
@@ -41,7 +48,7 @@ public class RapidProService {
     }
 
     public void getFlows(final Callback<FlowList> callback) {
-        m_api.getFlows("Token " + m_token, new Callback<FlowList>() {
+        m_api.getFlows(getToken(), new Callback<FlowList>() {
             @Override
             public void success(FlowList flowList, Response response) {
                 m_flowList = flowList;
@@ -53,6 +60,37 @@ public class RapidProService {
                 callback.failure(error);
             }
         });
+    }
+
+    public void getFlowDefinition(final Flow flow, final Callback<FlowDefinition> callback) {
+
+        final Realm realm = m_surveyor.getRealm();
+        realm.beginTransaction();
+        flow.setFetching(true);
+        realm.commitTransaction();
+
+        m_api.getFlowDefinition(getToken(), flow.getUuid(), new Callback<FlowDefinition>() {
+            @Override
+            public void success(FlowDefinition flowDefinition, Response response) {
+
+                realm.beginTransaction();
+                flow.setFetching(false);
+                realm.commitTransaction();
+
+                callback.success(flowDefinition, response);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+                realm.beginTransaction();
+                flow.setFetching(false);
+                realm.commitTransaction();
+
+                callback.failure(error);
+            }
+        });
+
     }
 
     private RapidProAPI getAPIAccessor() {

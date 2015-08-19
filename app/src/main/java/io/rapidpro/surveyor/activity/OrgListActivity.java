@@ -1,19 +1,13 @@
 package io.rapidpro.surveyor.activity;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.List;
-
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.adapter.ListItem;
 import io.rapidpro.surveyor.data.Org;
-import io.rapidpro.surveyor.fragment.ListItemFragment;
 import io.rapidpro.surveyor.fragment.OrgListFragment;
 
 public class OrgListActivity extends BaseActivity implements OrgListFragment.OnFragmentInteractionListener {
@@ -56,13 +50,11 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
     }
 
     @Override
-    public void onFragmentInteraction(ListItem item) {
+    public void onFragmentInteraction(Org org) {
 
-        Org org = (Org) item;
         getRapidProService().setToken(org.getToken());
-
         Intent intent = new Intent(OrgListActivity.this, OrgActivity.class);
-        intent.putExtra(SurveyorIntent.EXTRA_ORG_ID, item.getId());
+        intent.putExtra(SurveyorIntent.EXTRA_ORG_ID, org.getId());
         startActivity(intent);
     }
 }

@@ -9,14 +9,17 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import io.rapidpro.surveyor.adapter.ListItem;
-import io.rapidpro.surveyor.adapter.ListItemAdapter;
-import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.adapter.FlowListAdapter;
+import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
-import io.rapidpro.surveyor.fragment.ListItemFragment;
+import io.rapidpro.surveyor.net.FlowDefinition;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
-public class OrgActivity extends BaseActivity implements ListItemFragment.OnFragmentInteractionListener {
+public class OrgActivity extends BaseActivity implements FlowListFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +46,8 @@ public class OrgActivity extends BaseActivity implements ListItemFragment.OnFrag
         super.onResume();
         ListView list = (ListView) findViewById(android.R.id.list);
         if (list != null) {
-            ListItemAdapter adapter = ((ListItemAdapter) list.getAdapter());
-            adapter.notifyDataSetChanged();
+            FlowListAdapter adapter = ((FlowListAdapter) list.getAdapter());
+            // adapter.notifyDataSetChanged();
         }
     }
 
@@ -75,7 +78,18 @@ public class OrgActivity extends BaseActivity implements ListItemFragment.OnFrag
     }
 
     @Override
-    public void onFragmentInteraction(ListItem id) {
+    public void onFragmentInteraction(Flow flow) {
+        logDebug("Flow: " + flow.getDefinition());
+        getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
+            @Override
+            public void success(FlowDefinition flowDefinition, Response response) {
 
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
     }
 }

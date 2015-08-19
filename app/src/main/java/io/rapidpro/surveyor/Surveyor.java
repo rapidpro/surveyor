@@ -36,7 +36,7 @@ public class Surveyor extends Application {
 
     public RapidProService getRapidProService() {
         if (s_rapidProService == null) {
-            s_rapidProService = new RapidProService();
+            s_rapidProService = new RapidProService(this);
         }
         return s_rapidProService;
     }

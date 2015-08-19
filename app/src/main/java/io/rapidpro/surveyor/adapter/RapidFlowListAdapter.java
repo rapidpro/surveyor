@@ -2,6 +2,7 @@ package io.rapidpro.surveyor.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,13 +11,16 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.data.Flow;
 
-public class ListItemAdapter<T extends ListItem> extends ArrayAdapter {
+
+public class RapidFlowListAdapter extends ArrayAdapter {
 
     private int resource;
     private Context context;
 
-    public ListItemAdapter(Context context, int resource, List<T> items) {
+    public RapidFlowListAdapter(Context context, int resource, List<Flow> items) {
         super(context, resource, items);
         this.resource = resource;
         this.context = context;
@@ -39,8 +43,8 @@ public class ListItemAdapter<T extends ListItem> extends ArrayAdapter {
             cache = (ViewCache)row.getTag();
         }
 
-        T item = (T) getItem(position);
-        cache.titleView.setText(item.getName());
+        Flow flow = (Flow) getItem(position);
+        cache.titleView.setText(flow.getName());
 
         return row;
     }

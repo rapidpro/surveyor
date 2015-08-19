@@ -10,6 +10,7 @@ import retrofit.http.POST;
 import retrofit.Callback;
 
 import io.rapidpro.surveyor.data.Org;
+import retrofit.http.Query;
 
 public interface RapidProAPI {
 
@@ -21,5 +22,13 @@ public interface RapidProAPI {
             Callback<List<Org>> callback);
 
     @GET("/api/v1/flows.json")
-    void getFlows(@Header("Authorization") String token, Callback<FlowList> callback);
+    void getFlows(
+            @Header("Authorization") String token,
+            Callback<FlowList> callback);
+
+    @GET("/api/v1/flowdefinition.json")
+    void getFlowDefinition(
+            @Header("Authorization") String token,
+            @Query("uuid") String uuid,
+            Callback<FlowDefinition> callback);
 }

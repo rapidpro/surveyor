@@ -7,6 +7,8 @@ import io.realm.RealmConfiguration;
 
 public class BaseFragment extends Fragment {
 
+    public BaseFragment() {}
+
     public Realm getRealm() {
         RealmConfiguration config = new RealmConfiguration.Builder(getActivity()).build();
         return Realm.getInstance(config);
