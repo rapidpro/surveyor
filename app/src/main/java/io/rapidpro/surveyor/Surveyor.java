@@ -14,6 +14,8 @@ public class Surveyor extends Application {
     private static SharedPreferences s_prefs = null;
     private static RapidProService s_rapidProService = null;
 
+    public static Logger LOG = new Logger();
+
     @Override
     public void onCreate() {
         super.onCreate();

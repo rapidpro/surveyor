@@ -35,20 +35,12 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void onResume() {
         super.onResume();
-        logDebug(getClass().getSimpleName() + ".onResume()");
+        Surveyor.LOG.d(getClass().getSimpleName() + ".onResume()");
     }
 
     protected void onPause() {
         super.onPause();
-        logDebug(getClass().getSimpleName() + ".onPause()");
-    }
-
-    public void logDebug(String log) {
-        Log.d(TAG, log);
-    }
-
-    public void logError(String message, Throwable t) {
-        Log.e(TAG, message, t);
+        Surveyor.LOG.d(getClass().getSimpleName() + ".onPause()");
     }
 
     public SharedPreferences getPreferences() {

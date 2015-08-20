@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
@@ -79,7 +80,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
 
     @Override
     public void onFragmentInteraction(Flow flow) {
-        logDebug("Flow: " + flow.getDefinition());
+        Surveyor.LOG.d("Flow: " + flow.getDefinition());
         getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
             @Override
             public void success(FlowDefinition flowDefinition, Response response) {

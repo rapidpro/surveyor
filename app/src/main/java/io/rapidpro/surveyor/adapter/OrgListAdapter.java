@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.data.Org;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
@@ -32,7 +33,7 @@ public class OrgListAdapter extends RealmBaseAdapter<Org> implements ListAdapter
         if (convertView == null) {
             convertView = inflater.inflate(m_resourceId, parent, false);
             cache = new ViewCache();
-            cache.titleView = (TextView) convertView.findViewById(android.R.id.text1);
+            cache.titleView = (TextView) convertView.findViewById(R.id.text_org);
             convertView.setTag(cache);
         } else {
             cache = (ViewCache) convertView.getTag();

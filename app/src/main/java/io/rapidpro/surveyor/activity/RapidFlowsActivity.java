@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.adapter.RapidFlowListAdapter;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
@@ -29,7 +30,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         setContentView(R.layout.activity_flow_list_pending);
 
         final Org org = getOrg();
-        logDebug("Fetching flows for " + org.getName());
+        Surveyor.LOG.d("Fetching flows for " + org.getName());
 
         getRapidProService().getFlows(new Callback<FlowList>() {
             @Override
@@ -46,7 +47,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
 
             @Override
             public void failure(RetrofitError error) {
-                logError("Boom: " + error.getMessage(), error.getCause());
+                Surveyor.LOG.e("Boom: " + error.getMessage(), error.getCause());
             }
         });
     }
@@ -76,7 +77,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
     @Override
     public void onRapidFlowSelection(final Flow flow) {
 
-        logDebug("Flow selected: " + flow.getName());
+        Surveyor.LOG.d("Flow selected: " + flow.getName());
 
         // save which org this flow came from
         flow.setOrgId(getOrg().getId());
@@ -99,7 +100,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
 
             @Override
             public void failure(RetrofitError error) {
-                logError("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error.getCause());
+                Surveyor.LOG.e("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error.getCause());
             }
         });
 

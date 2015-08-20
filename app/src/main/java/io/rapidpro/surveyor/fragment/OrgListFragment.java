@@ -31,7 +31,7 @@ public class OrgListFragment extends BaseFragment implements AbsListView.OnItemC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        m_adapter = new OrgListAdapter(getActivity(), android.R.layout.simple_list_item_1, getItems(), true);
+        m_adapter = new OrgListAdapter(getActivity(), R.layout.item_org, getItems(), true);
     }
 
     public RealmResults<Org> getItems() {

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.Org;
 import io.realm.Realm;
 import retrofit.Callback;
@@ -152,7 +153,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
                 @Override
                 public void failure(RetrofitError error) {
-                    logError("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error.getCause());
+                    Surveyor.LOG.e("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error.getCause());
                     showProgress(false);
                 }
             });

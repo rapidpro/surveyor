@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp">
+
+    <io.rapidpro.surveyor.ui.IconTextView
+        android:id="@+id/org_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center_vertical"
+        android:text="@string/icon_folder_open"
+        android:textColor="@color/secondary_lightest"
+        android:textSize="32sp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@+id/org_icon">
+
+        <TextView
+            android:id="@+id/text_org"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_marginTop="2dp"
+            android:text="Nyaruka"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
