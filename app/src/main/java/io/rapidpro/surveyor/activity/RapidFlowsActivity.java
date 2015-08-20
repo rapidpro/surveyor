@@ -34,12 +34,13 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         getRapidProService().getFlows(new Callback<FlowList>() {
             @Override
             public void success(FlowList flows, Response response) {
-                setContentView(R.layout.activity_flow_list);
-
-                if (savedInstanceState == null) {
-                    Fragment listFragment = RapidFlowsFragment.newInstance(org.getId());
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.add(R.id.fragment_container, listFragment).commit();
+                if (!RapidFlowsActivity.this.isDestroyed()) {
+                    setContentView(R.layout.activity_flow_list);
+                    if (savedInstanceState == null) {
+                        Fragment listFragment = RapidFlowsFragment.newInstance(org.getId());
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.add(R.id.fragment_container, listFragment).commit();
+                    }
                 }
             }
 
@@ -48,7 +49,6 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
                 logError("Boom: " + error.getMessage(), error.getCause());
             }
         });
-
     }
 
     @Override
