@@ -3,9 +3,13 @@ package io.rapidpro.surveyor.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
+import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
@@ -19,6 +23,15 @@ public class BaseActivity extends AppCompatActivity {
     private static String TAG = "Surveyor";
 
     private Org m_org;
+
+    protected void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+    }
 
     protected void onResume() {
         super.onResume();

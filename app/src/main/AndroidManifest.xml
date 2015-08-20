@@ -12,8 +12,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
-        <activity android:name=".activity.MainActivity" />
+        android:theme="@style/RapidTheme" >
         <activity
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login"
@@ -31,10 +30,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".activity.OrgHomeActivity"
-            android:label="@string/title_activity_org_home" >
         </activity>
         <activity
             android:name=".activity.OrgActivity"
