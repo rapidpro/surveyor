@@ -2,7 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="12dp">
+                android:paddingEnd="22dp"
+                android:paddingStart="22dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp">
 
     <io.rapidpro.surveyor.ui.IconTextView
         android:id="@+id/org_icon"
@@ -10,8 +13,8 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center_vertical"
-        android:text="@string/icon_folder_open"
-        android:textColor="@color/secondary_lightest"
+        android:text="@string/icon_folder"
+        android:textColor="@color/primary_lightest"
         android:textSize="32sp"/>
 
     <LinearLayout

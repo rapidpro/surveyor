@@ -1,8 +1,8 @@
 package io.rapidpro.surveyor;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import io.rapidpro.surveyor.net.RapidProService;
 import io.realm.Realm;
@@ -11,43 +11,42 @@ import io.realm.RealmConfiguration;
 public class Surveyor extends Application {
 
     public static String BASE_URL = null;
-    private static SharedPreferences s_prefs = null;
-    private static RapidProService s_rapidProService = null;
-
     public static Logger LOG = new Logger();
+    private static Surveyor s_this;
+
+    private SharedPreferences m_prefs = null;
+    private RapidProService m_rapidProService = null;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        s_this = this;
         updatePrefs();
 
-        Realm.deleteRealm(getRealConfiguration());
+        // Temporary: nuke our db on every start until the schema is ironed out
+        RealmConfiguration config = new RealmConfiguration.Builder(this).build();
+        Realm.deleteRealm(config);
+
+        // set our default database config
+        Realm.setDefaultConfiguration(config);
     }
 
-    public static SharedPreferences getPreferences(Context context) {
-        if (s_prefs == null) {
-            s_prefs = context.getSharedPreferences(context.getString(R.string.preference_key_file), Context.MODE_PRIVATE);
+    public SharedPreferences getPreferences() {
+        if (m_prefs == null) {
+            m_prefs = PreferenceManager.getDefaultSharedPreferences(s_this);
         }
-        return s_prefs;
+        return m_prefs;
     }
 
     public void updatePrefs() {
-        SharedPreferences prefs = Surveyor.getPreferences(this);
-        BASE_URL = prefs.getString(getString(R.string.pref_key_server), getString(R.string.pref_default_server));
+        BASE_URL = getPreferences().getString("pref_key_host", null);
+        m_rapidProService = null;
     }
 
     public RapidProService getRapidProService() {
-        if (s_rapidProService == null) {
-            s_rapidProService = new RapidProService(this);
+        if (m_rapidProService == null) {
+            m_rapidProService = new RapidProService();
         }
-        return s_rapidProService;
-    }
-
-    public RealmConfiguration getRealConfiguration() {
-        return new RealmConfiguration.Builder(this).build();
-    }
-
-    public Realm getRealm() {
-        return Realm.getInstance(getRealConfiguration());
+        return m_rapidProService;
     }
 }

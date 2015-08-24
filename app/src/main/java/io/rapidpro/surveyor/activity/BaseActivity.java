@@ -8,6 +8,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
@@ -23,14 +25,53 @@ public class BaseActivity extends AppCompatActivity {
     private static String TAG = "Surveyor";
 
     private Org m_org;
+    private Realm m_realm;
+
+    public Surveyor getSurveyor() {
+        return (Surveyor)getApplication();
+    }
+
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+
     }
 
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        } else if (id == R.id.action_logout) {
+            Realm realm = getRealm();
+            realm.beginTransaction();
+            realm.clear(Flow.class);
+            realm.clear(Org.class);
+            realm.commitTransaction();
+            finish();
+            startActivity(new Intent(this, LoginActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     protected void onResume() {
@@ -40,21 +81,25 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void onPause() {
         super.onPause();
+        if (m_realm != null) {
+            m_realm.close();
+            m_realm = null;
+        }
         Surveyor.LOG.d(getClass().getSimpleName() + ".onPause()");
     }
 
     public SharedPreferences getPreferences() {
-        return Surveyor.getPreferences(this);
+        return getSurveyor().getPreferences();
     }
 
     public void saveString(int key, String value) {
-        SharedPreferences.Editor editor = Surveyor.getPreferences(this).edit();
+        SharedPreferences.Editor editor = getPreferences().edit();
         editor.putString(getString(key), value);
         editor.apply();
     }
 
     public void saveInt(int key, int value) {
-        SharedPreferences.Editor editor = Surveyor.getPreferences(this).edit();
+        SharedPreferences.Editor editor = getPreferences().edit();
         editor.putInt(getString(key), value);
         editor.apply();
     }
@@ -67,12 +112,12 @@ public class BaseActivity extends AppCompatActivity {
         return getPreferences().getInt(getString(key), def);
     }
 
-    public Surveyor getSurveyor() {
-        return (Surveyor)getApplication();
-    }
 
     public Realm getRealm() {
-        return getSurveyor().getRealm();
+        if (m_realm == null){
+            m_realm = Realm.getDefaultInstance();
+        }
+        return m_realm;
     }
 
     public RapidProService getRapidProService() {

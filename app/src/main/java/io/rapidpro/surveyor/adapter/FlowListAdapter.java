@@ -1,18 +1,18 @@
 package io.rapidpro.surveyor.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.data.Flow;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
-/**
- * Created by eric on 8/18/15.
- */
 public class FlowListAdapter extends RealmBaseAdapter<Flow> implements ListAdapter {
 
     private int m_resourceId;
@@ -27,27 +27,37 @@ public class FlowListAdapter extends RealmBaseAdapter<Flow> implements ListAdapt
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewCache cache = null;
+        View row = convertView;
+        ViewCache cache;
 
-        if (convertView == null) {
-            convertView = inflater.inflate(m_resourceId, parent, false);
+        if(row == null) {
+            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+            row = inflater.inflate(m_resourceId, parent, false);
+
             cache = new ViewCache();
-            cache.titleView = (TextView) convertView.findViewById(android.R.id.text1);
-            convertView.setTag(cache);
+            cache.titleView = (TextView)row.findViewById(R.id.text_flow_name);
+            cache.questionView = (TextView)row.findViewById(R.id.text_flow_questions);
+
+            row.setTag(cache);
         } else {
-            cache = (ViewCache) convertView.getTag();
+            cache = (ViewCache)row.getTag();
         }
 
-        Flow flow = realmResults.get(position);
-        cache.titleView.setText(flow.getName() + " " + flow.isFetching());
-        return convertView;
-    }
+        Flow flow = (Flow) getItem(position);
+        cache.titleView.setText(flow.getName());
 
-    public RealmResults<Flow> getRealmResults() {
-        return realmResults;
+        String questionString = "Questions";
+        if (flow.getQuestionCount() == 1) {
+            questionString = "Question";
+        }
+
+        cache.questionView.setText(flow.getQuestionCount() + " " + questionString);
+
+        return row;
     }
 
     public static class ViewCache {
         TextView titleView;
+        TextView questionView;
     }
 }

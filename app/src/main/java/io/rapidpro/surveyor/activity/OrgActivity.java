@@ -2,10 +2,10 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -25,9 +25,10 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_org);
+        setContentView(R.layout.fragment_container);
 
         Org org = getOrg();
+
         if (org == null) {
             Toast.makeText(this, R.string.error_org_missing, Toast.LENGTH_SHORT).show();
             finish();
@@ -38,6 +39,11 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 Fragment listFragment = FlowListFragment.newInstance(org.getId());
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.add(R.id.fragment_container, listFragment).commit();
+
+                // if we don't have flows, start download activity
+                if (getRealm().where(Flow.class).equalTo("orgId", org.getId()).findFirst() == null) {
+                    startActivity(getIntent(OrgActivity.this, RapidFlowsActivity.class));
+                }
             }
         }
     }
@@ -47,35 +53,21 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         super.onResume();
         ListView list = (ListView) findViewById(android.R.id.list);
         if (list != null) {
-            FlowListAdapter adapter = ((FlowListAdapter) list.getAdapter());
+            // FlowListAdapter adapter = ((FlowListAdapter) list.getAdapter());
             // adapter.notifyDataSetChanged();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_org, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
-    }
-
-    public void showFlowList(View view) {
-        startActivity(getIntent(this, RapidFlowsActivity.class));
     }
 
     @Override
@@ -92,5 +84,9 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
 
             }
         });
+    }
+
+    public void showFlowList(MenuItem item) {
+        startActivity(getIntent(this, RapidFlowsActivity.class));
     }
 }

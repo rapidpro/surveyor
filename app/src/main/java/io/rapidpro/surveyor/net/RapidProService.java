@@ -6,7 +6,16 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.TypeAdapterFactory;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import io.rapidpro.surveyor.Surveyor;
@@ -24,13 +33,10 @@ public class RapidProService {
 
     private RapidProAPI m_api;
     private String m_token;
-
     private FlowList m_flowList;
-    private Surveyor m_surveyor;
 
-    public RapidProService(Surveyor app) {
+    public RapidProService() {
         m_api = getAPIAccessor();
-        m_surveyor = app;
     }
 
     public FlowList getLastFlows() { return m_flowList; }
@@ -64,7 +70,7 @@ public class RapidProService {
 
     public void getFlowDefinition(final Flow flow, final Callback<FlowDefinition> callback) {
 
-        final Realm realm = m_surveyor.getRealm();
+        final Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         flow.setFetching(true);
         realm.commitTransaction();
@@ -76,6 +82,7 @@ public class RapidProService {
                 realm.beginTransaction();
                 flow.setFetching(false);
                 realm.commitTransaction();
+                realm.close();
 
                 callback.success(flowDefinition, response);
             }
@@ -86,6 +93,7 @@ public class RapidProService {
                 realm.beginTransaction();
                 flow.setFetching(false);
                 realm.commitTransaction();
+                realm.close();
 
                 callback.failure(error);
             }
@@ -104,7 +112,7 @@ public class RapidProService {
             public boolean shouldSkipClass(Class<?> clazz) {
                 return false;
             }
-        }).create();
+        }).registerTypeAdapterFactory(new FlowListTypeAdapterFactory()).create();
 
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(Surveyor.BASE_URL)
@@ -114,4 +122,56 @@ public class RapidProService {
 
         return restAdapter.create(RapidProAPI.class);
     }
+
+    private class FlowTypeAdapterFactory extends CustomizedTypeAdapterFactory<Flow> {
+        private FlowTypeAdapterFactory() {
+            super(Flow.class);
+        }
+
+        @Override protected void beforeWrite(Flow flow, JsonElement json) {}
+
+        @Override protected void afterRead(JsonElement deserialized) {
+            JsonObject custom = deserialized.getAsJsonObject();
+            JsonArray rulesets = custom.get("rulesets").getAsJsonArray();
+            int questionCount = 0;
+            for (int i=0; i<rulesets.size(); i++) {
+                if ("wait_message".equals(rulesets.get(i).getAsJsonObject().get("ruleset_type").getAsString())) {
+                    questionCount++;
+                }
+            }
+            custom.add("questionCount", new JsonPrimitive(questionCount));
+        }
+    }
+
+    private class FlowListTypeAdapterFactory extends CustomizedTypeAdapterFactory<FlowList> {
+        private FlowListTypeAdapterFactory() {
+            super(FlowList.class);
+        }
+
+        @Override protected void beforeWrite(FlowList flow, JsonElement json) {}
+
+        @Override protected void afterRead(JsonElement deserialized) {
+            JsonObject custom = deserialized.getAsJsonObject();
+            JsonArray flows = custom.get("results").getAsJsonArray();
+            for (int i=0; i<flows.size(); i++) {
+                int questionCount = 0;
+                JsonObject flow = flows.get(i).getAsJsonObject();
+                JsonArray rulesets = flow.get("rulesets").getAsJsonArray();
+                for (int j=0; j<rulesets.size(); j++) {
+                    if ("wait_message".equals(rulesets.get(j).getAsJsonObject().get("ruleset_type").getAsString())) {
+                        questionCount++;
+                    }
+                }
+
+                flow.add("questionCount", new JsonPrimitive(questionCount));
+                if (questionCount == 0) {
+                    flows.remove(i);
+                    i--;
+                }
+            }
+        }
+    }
+
+
+
 }

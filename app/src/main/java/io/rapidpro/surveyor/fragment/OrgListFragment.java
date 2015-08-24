@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
@@ -23,7 +24,7 @@ public class OrgListFragment extends BaseFragment implements AbsListView.OnItemC
     /**
      * The fragment's ListView/GridView.
      */
-    private AbsListView m_listView;
+    private ListView m_listView;
     private ListAdapter m_adapter;
 
     public OrgListFragment() {}
@@ -42,10 +43,10 @@ public class OrgListFragment extends BaseFragment implements AbsListView.OnItemC
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_org_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
 
         // Set the adapter
-        m_listView = (AbsListView) view.findViewById(android.R.id.list);
+        m_listView = (ListView) view.findViewById(android.R.id.list);
         m_listView.setAdapter(m_adapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
@@ -74,13 +75,6 @@ public class OrgListFragment extends BaseFragment implements AbsListView.OnItemC
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != m_listener) {
             m_listener.onFragmentInteraction((Org) m_adapter.getItem(position));
-        }
-    }
-
-    public void setEmptyText(CharSequence emptyText) {
-        View emptyView = m_listView.getEmptyView();
-        if (emptyView instanceof TextView) {
-            ((TextView) emptyView).setText(emptyText);
         }
     }
 

@@ -20,7 +20,7 @@
     <string name="action_logout">Logout</string>
     <string name="title_activity_org_list">Choose Organization</string>
     <string name="title_activity_org">Nyaruka</string>
-    <string name="title_activity_flow_list">Choose a Flow</string>
+    <string name="title_activity_flow_list">Download Flow</string>
     <string name="error_org_missing">Org couldn\'t be found</string>
     <string name="pref_default_server">http://192.168.0.185:8000</string>
 
@@ -819,4 +819,14 @@
     <string name="icon_gif">\ue318</string>
     <string name="icon_indeterminate_check_box">\ue319</string>
     <string name="icon_offline_pin">\ue31a</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="pref_default_host">http://localhost:8000</string>
+    <string name="pref_title_rapidpro_host">RapidPro Host</string>
+    <string name="pref_summary_rapidpro_host">The address for your RapidPro installation</string>
+    <string name="download_blurb">Download a Flow to run it later without a network connection.</string>
+    <string name="button_download">Download More Flows</string>
+    <string name="start_flow_blurb">Select a Flow to begin.</string>
+    <string name="action_download">Download</string>
 </resources>

@@ -1,5 +1,7 @@
 package io.rapidpro.surveyor.activity;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,6 +10,7 @@ import android.view.MenuItem;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.fragment.FlowListFragment;
 import io.rapidpro.surveyor.fragment.OrgListFragment;
 
 public class OrgListActivity extends BaseActivity implements OrgListFragment.OnFragmentInteractionListener {
@@ -24,28 +27,23 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
         }
 
         // this holds our org list fragment which shows all orgs in the db
-        setContentView(R.layout.activity_org_list);
+        setContentView(R.layout.fragment_container);
+
+        if (savedInstanceState == null) {
+            Fragment fragment = new OrgListFragment();
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(R.id.fragment_container, fragment).commit();
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_org_list, menu);
+        super.onCreateOptionsMenu(menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 

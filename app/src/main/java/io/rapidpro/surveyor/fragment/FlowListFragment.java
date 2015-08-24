@@ -8,14 +8,13 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
-import io.rapidpro.surveyor.adapter.OrgListAdapter;
 import io.rapidpro.surveyor.data.Flow;
-import io.rapidpro.surveyor.data.Org;
 import io.realm.RealmResults;
 
 
@@ -23,10 +22,7 @@ public class FlowListFragment extends BaseFragment implements AbsListView.OnItem
 
     private OnFragmentInteractionListener m_listener;
 
-    /**
-     * The fragment's ListView/GridView.
-     */
-    private AbsListView m_listView;
+    private ListView m_listView;
     private ListAdapter m_adapter;
 
     public FlowListFragment() {}
@@ -42,7 +38,7 @@ public class FlowListFragment extends BaseFragment implements AbsListView.OnItem
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        m_adapter = new FlowListAdapter(getActivity(), android.R.layout.simple_list_item_1, getItems(), true);
+        m_adapter = new FlowListAdapter(getActivity(), R.layout.item_flow_downloaded, getItems(), true);
     }
 
     public RealmResults<Flow> getItems() {
@@ -54,10 +50,10 @@ public class FlowListFragment extends BaseFragment implements AbsListView.OnItem
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_org_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
 
         // Set the adapter
-        m_listView = (AbsListView) view.findViewById(android.R.id.list);
+        m_listView = (ListView) view.findViewById(android.R.id.list);
         m_listView.setAdapter(m_adapter);
 
         // Set OnItemClickListener so we can be notified on item clicks

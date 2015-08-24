@@ -26,4 +26,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:7.5.0'
     compile 'com.android.support:support-v4:22.2.1'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.github.manuelpeinado.fadingactionbar:fadingactionbar-abc:3.1.2'
 }

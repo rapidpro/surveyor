@@ -15,6 +15,8 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -40,14 +42,6 @@ import retrofit.client.Response;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends BaseActivity implements LoaderCallbacks<Cursor> {
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
 
     // UI references.
     private AutoCompleteTextView m_emailView;
@@ -76,8 +70,8 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        Button emailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        emailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
@@ -86,6 +80,24 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
         m_loginFormView = findViewById(R.id.login_form);
         m_progressView = findViewById(R.id.login_progress);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_login, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void populateAutoComplete() {
@@ -161,12 +173,10 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -259,4 +269,3 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         m_emailView.setAdapter(adapter);
     }
 }
-

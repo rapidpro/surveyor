@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="light_gray">#b1b1b1</color>
+
+    <!--
+      Palette generated from paletton:
+      http://paletton.com/#uid=53B0x0knyhTdHrQjdmlsEcMAt7T
+    -->
+
+    <color name="primary_background">#a9c6f2</color>
+    <color name="primary_lightest">#587391</color>
+    <color name="primary_light">#345274</color>
+    <color name="primary">#1E3C5D</color>
+    <color name="primary_dark">#0C2642</color>
+    <color name="primary_darkest">#031529</color>
+
+    <color name="secondary_lightest">#68609A</color>
+    <color name="secondary_light">#443B7B</color>
+    <color name="secondary">#2C2463</color>
+    <color name="secondary_dark">#171047</color>
+    <color name="secondary_darkest">#0A052B</color>
+
+    <color name="tertiary_lightest">#196045</color>
+    <color name="tertiary_light">#56967E</color>
+    <color name="tertiary">#30785D</color>
+    <color name="tertiary_dark">#07452E</color>
+    <color name="tertiary_darkest">#002A1A</color>
+
+</resources>

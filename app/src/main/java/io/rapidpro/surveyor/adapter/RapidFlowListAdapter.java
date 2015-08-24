@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
 
@@ -36,7 +37,8 @@ public class RapidFlowListAdapter extends ArrayAdapter {
             row = inflater.inflate(resource, parent, false);
 
             cache = new ViewCache();
-            cache.titleView = (TextView)row.findViewById(android.R.id.text1);
+            cache.titleView = (TextView)row.findViewById(R.id.text_flow_name);
+            cache.questionView = (TextView)row.findViewById(R.id.text_flow_questions);
 
             row.setTag(cache);
         } else {
@@ -46,10 +48,18 @@ public class RapidFlowListAdapter extends ArrayAdapter {
         Flow flow = (Flow) getItem(position);
         cache.titleView.setText(flow.getName());
 
+        String questionString = "Questions";
+        if (flow.getQuestionCount() == 1) {
+            questionString = "Question";
+        }
+
+        cache.questionView.setText(flow.getQuestionCount() + " " + questionString);
+
         return row;
     }
 
     public static class ViewCache {
         TextView titleView;
+        TextView questionView;
     }
 }
