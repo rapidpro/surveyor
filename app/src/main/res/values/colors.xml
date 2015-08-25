@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="light_gray">#b1b1b1</color>
-
     <!--
       Palette generated from paletton:
       http://paletton.com/#uid=53B0x0knyhTdHrQjdmlsEcMAt7T
@@ -26,5 +24,12 @@
     <color name="tertiary">#30785D</color>
     <color name="tertiary_dark">#07452E</color>
     <color name="tertiary_darkest">#002A1A</color>
+
+    <!-- other widgets -->
+    <color name="light_gray">#b1b1b1</color>
+    <color name="chat_in">#c4ddfb</color>
+    <color name="chat_out">#dddddd</color>
+    <color name="white">#FFFFFF</color>
+
 
 </resources>

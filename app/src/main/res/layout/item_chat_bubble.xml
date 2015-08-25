@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.rapidpro.surveyor.widget.ChatBubbleView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chat_bubble"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/bubble_margin"
+    android:paddingStart="@dimen/bubble_margin"
+    android:paddingEnd="@dimen/bubble_margin">
+
+    <TextView
+        android:id="@+id/text_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/chat_bubble_in"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:layout_weight="@dimen/bubble_size"
+        android:text="This is a flow message sent by the flow engine"
+        />
+
+    <View
+        android:id="@+id/spacer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="@dimen/bubble_space" />
+
+</io.rapidpro.surveyor.widget.ChatBubbleView>

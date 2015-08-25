@@ -6,4 +6,7 @@
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">240dp</dimen>
+    <item name="bubble_size" format="float" type="dimen">.7</item>
+    <item name="bubble_space" format="float" type="dimen">.3</item>
+    <dimen name="bubble_margin">18dp</dimen>
 </resources>

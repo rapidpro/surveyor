@@ -73,17 +73,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
     @Override
     public void onFragmentInteraction(Flow flow) {
         Surveyor.LOG.d("Flow: " + flow.getDefinition());
-        getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
-            @Override
-            public void success(FlowDefinition flowDefinition, Response response) {
-
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-
-            }
-        });
+        startActivity(new Intent(this, FlowRunActivity.class));
     }
 
     public void showFlowList(MenuItem item) {

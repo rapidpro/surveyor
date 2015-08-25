@@ -39,6 +39,10 @@
             android:name=".activity.RapidFlowsActivity"
             android:label="@string/title_activity_flow_list" >
         </activity>
+        <activity android:name=".activity.FlowRunActivity"
+                  android:label="@string/title_activity_flowrun">
+        </activity>
+
     </application>
 
 </manifest>

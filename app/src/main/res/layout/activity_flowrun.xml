@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:paddingTop="5dp"
+        android:id="@+id/chat_box">
+
+        <io.rapidpro.surveyor.ui.IconTextView
+            android:id="@+id/button_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="@string/icon_send"
+            android:textColor="@color/light_gray"
+            android:textSize="32sp"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/button_send"
+            android:layout_alignBaseline="@+id/button_send"
+            android:id="@+id/text_chat"/>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/chat_box"
+        android:background="@color/white"
+        android:id="@+id/scrollView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/chat_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:background="@drawable/header">
+
+                <io.rapidpro.surveyor.ui.IconTextView
+                    android:id="@+id/download_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/icon_forum"
+                    android:textColor="@color/light_gray"
+                    android:textSize="22sp"/>
+
+                <TextView
+                    android:id="@+id/download_blurb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/download_icon"
+                    android:textColor="@color/light_gray"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    android:paddingTop="1dp"
+                    android:layout_marginStart="14dp"
+                    android:text="Started UNICEF U-Report Registration Flow"/>
+
+            </RelativeLayout>
+            <LinearLayout
+                android:id="@+id/chats"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

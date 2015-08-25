@@ -21,6 +21,7 @@
     <string name="title_activity_org_list">Choose Organization</string>
     <string name="title_activity_org">Nyaruka</string>
     <string name="title_activity_flow_list">Download Flow</string>
+    <string name="title_activity_flowrun">Flow Run</string>
     <string name="error_org_missing">Org couldn\'t be found</string>
     <string name="pref_default_server">http://192.168.0.185:8000</string>
 
