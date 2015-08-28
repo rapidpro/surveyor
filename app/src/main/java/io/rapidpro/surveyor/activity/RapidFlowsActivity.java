@@ -2,13 +2,12 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.os.Bundle;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.data.Flow;
-import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.data.DBFlow;
+import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.fragment.RapidFlowsFragment;
 import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.net.FlowList;
@@ -23,9 +22,9 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_flow_list_pending);
+        setContentView(R.layout.activity_pending);
 
-        final Org org = getOrg();
+        final DBOrg org = getOrg();
         Surveyor.LOG.d("Fetching flows for " + org.getName());
 
 
@@ -50,11 +49,11 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
     }
 
     @Override
-    public void onRapidFlowSelection(final Flow flow) {
+    public void onRapidFlowSelection(final DBFlow flow) {
 
-        Surveyor.LOG.d("Flow selected: " + flow.getName());
+        Surveyor.LOG.d("DBFlow selected: " + flow.getName());
 
-        // save which org this flow came from
+        // save which org this DBFlow came from
         flow.setOrgId(getOrg().getId());
 
         final Realm realm = getRealm();
@@ -63,12 +62,12 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         realm.commitTransaction();
         finish();
 
-        // go fetch our flow defintion async
+        // go fetch our DBFlow defintion async
         getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
             @Override
             public void success(FlowDefinition flowDefinition, Response response) {
                 realm.beginTransaction();
-                flow.setDefinition(flowDefinition.results.toString());
+                flow.setDefinition("{\"flow\":" + flowDefinition.results.toString() + "}");
                 realm.copyToRealmOrUpdate(flow);
                 realm.commitTransaction();
             }

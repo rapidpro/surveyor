@@ -9,16 +9,16 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.DBFlow;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
-public class FlowListAdapter extends RealmBaseAdapter<Flow> implements ListAdapter {
+public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAdapter {
 
     private int m_resourceId;
 
     public FlowListAdapter(Context context, int resourceId,
-                          RealmResults<Flow> realmResults,
+                          RealmResults<DBFlow> realmResults,
                           boolean automaticUpdate) {
         super(context, realmResults, automaticUpdate);
         m_resourceId = resourceId;
@@ -43,7 +43,7 @@ public class FlowListAdapter extends RealmBaseAdapter<Flow> implements ListAdapt
             cache = (ViewCache)row.getTag();
         }
 
-        Flow flow = (Flow) getItem(position);
+        DBFlow flow = (DBFlow) getItem(position);
         cache.titleView.setText(flow.getName());
 
         String questionString = "Questions";

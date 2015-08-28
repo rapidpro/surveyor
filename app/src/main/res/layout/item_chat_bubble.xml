@@ -17,7 +17,7 @@
         android:padding="16dp"
         android:textSize="16sp"
         android:layout_weight="@dimen/bubble_size"
-        android:text="This is a flow message sent by the flow engine"
+        android:text="This is a DBFlow message sent by the DBFlow engine"
         />
 
     <View

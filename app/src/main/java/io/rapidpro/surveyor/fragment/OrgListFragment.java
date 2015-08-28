@@ -9,11 +9,10 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.adapter.OrgListAdapter;
-import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.data.DBOrg;
 import io.realm.RealmResults;
 
 
@@ -35,8 +34,8 @@ public class OrgListFragment extends BaseFragment implements AbsListView.OnItemC
         m_adapter = new OrgListAdapter(getActivity(), R.layout.item_org, getItems(), true);
     }
 
-    public RealmResults<Org> getItems() {
-        return getRealm().where(Org.class).findAll();
+    public RealmResults<DBOrg> getItems() {
+        return getRealm().where(DBOrg.class).findAll();
     }
 
     @Override
@@ -74,13 +73,13 @@ public class OrgListFragment extends BaseFragment implements AbsListView.OnItemC
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != m_listener) {
-            m_listener.onFragmentInteraction((Org) m_adapter.getItem(position));
+            m_listener.onFragmentInteraction((DBOrg) m_adapter.getItem(position));
         }
     }
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Org org);
+        public void onFragmentInteraction(DBOrg org);
     }
 
 }

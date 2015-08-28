@@ -32,7 +32,7 @@ import java.util.List;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.data.DBOrg;
 import io.realm.Realm;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -150,12 +150,12 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
             // perform the user login attempt.
             showProgress(true);
 
-            getRapidProService().getOrgs(email, password, new Callback<List<Org>>() {
+            getRapidProService().getOrgs(email, password, new Callback<List<DBOrg>>() {
                 @Override
-                public void success(List<Org> orgs, Response response) {
+                public void success(List<DBOrg> orgs, Response response) {
                     Realm realm = getRealm();
                     realm.beginTransaction();
-                    realm.where(Org.class).findAll().clear();
+                    realm.where(DBOrg.class).findAll().clear();
                     realm.copyToRealm(orgs);
                     realm.commitTransaction();
                     finish();

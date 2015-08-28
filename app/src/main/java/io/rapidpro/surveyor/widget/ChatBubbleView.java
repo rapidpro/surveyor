@@ -2,10 +2,9 @@ package io.rapidpro.surveyor.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.ui.CachedLinearLayout;
@@ -44,7 +43,13 @@ public class ChatBubbleView extends CachedLinearLayout {
      * @param text the message to set on the view
      */
     public void setMessage(String text, boolean inbound) {
-        getTextView(R.id.text_message).setText(text);
+        TextView tv = getTextView(R.id.text_message);
+        tv.setText(text);
+
+        if (!inbound) {
+            tv.setBackground(getResources().getDrawable(R.drawable.chat_bubble_out));
+        }
+
         addView(getSpacer(), inbound ? 1 : 0);
     }
 

@@ -7,19 +7,19 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.data.DBOrg;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
 /**
  * Created by eric on 8/18/15.
  */
-public class OrgListAdapter extends RealmBaseAdapter<Org> implements ListAdapter {
+public class OrgListAdapter extends RealmBaseAdapter<DBOrg> implements ListAdapter {
 
     private int m_resourceId;
 
     public OrgListAdapter(Context context, int resourceId,
-                     RealmResults<Org> realmResults,
+                     RealmResults<DBOrg> realmResults,
                      boolean automaticUpdate) {
         super(context, realmResults, automaticUpdate);
         m_resourceId = resourceId;
@@ -39,12 +39,12 @@ public class OrgListAdapter extends RealmBaseAdapter<Org> implements ListAdapter
             cache = (ViewCache) convertView.getTag();
         }
 
-        Org org = realmResults.get(position);
+        DBOrg org = realmResults.get(position);
         cache.titleView.setText(org.getName());
         return convertView;
     }
 
-    public RealmResults<Org> getRealmResults() {
+    public RealmResults<DBOrg> getRealmResults() {
         return realmResults;
     }
 

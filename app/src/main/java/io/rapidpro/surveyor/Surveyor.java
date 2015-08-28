@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.jakewharton.threetenabp.AndroidThreeTen;
+
 import io.rapidpro.surveyor.net.RapidProService;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -29,6 +31,8 @@ public class Surveyor extends Application {
 
         // set our default database config
         Realm.setDefaultConfiguration(config);
+
+        AndroidThreeTen.init(this);
     }
 
     public SharedPreferences getPreferences() {
@@ -39,7 +43,7 @@ public class Surveyor extends Application {
     }
 
     public void updatePrefs() {
-        BASE_URL = getPreferences().getString("pref_key_host", null);
+        BASE_URL = getPreferences().getString("pref_key_host", getString(R.string.pref_default_host));
         m_rapidProService = null;
     }
 

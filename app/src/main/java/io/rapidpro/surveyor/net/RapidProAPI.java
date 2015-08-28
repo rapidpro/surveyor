@@ -2,6 +2,7 @@ package io.rapidpro.surveyor.net;
 
 import java.util.List;
 
+import io.rapidpro.surveyor.data.DBOrg;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
@@ -9,7 +10,6 @@ import retrofit.http.Header;
 import retrofit.http.POST;
 import retrofit.Callback;
 
-import io.rapidpro.surveyor.data.Org;
 import retrofit.http.Query;
 
 public interface RapidProAPI {
@@ -19,7 +19,7 @@ public interface RapidProAPI {
     void getOrgs(
             @Field("email") String email,
             @Field("password") String password,
-            Callback<List<Org>> callback);
+            Callback<List<DBOrg>> callback);
 
     @GET("/api/v1/flows.json")
     void getFlows(

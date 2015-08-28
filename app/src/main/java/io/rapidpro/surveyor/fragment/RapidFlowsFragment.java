@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,7 +18,7 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.activity.BaseActivity;
 import io.rapidpro.surveyor.adapter.RapidFlowListAdapter;
-import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.net.FlowList;
 
 public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnItemClickListener {
@@ -48,31 +47,31 @@ public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnIt
         m_adapter = new RapidFlowListAdapter(getActivity(), R.layout.item_flow, getItems());
     }
 
-    public List<Flow> getItems() {
+    public List<DBFlow> getItems() {
 
-        // look up our existing flows
+        // look up our existing DBFlows
         Bundle bundle = getArguments();
         int orgId = bundle.getInt(SurveyorIntent.EXTRA_ORG_ID);
-        List<Flow> existing = getRealm().where(Flow.class).equalTo("orgId", orgId).findAllSorted("name");
+        List<DBFlow> existing = getRealm().where(DBFlow.class).equalTo("orgId", orgId).findAllSorted("name");
 
-        // create a quick lookup for existing flows
+        // create a quick lookup for existing DBFlows
         Set<String> existingIds = new HashSet<String>();
-        for (Flow flow : existing) {
-            existingIds.add(flow.getUuid());
+        for (DBFlow DBFlow : existing) {
+            existingIds.add(DBFlow.getUuid());
         }
 
-        // exclude any flows that are already in our database
+        // exclude any DBFlows that are already in our database
         FlowList flowList = ((BaseActivity)getActivity()).getRapidProService().getLastFlows();
-        List<Flow> flows = new ArrayList<>();
+        List<DBFlow> DBFlows = new ArrayList<>();
         if (flowList != null) {
-            for (Flow flow : flowList.results) {
-                if (!existingIds.contains(flow.getUuid())) {
-                    flows.add(flow);
+            for (DBFlow DBFlow : flowList.results) {
+                if (!existingIds.contains(DBFlow.getUuid())) {
+                    DBFlows.add(DBFlow);
                 }
             }
         }
 
-        return flows;
+        return DBFlows;
     }
 
     @Override
@@ -116,13 +115,13 @@ public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnIt
         if (null != m_listener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            m_listener.onRapidFlowSelection((Flow) m_adapter.getItem(position - 1));
+            m_listener.onRapidFlowSelection((DBFlow) m_adapter.getItem(position - 1));
         }
     }
 
     public interface RapidFlowListener {
         // TODO: Update argument type and name
-        public void onRapidFlowSelection(Flow flow);
+        public void onRapidFlowSelection(DBFlow flow);
     }
 
 }

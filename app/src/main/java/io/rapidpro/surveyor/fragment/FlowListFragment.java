@@ -14,7 +14,7 @@ import android.widget.TextView;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
-import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.DBFlow;
 import io.realm.RealmResults;
 
 
@@ -41,9 +41,9 @@ public class FlowListFragment extends BaseFragment implements AbsListView.OnItem
         m_adapter = new FlowListAdapter(getActivity(), R.layout.item_flow_downloaded, getItems(), true);
     }
 
-    public RealmResults<Flow> getItems() {
+    public RealmResults<DBFlow> getItems() {
         int orgId = getArguments().getInt(SurveyorIntent.EXTRA_ORG_ID);
-        return getRealm().where(Flow.class).equalTo("orgId", orgId).findAllSorted("name");
+        return getRealm().where(DBFlow.class).equalTo("orgId", orgId).findAllSorted("name");
     }
 
     @Override
@@ -81,7 +81,7 @@ public class FlowListFragment extends BaseFragment implements AbsListView.OnItem
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != m_listener) {
-            m_listener.onFragmentInteraction((Flow) m_adapter.getItem(position));
+            m_listener.onFragmentInteraction((DBFlow) m_adapter.getItem(position));
         }
     }
 
@@ -94,7 +94,7 @@ public class FlowListFragment extends BaseFragment implements AbsListView.OnItem
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Flow flow);
+        public void onFragmentInteraction(DBFlow flow);
     }
 
 }

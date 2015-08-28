@@ -1,9 +1,11 @@
 package io.rapidpro.surveyor.data;
 
+import com.google.gson.annotations.SerializedName;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-public class Org extends RealmObject {
+public class DBOrg extends RealmObject {
 
     @PrimaryKey
     private int id;

@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-public class Flow extends RealmObject {
+public class DBFlow extends RealmObject {
 
     @PrimaryKey
     private String uuid;

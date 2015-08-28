@@ -1,26 +1,19 @@
 package io.rapidpro.surveyor.net;
 
-import android.content.Context;
-
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.TypeAdapterFactory;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.data.Org;
-import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.DBFlow;
+import io.rapidpro.surveyor.data.DBOrg;
 import io.realm.Realm;
 import io.realm.RealmObject;
 import retrofit.Callback;
@@ -49,7 +42,7 @@ public class RapidProService {
         return m_token;
     }
 
-    public void getOrgs(String email, String password, Callback<List<Org>> callback) {
+    public void getOrgs(String email, String password, Callback<List<DBOrg>> callback) {
         m_api.getOrgs(email, password, callback);
     }
 
@@ -68,7 +61,7 @@ public class RapidProService {
         });
     }
 
-    public void getFlowDefinition(final Flow flow, final Callback<FlowDefinition> callback) {
+    public void getFlowDefinition(final DBFlow flow, final Callback<FlowDefinition> callback) {
 
         final Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
@@ -123,12 +116,12 @@ public class RapidProService {
         return restAdapter.create(RapidProAPI.class);
     }
 
-    private class FlowTypeAdapterFactory extends CustomizedTypeAdapterFactory<Flow> {
+    private class FlowTypeAdapterFactory extends CustomizedTypeAdapterFactory<DBFlow> {
         private FlowTypeAdapterFactory() {
-            super(Flow.class);
+            super(DBFlow.class);
         }
 
-        @Override protected void beforeWrite(Flow flow, JsonElement json) {}
+        @Override protected void beforeWrite(DBFlow flow, JsonElement json) {}
 
         @Override protected void afterRead(JsonElement deserialized) {
             JsonObject custom = deserialized.getAsJsonObject();

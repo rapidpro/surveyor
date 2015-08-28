@@ -2,7 +2,6 @@ package io.rapidpro.surveyor.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.DBFlow;
 
 
 public class RapidFlowListAdapter extends ArrayAdapter {
@@ -21,7 +19,7 @@ public class RapidFlowListAdapter extends ArrayAdapter {
     private int resource;
     private Context context;
 
-    public RapidFlowListAdapter(Context context, int resource, List<Flow> items) {
+    public RapidFlowListAdapter(Context context, int resource, List<DBFlow> items) {
         super(context, resource, items);
         this.resource = resource;
         this.context = context;
@@ -45,7 +43,7 @@ public class RapidFlowListAdapter extends ArrayAdapter {
             cache = (ViewCache)row.getTag();
         }
 
-        Flow flow = (Flow) getItem(position);
+        DBFlow flow = (DBFlow) getItem(position);
         cache.titleView.setText(flow.getName());
 
         String questionString = "Questions";

@@ -20,13 +20,16 @@
             android:layout_alignParentEnd="true"
             android:text="@string/icon_send"
             android:textColor="@color/light_gray"
+            android:onClick="sendMessage"
             android:textSize="32sp"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toStartOf="@+id/button_send"
             android:layout_alignBaseline="@+id/button_send"
-            android:id="@+id/text_chat"/>
+            android:imeOptions="actionSend"
+            android:id="@+id/text_chat"
+            android:singleLine="true"/>
 
     </RelativeLayout>
 
@@ -35,11 +38,12 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/chat_box"
         android:background="@color/white"
-        android:id="@+id/scrollView">
+        android:id="@+id/scroll">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="20dp"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -61,7 +65,7 @@
                     android:textSize="22sp"/>
 
                 <TextView
-                    android:id="@+id/download_blurb"
+                    android:id="@+id/text_flow_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/download_icon"

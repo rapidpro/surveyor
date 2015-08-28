@@ -5,7 +5,7 @@
     <EditTextPreference
         android:key="@string/pref_key_server"
         android:title="@string/pref_title_server"
-        android:defaultValue="@string/pref_default_server"
+        android:defaultValue="@string/pref_default_host"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:maxLines="1" />

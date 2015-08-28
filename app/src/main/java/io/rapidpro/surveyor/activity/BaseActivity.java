@@ -4,18 +4,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.Flow;
-import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.data.DBFlow;
+import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.net.RapidProService;
 import io.realm.Realm;
 
@@ -24,7 +21,8 @@ public class BaseActivity extends AppCompatActivity {
     // our logging tag
     private static String TAG = "Surveyor";
 
-    private Org m_org;
+    private DBOrg m_org;
+    private DBFlow m_flow;
     private Realm m_realm;
 
     public Surveyor getSurveyor() {
@@ -64,8 +62,8 @@ public class BaseActivity extends AppCompatActivity {
         } else if (id == R.id.action_logout) {
             Realm realm = getRealm();
             realm.beginTransaction();
-            realm.clear(Flow.class);
-            realm.clear(Org.class);
+            realm.clear(DBFlow.class);
+            realm.clear(DBOrg.class);
             realm.commitTransaction();
             finish();
             startActivity(new Intent(this, LoginActivity.class));
@@ -124,21 +122,29 @@ public class BaseActivity extends AppCompatActivity {
         return getSurveyor().getRapidProService();
     }
 
-    public Org getOrg() {
+    public DBFlow getFlow() {
+        if (m_flow == null) {
+            String flowId = getIntent().getStringExtra(SurveyorIntent.EXTRA_FLOW_ID);
+            m_flow = getRealm().where(DBFlow.class).equalTo("uuid", flowId).findFirst();
+        }
+        return m_flow;
+    }
+
+    public DBOrg getOrg() {
         if (m_org == null) {
             int orgId = getIntent().getIntExtra(SurveyorIntent.EXTRA_ORG_ID, 0);
-            m_org = getRealm().where(Org.class).equalTo("id", orgId).findFirst();
+            m_org = getRealm().where(DBOrg.class).equalTo("id", orgId).findFirst();
         }
         return m_org;
     }
 
-    public Flow getFlow(String id) {
-        return getRealm().where(Flow.class).equalTo("id", id).findFirst();
+    public DBFlow getFlow(String id) {
+        return getRealm().where(DBFlow.class).equalTo("uuid", id).findFirst();
     }
 
     public Intent getIntent(Activity from, Class to) {
         Intent intent = new Intent(from, to);
-        Org org = getOrg();
+        DBOrg org = getOrg();
         if (org !=null) {
             intent.putExtra(SurveyorIntent.EXTRA_ORG_ID, org.getId());
         }

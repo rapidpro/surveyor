@@ -2,8 +2,8 @@ package io.rapidpro.surveyor.net;
 
 import java.util.List;
 
-import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.DBFlow;
 
 public class FlowList {
-    public List<Flow> results;
+    public List<DBFlow> results;
 }

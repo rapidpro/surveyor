@@ -7,10 +7,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.List;
+
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.Org;
-import io.rapidpro.surveyor.fragment.FlowListFragment;
+import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.fragment.OrgListFragment;
 
 public class OrgListActivity extends BaseActivity implements OrgListFragment.OnFragmentInteractionListener {
@@ -19,10 +20,16 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // if we don't have any orgs, take them back to the login screen
-        if (getRealm().where(Org.class).findAll().size() == 0) {
+        List<DBOrg> orgs = getRealm().where(DBOrg.class).findAll();
+        // if we don't have any orgs, take us back to the login screen
+        if (orgs.size() == 0) {
             Intent i = new Intent(OrgListActivity.this, LoginActivity.class);
             startActivity(i);
+            finish();
+        }
+        // if it's a single org, skip our activity
+        else if (orgs.size() == 1) {
+            onFragmentInteraction(orgs.get(0));
             finish();
         }
 
@@ -48,7 +55,7 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
     }
 
     @Override
-    public void onFragmentInteraction(Org org) {
+    public void onFragmentInteraction(DBOrg org) {
 
         getRapidProService().setToken(org.getToken());
         Intent intent = new Intent(OrgListActivity.this, OrgActivity.class);

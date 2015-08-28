@@ -11,24 +11,20 @@ import android.widget.Toast;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.adapter.FlowListAdapter;
-import io.rapidpro.surveyor.data.Flow;
-import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.data.DBFlow;
+import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
-import io.rapidpro.surveyor.net.FlowDefinition;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class OrgActivity extends BaseActivity implements FlowListFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        DBOrg org = getOrg();
         setContentView(R.layout.fragment_container);
-
-        Org org = getOrg();
-
+        
         if (org == null) {
             Toast.makeText(this, R.string.error_org_missing, Toast.LENGTH_SHORT).show();
             finish();
@@ -41,7 +37,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 ft.add(R.id.fragment_container, listFragment).commit();
 
                 // if we don't have flows, start download activity
-                if (getRealm().where(Flow.class).equalTo("orgId", org.getId()).findFirst() == null) {
+                if (getRealm().where(DBFlow.class).equalTo("orgId", org.getId()).findFirst() == null) {
                     startActivity(getIntent(OrgActivity.this, RapidFlowsActivity.class));
                 }
             }
@@ -71,9 +67,11 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
     }
 
     @Override
-    public void onFragmentInteraction(Flow flow) {
+    public void onFragmentInteraction(DBFlow flow) {
         Surveyor.LOG.d("Flow: " + flow.getDefinition());
-        startActivity(new Intent(this, FlowRunActivity.class));
+        Intent intent = new Intent(this, FlowRunActivity.class);
+        intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
+        startActivity(intent);
     }
 
     public void showFlowList(MenuItem item) {
