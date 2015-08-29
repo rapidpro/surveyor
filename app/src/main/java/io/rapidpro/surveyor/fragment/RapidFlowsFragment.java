@@ -52,7 +52,7 @@ public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnIt
         // look up our existing DBFlows
         Bundle bundle = getArguments();
         int orgId = bundle.getInt(SurveyorIntent.EXTRA_ORG_ID);
-        List<DBFlow> existing = getRealm().where(DBFlow.class).equalTo("orgId", orgId).findAllSorted("name");
+        List<DBFlow> existing = getRealm().where(DBFlow.class).equalTo("org.id", orgId).findAllSorted("name");
 
         // create a quick lookup for existing DBFlows
         Set<String> existingIds = new HashSet<String>();

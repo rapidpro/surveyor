@@ -23,6 +23,7 @@ import io.rapidpro.flows.runner.Runner;
 import io.rapidpro.flows.runner.Step;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.data.DBFlow;
+import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
 import io.rapidpro.flows.runner.Org;
 
@@ -47,6 +48,7 @@ public class FlowRunActivity extends BaseActivity {
         setContentView(R.layout.activity_flowrun);
 
         DBFlow dbFlow = getFlow();
+        DBOrg dbOrg = dbFlow.getOrg();
 
         m_chats = (LinearLayout) findViewById(R.id.chats);
         m_chatbox = (EditText) findViewById(R.id.text_chat);
@@ -78,16 +80,20 @@ public class FlowRunActivity extends BaseActivity {
         });
 
 
-        // initialize our runner
-        Org org = new Org("RW", "eng", ZoneId.of("Africa/Kigali"), DateStyle.DAY_FIRST, false);
+        // create the org for our runner
+        DateStyle dateStyle = DateStyle.DAY_FIRST;
+        if (dbOrg.getDateStyle().equals("month_first")) {
+            dateStyle = DateStyle.DAY_FIRST.MONTH_FIRST;
+        }
+
+        Org org = new Org(dbOrg.getCountry(), dbOrg.getPrimaryLanguage(), ZoneId.of(dbOrg.getTimezone()), dateStyle, dbOrg.isAnonymous());
         Contact contact = new Contact("uuid", "Eric Newcomer", ContactUrn.fromString("tel:+250788382382"), "eng");
-        Flow flow = Flow.fromJson(dbFlow.getDefinition());
 
         // initialize our runner and start the flow
         m_runner = new RunnerBuilder().build();
 
-
         try {
+            Flow flow = Flow.fromJson(dbFlow.getDefinition());
             m_run = m_runner.start(org, contact, flow);
         } catch (Throwable t) {
             addMessage(t.getMessage().toString(), true);

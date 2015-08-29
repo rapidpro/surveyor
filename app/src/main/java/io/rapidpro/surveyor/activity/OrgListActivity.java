@@ -21,6 +21,7 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
         super.onCreate(savedInstanceState);
 
         List<DBOrg> orgs = getRealm().where(DBOrg.class).findAll();
+
         // if we don't have any orgs, take us back to the login screen
         if (orgs.size() == 0) {
             Intent i = new Intent(OrgListActivity.this, LoginActivity.class);
@@ -29,17 +30,19 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
         }
         // if it's a single org, skip our activity
         else if (orgs.size() == 1) {
+            getSurveyor().LOG.d("One org found, shortcutting: " + orgs.get(0).getName());
             onFragmentInteraction(orgs.get(0));
             finish();
-        }
+        } else {
 
-        // this holds our org list fragment which shows all orgs in the db
-        setContentView(R.layout.fragment_container);
+            // this holds our org list fragment which shows all orgs in the db
+            setContentView(R.layout.fragment_container);
 
-        if (savedInstanceState == null) {
-            Fragment fragment = new OrgListFragment();
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(R.id.fragment_container, fragment).commit();
+            if (savedInstanceState == null) {
+                Fragment fragment = new OrgListFragment();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.add(R.id.fragment_container, fragment).commit();
+            }
         }
     }
 

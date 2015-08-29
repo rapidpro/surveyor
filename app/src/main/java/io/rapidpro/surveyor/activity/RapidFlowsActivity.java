@@ -54,7 +54,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         Surveyor.LOG.d("DBFlow selected: " + flow.getName());
 
         // save which org this DBFlow came from
-        flow.setOrgId(getOrg().getId());
+        flow.setOrg(getOrg());
 
         final Realm realm = getRealm();
         realm.beginTransaction();

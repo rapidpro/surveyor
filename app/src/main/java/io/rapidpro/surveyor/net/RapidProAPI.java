@@ -21,6 +21,9 @@ public interface RapidProAPI {
             @Field("password") String password,
             Callback<List<DBOrg>> callback);
 
+    @GET("/api/v1/org.json")
+    void getOrg(@Header("Authorization") String token, Callback<DBOrg> callback);
+
     @GET("/api/v1/flows.json")
     void getFlows(
             @Header("Authorization") String token,

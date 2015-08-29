@@ -43,7 +43,7 @@ public class FlowListFragment extends BaseFragment implements AbsListView.OnItem
 
     public RealmResults<DBFlow> getItems() {
         int orgId = getArguments().getInt(SurveyorIntent.EXTRA_ORG_ID);
-        return getRealm().where(DBFlow.class).equalTo("orgId", orgId).findAllSorted("name");
+        return getRealm().where(DBFlow.class).equalTo("org.id", orgId).findAllSorted("name");
     }
 
     @Override

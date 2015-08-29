@@ -46,6 +46,10 @@ public class RapidProService {
         m_api.getOrgs(email, password, callback);
     }
 
+    public void getOrg(Callback<DBOrg> callback) {
+        m_api.getOrg(getToken(), callback);
+    }
+
     public void getFlows(final Callback<FlowList> callback) {
         m_api.getFlows(getToken(), "F", new Callback<FlowList>() {
             @Override

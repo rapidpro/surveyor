@@ -9,12 +9,18 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.annotations.SerializedName;
+
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
+import io.realm.Realm;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class OrgActivity extends BaseActivity implements FlowListFragment.OnFragmentInteractionListener {
 
@@ -22,14 +28,46 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DBOrg org = getOrg();
-        setContentView(R.layout.fragment_container);
-        
-        if (org == null) {
-            Toast.makeText(this, R.string.error_org_missing, Toast.LENGTH_SHORT).show();
-            finish();
+        final DBOrg org = getOrg();
+
+        getSurveyor().LOG.d("COUNTRY: '"+ org.getCountry() + "'");
+        // if we don't know our country yet, fetch it
+        if (org.getCountry() == null || org.getCountry().trim().length() == 0) {
+            setContentView(R.layout.activity_pending);
+
+            getRapidProService().getOrg(new Callback<DBOrg>() {
+                @Override
+                public void success(DBOrg latest, Response response) {
+
+                    // save to our database
+                    Realm realm = getRealm();
+                    realm.beginTransaction();
+
+                    org.setAnonymous(latest.isAnonymous());
+                    org.setCountry(latest.getCountry());
+                    org.setDateStyle(latest.getDateStyle());
+                    org.setPrimaryLanguage(latest.getPrimaryLanguage());
+                    org.setTimezone(latest.getTimezone());
+
+                    realm.commitTransaction();
+
+                    // restart our activity
+                    startActivity(getIntent());
+                    finish();
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    finish();
+                }
+            });
+
         } else {
+            setContentView(R.layout.fragment_container);
+
             setTitle(org.getName());
+
+            getSurveyor().LOG.d("Org: " + org.getTimezone());
 
             if (savedInstanceState == null) {
                 Fragment listFragment = FlowListFragment.newInstance(org.getId());
@@ -37,11 +75,15 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 ft.add(R.id.fragment_container, listFragment).commit();
 
                 // if we don't have flows, start download activity
-                if (getRealm().where(DBFlow.class).equalTo("orgId", org.getId()).findFirst() == null) {
+
+
+                if (getRealm().where(DBFlow.class).equalTo("org.id", org.getId()).findFirst() == null) {
                     startActivity(getIntent(OrgActivity.this, RapidFlowsActivity.class));
                 }
             }
         }
+
+
     }
 
     @Override
