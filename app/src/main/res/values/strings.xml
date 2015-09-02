@@ -830,4 +830,7 @@
     <string name="start_flow_blurb">Select a Flow to begin.</string>
     <string name="action_download">Download</string>
     <string name="send_message">Send</string>
+    <string name="prompt_contact_name">Contact Name</string>
+    <string name="action_start_flow">Start Flow</string>
+    <string name="prompt_phone">Phone Number</string>
 </resources>

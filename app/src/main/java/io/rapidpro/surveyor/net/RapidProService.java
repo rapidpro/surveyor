@@ -120,26 +120,6 @@ public class RapidProService {
         return restAdapter.create(RapidProAPI.class);
     }
 
-    private class FlowTypeAdapterFactory extends CustomizedTypeAdapterFactory<DBFlow> {
-        private FlowTypeAdapterFactory() {
-            super(DBFlow.class);
-        }
-
-        @Override protected void beforeWrite(DBFlow flow, JsonElement json) {}
-
-        @Override protected void afterRead(JsonElement deserialized) {
-            JsonObject custom = deserialized.getAsJsonObject();
-            JsonArray rulesets = custom.get("rulesets").getAsJsonArray();
-            int questionCount = 0;
-            for (int i=0; i<rulesets.size(); i++) {
-                if ("wait_message".equals(rulesets.get(i).getAsJsonObject().get("ruleset_type").getAsString())) {
-                    questionCount++;
-                }
-            }
-            custom.add("questionCount", new JsonPrimitive(questionCount));
-        }
-    }
-
     private class FlowListTypeAdapterFactory extends CustomizedTypeAdapterFactory<FlowList> {
         private FlowListTypeAdapterFactory() {
             super(FlowList.class);

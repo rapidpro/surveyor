@@ -42,7 +42,8 @@
         <activity android:name=".activity.FlowRunActivity"
                   android:label="@string/title_activity_flowrun">
         </activity>
-
+        <activity android:name=".activity.ContactActivity"
+                  android:label="New Run">
+        </activity>
     </application>
-
 </manifest>

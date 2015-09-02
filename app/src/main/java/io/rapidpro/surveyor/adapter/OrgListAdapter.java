@@ -44,10 +44,6 @@ public class OrgListAdapter extends RealmBaseAdapter<DBOrg> implements ListAdapt
         return convertView;
     }
 
-    public RealmResults<DBOrg> getRealmResults() {
-        return realmResults;
-    }
-
     public static class ViewCache {
         TextView titleView;
     }

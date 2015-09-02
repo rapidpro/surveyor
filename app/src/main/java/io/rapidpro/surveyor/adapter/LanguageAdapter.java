@@ -8,21 +8,21 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.neovisionaries.i18n.LanguageAlpha3Code;
+
 import java.util.List;
 
-import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.data.DBFlow;
-
-
-public class RapidFlowListAdapter extends ArrayAdapter {
+public class LanguageAdapter extends ArrayAdapter<LanguageAlpha3Code> {
 
     private int m_resource;
     private Context m_context;
 
-    public RapidFlowListAdapter(Context context, int resource, List<DBFlow> items) {
+    public LanguageAdapter(Context context, int resource, List<LanguageAlpha3Code> items) {
         super(context, resource, items);
         m_resource = resource;
         m_context = context;
+
+        setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     }
 
     @Override
@@ -35,29 +35,20 @@ public class RapidFlowListAdapter extends ArrayAdapter {
             row = inflater.inflate(m_resource, parent, false);
 
             cache = new ViewCache();
-            cache.titleView = (TextView)row.findViewById(R.id.text_flow_name);
-            cache.questionView = (TextView)row.findViewById(R.id.text_flow_questions);
+            cache.text = (TextView)row;
 
             row.setTag(cache);
         } else {
             cache = (ViewCache)row.getTag();
         }
 
-        DBFlow flow = (DBFlow) getItem(position);
-        cache.titleView.setText(flow.getName());
-
-        String questionString = "Questions";
-        if (flow.getQuestionCount() == 1) {
-            questionString = "Question";
-        }
-
-        cache.questionView.setText(flow.getQuestionCount() + " " + questionString);
+        LanguageAlpha3Code lang = getItem(position);
+        cache.text.setText(lang.getName());
 
         return row;
     }
 
     public static class ViewCache {
-        TextView titleView;
-        TextView questionView;
+        TextView text;
     }
 }

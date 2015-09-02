@@ -28,9 +28,8 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final DBOrg org = getOrg();
+        final DBOrg org = getDBOrg();
 
-        getSurveyor().LOG.d("COUNTRY: '"+ org.getCountry() + "'");
         // if we don't know our country yet, fetch it
         if (org.getCountry() == null || org.getCountry().trim().length() == 0) {
             setContentView(R.layout.activity_pending);
@@ -110,8 +109,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
 
     @Override
     public void onFragmentInteraction(DBFlow flow) {
-        Surveyor.LOG.d("Flow: " + flow.getDefinition());
-        Intent intent = new Intent(this, FlowRunActivity.class);
+        Intent intent = new Intent(this, ContactActivity.class);
         intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
         startActivity(intent);
     }

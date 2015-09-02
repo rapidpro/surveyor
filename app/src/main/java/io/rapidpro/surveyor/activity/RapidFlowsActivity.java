@@ -24,7 +24,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
 
         setContentView(R.layout.activity_pending);
 
-        final DBOrg org = getOrg();
+        final DBOrg org = getDBOrg();
         Surveyor.LOG.d("Fetching flows for " + org.getName());
 
 
@@ -54,7 +54,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         Surveyor.LOG.d("DBFlow selected: " + flow.getName());
 
         // save which org this DBFlow came from
-        flow.setOrg(getOrg());
+        flow.setOrg(getDBOrg());
 
         final Realm realm = getRealm();
         realm.beginTransaction();
@@ -62,7 +62,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         realm.commitTransaction();
         finish();
 
-        // go fetch our DBFlow defintion async
+        // go fetch our DBFlow definition async
         getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
             @Override
             public void success(FlowDefinition flowDefinition, Response response) {
