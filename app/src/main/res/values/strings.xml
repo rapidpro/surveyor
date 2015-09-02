@@ -833,4 +833,9 @@
     <string name="prompt_contact_name">Contact Name</string>
     <string name="action_start_flow">Start Flow</string>
     <string name="prompt_phone">Phone Number</string>
+    <string name="log_flow_complete">Flow complete</string>
+    <string name="action_save_run">Save Results</string>
+    <string name="confirm_run_removal">Are you sure you want to remove this flow run?</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_discard_run">Discard</string>
 </resources>

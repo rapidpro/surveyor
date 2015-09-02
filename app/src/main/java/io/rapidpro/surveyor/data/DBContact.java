@@ -1,7 +1,5 @@
 package io.rapidpro.surveyor.data;
 
-import io.rapidpro.flows.runner.Contact;
-import io.rapidpro.flows.runner.ContactUrn;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 

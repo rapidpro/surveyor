@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.data.DBFlow;
+import io.rapidpro.surveyor.data.DBFlowRun;
+import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
@@ -37,14 +39,25 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
             cache = new ViewCache();
             cache.titleView = (TextView)row.findViewById(R.id.text_flow_name);
             cache.questionView = (TextView)row.findViewById(R.id.text_flow_questions);
+            cache.pendingSubmissions = (TextView)row.findViewById(R.id.text_pending_submissions);
 
             row.setTag(cache);
         } else {
             cache = (ViewCache)row.getTag();
         }
 
-        DBFlow flow = (DBFlow) getItem(position);
+        DBFlow flow = getItem(position);
         cache.titleView.setText(flow.getName());
+
+        Realm realm = Realm.getDefaultInstance();
+        long submissions = realm.where(DBFlowRun.class).equalTo("flow.uuid", flow.getUuid()).count();
+        cache.pendingSubmissions.setText("" + submissions);
+
+        if (submissions > 0) {
+            cache.pendingSubmissions.setVisibility(View.VISIBLE);
+        } else {
+            cache.pendingSubmissions.setVisibility(View.GONE);
+        }
 
         String questionString = "Questions";
         if (flow.getQuestionCount() == 1) {
@@ -59,5 +72,6 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
     public static class ViewCache {
         TextView titleView;
         TextView questionView;
+        TextView pendingSubmissions;
     }
 }

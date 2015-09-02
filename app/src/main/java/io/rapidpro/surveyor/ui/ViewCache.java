@@ -64,6 +64,10 @@ public class ViewCache {
         getCachedView(id).setVisibility(View.GONE);
     }
 
+    public void show(int id) {
+        getCachedView(id).setVisibility(View.VISIBLE);
+    }
+
     public void setText(int id, String text) {
         getTextView(id).setText(text);
     }

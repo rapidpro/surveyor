@@ -71,22 +71,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginStart="6dp"
-                    android:layout_marginBottom="4dp"
-                    android:text="Select a Language"
-                    android:id="@+id/textView"
-                    style="@style/Base.TextAppearance.AppCompat.Subhead"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:layout_marginStart="6dp"
                     android:layout_marginBottom="8dp"
                     android:text="This flow supports more than one language. Select the language below for the contact."
-                    style="@style/Base.TextAppearance.AppCompat.Small"
-                    android:id="@+id/"/>
+                    style="@style/Base.TextAppearance.AppCompat.Small"/>
 
                 <Spinner
                     android:id="@+id/language_spinner"

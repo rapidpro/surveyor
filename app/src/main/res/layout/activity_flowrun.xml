@@ -4,39 +4,76 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/bottom_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:paddingTop="5dp"
-        android:id="@+id/chat_box">
+        android:orientation="vertical">
 
-        <io.rapidpro.surveyor.ui.IconTextView
-            android:id="@+id/button_send"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:text="@string/icon_send"
-            android:textColor="@color/light_gray"
-            android:onClick="sendMessage"
-            android:textSize="32sp"/>
-        <EditText
+        <LinearLayout
+            android:id="@+id/completion_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toStartOf="@+id/button_send"
-            android:layout_alignBaseline="@+id/button_send"
-            android:imeOptions="actionSend"
-            android:id="@+id/text_chat"
-            android:singleLine="true"/>
+            android:orientation="horizontal"
+            android:background="@color/white"
+            android:weightSum="1"
+            android:padding="8dp"
+            android:visibility="gone">
 
-    </RelativeLayout>
+            <Button style="?android:textAppearanceSmall"
+                    android:layout_width="0dp"
+                    android:layout_weight=".5"
+                    android:layout_height="wrap_content"
+                    android:onClick="saveRunButton"
+                    android:text="@string/action_save_run"
+                    android:textStyle="bold" />
+
+            <Button style="?android:textAppearanceSmall"
+                    android:layout_width="0dp"
+                    android:layout_weight=".5"
+                    android:layout_height="wrap_content"
+                    android:onClick="discardRunButton"
+                    android:text="@string/action_discard_run"
+                    android:textStyle="bold" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:paddingTop="5dp"
+            android:id="@+id/chat_box">
+
+            <io.rapidpro.surveyor.ui.IconTextView
+                android:id="@+id/button_send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="@string/icon_send"
+                android:textColor="@color/light_gray"
+                android:onClick="sendMessage"
+                android:textSize="32sp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/button_send"
+                android:layout_alignBaseline="@+id/button_send"
+                android:imeOptions="actionSend"
+                android:id="@+id/text_chat"
+                android:singleLine="true"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/chat_box"
+        android:layout_above="@+id/bottom_options"
         android:background="@color/white"
         android:id="@+id/scroll">
 
