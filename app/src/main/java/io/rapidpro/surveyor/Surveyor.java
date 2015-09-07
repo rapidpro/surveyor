@@ -35,6 +35,10 @@ public class Surveyor extends Application {
         AndroidThreeTen.init(this);
     }
 
+    public static Surveyor get() {
+        return s_this;
+    }
+
     public SharedPreferences getPreferences() {
         if (m_prefs == null) {
             m_prefs = PreferenceManager.getDefaultSharedPreferences(s_this);

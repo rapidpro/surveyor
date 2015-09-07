@@ -2,7 +2,6 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -15,8 +14,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Date;
-import java.util.UUID;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
 
 import io.rapidpro.flows.RunnerBuilder;
 import io.rapidpro.flows.definition.actions.Action;
@@ -30,10 +30,9 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.RunnerUtil;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.data.DBFlowRun;
+import io.rapidpro.surveyor.data.RunStateStorage;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
-import io.realm.Realm;
 
 /**
  * Starts and runs a given flow
@@ -45,10 +44,9 @@ public class FlowRunActivity extends BaseActivity {
     private ScrollView m_scrollView;
 
     private Runner m_runner;
-
-    private RunState m_savedState;
     private RunState m_runningState;
-    private DBFlowRun m_dbFlowRun;
+
+    private File m_runFile;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -56,17 +54,6 @@ public class FlowRunActivity extends BaseActivity {
         setContentView(R.layout.activity_flowrun);
 
         DBFlow flow = getDBFlow();
-
-        // create our flow run object
-        Realm realm = getRealm();
-        realm.beginTransaction();
-        m_dbFlowRun = realm.createObject(DBFlowRun.class);
-        m_dbFlowRun.setUuid(UUID.randomUUID().toString());
-        m_dbFlowRun.setFlow(flow);
-        m_dbFlowRun.setContact(getDBContact());
-        m_dbFlowRun.setStarted(new Date());
-        realm.copyToRealm(m_dbFlowRun);
-        realm.commitTransaction();
 
         try {
 
@@ -100,8 +87,8 @@ public class FlowRunActivity extends BaseActivity {
             });
 
             m_runner = new RunnerBuilder().build();
-            m_runningState = RunnerUtil.getRunState(m_runner, m_dbFlowRun);
-            m_savedState = RunnerUtil.getRunState(m_runner, m_dbFlowRun);
+            m_runningState = RunnerUtil.getRunState(m_runner, getDBFlow(), getDBContact());
+            m_runFile = RunStateStorage.createRunFile(getDBFlow(), getDBContact());
 
             // show any initial messages
             addMessages(m_runningState);
@@ -150,7 +137,7 @@ public class FlowRunActivity extends BaseActivity {
 
             try {
                 m_runner.resume(m_runningState, Input.of(message));
-                saveSteps(m_runningState);
+                saveSteps();
 
                 addMessage(message, false);
 
@@ -176,27 +163,15 @@ public class FlowRunActivity extends BaseActivity {
         }
     }
 
-    private void saveSteps(RunState run) throws FlowRunException {
-
+    private void saveSteps() throws FlowRunException {
         // update our persisted state with the newly completed steps
-        Realm realm = getRealm();
-        realm.beginTransaction();
-
-        m_savedState.getSteps().addAll(run.getCompletedSteps());
-        m_dbFlowRun.setRunState(m_savedState.toJson());
-
-        realm.copyToRealmOrUpdate(m_dbFlowRun);
-        realm.commitTransaction();
-
-        Surveyor.LOG.d(m_savedState.getSteps().size() + ": " + m_dbFlowRun.getRunState());
+        RunStateStorage.saveRunState(m_runFile, m_runningState, getDBFlow());
     }
 
     private void addMessages(RunState run) {
-
         if (run != null) {
             for (Step step : run.getCompletedSteps()) {
                 for (Action action : step.getActions()) {
-
                     if (action instanceof MessageAction) {
                         getSurveyor().LOG.d("Message: " + ((MessageAction) action).getMsg().getLocalized(run));
                         addMessage(((MessageAction) action).getMsg().getLocalized(run), true);
@@ -213,12 +188,6 @@ public class FlowRunActivity extends BaseActivity {
     }
 
     private void markFlowComplete() {
-
-        // mark our run as completed
-        Realm realm = getRealm();
-        realm.beginTransaction();
-        m_dbFlowRun.setCompleted(new Date());
-        realm.commitTransaction();
 
         addLogMessage(R.string.log_flow_complete);
         ViewCache cache = getViewCache();
@@ -244,12 +213,8 @@ public class FlowRunActivity extends BaseActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-
-                        // Remove our run
-                        Realm realm = getRealm();
-                        realm.beginTransaction();
-                        m_dbFlowRun.removeFromRealm();
-                        realm.commitTransaction();
+                        // delete our run file
+                        FileUtils.deleteQuietly(m_runFile);
                         finish();
                     }
                 })

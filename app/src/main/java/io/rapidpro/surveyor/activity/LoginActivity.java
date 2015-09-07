@@ -52,6 +52,9 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
+
         setContentView(R.layout.activity_login);
 
         // Set up the login form.
@@ -82,6 +85,10 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         m_progressView = findViewById(R.id.login_progress);
     }
 
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

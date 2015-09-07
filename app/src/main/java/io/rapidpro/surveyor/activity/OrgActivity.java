@@ -53,11 +53,13 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                     // restart our activity
                     startActivity(getIntent());
                     finish();
+                    overridePendingTransition(0, 0);
                 }
 
                 @Override
                 public void failure(RetrofitError error) {
                     finish();
+                    overridePendingTransition(0, 0);
                 }
             });
 

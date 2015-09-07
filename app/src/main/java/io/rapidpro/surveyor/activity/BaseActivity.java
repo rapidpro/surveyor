@@ -14,10 +14,16 @@ import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBContact;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.data.RunStateStorage;
 import io.rapidpro.surveyor.net.RapidProService;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
 
+/**
+ * All activities for the Surveyor app extend BaseActivity
+ * which provides convenience methods for transferring state
+ * between activities and the like.
+ */
 public class BaseActivity extends AppCompatActivity {
 
     // our logging tag
@@ -37,7 +43,12 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+        overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
+    }
 
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
     }
 
     @Override
@@ -71,6 +82,8 @@ public class BaseActivity extends AppCompatActivity {
             realm.clear(DBOrg.class);
             realm.commitTransaction();
             finish();
+
+            RunStateStorage.clear();
             startActivity(new Intent(this, LoginActivity.class));
             return true;
         }

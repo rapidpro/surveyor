@@ -27,12 +27,14 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
             Intent i = new Intent(OrgListActivity.this, LoginActivity.class);
             startActivity(i);
             finish();
+            overridePendingTransition(0, 0);
         }
         // if it's a single org, skip our activity
         else if (orgs.size() == 1) {
             getSurveyor().LOG.d("One org found, shortcutting: " + orgs.get(0).getName());
             onFragmentInteraction(orgs.get(0));
             finish();
+            overridePendingTransition(0, 0);
         } else {
 
             // this holds our org list fragment which shows all orgs in the db

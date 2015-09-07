@@ -19,6 +19,7 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
     }
 }
 
@@ -52,5 +53,8 @@ dependencies {
     // instead, add jakewharton's android friendly backport
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.2'
 
+    // apache commons io
+    compile 'commons-io:commons-io:2.0.1'
+    // compile group: 'commons-io', name: 'commons-io', version: '2.0.1'
 
 }

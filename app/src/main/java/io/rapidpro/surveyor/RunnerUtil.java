@@ -44,20 +44,7 @@ public class RunnerUtil {
                        org.isAnonymous());
     }
 
-    public static RunState getRunState(Runner runner, DBFlowRun flowRun) throws FlowRunException {
-
-        DBFlow flow = flowRun.getFlow();
-        Flow parsedFlow = createFlow(flow);
-
-        // see if we have a stored run state
-        String runState = flowRun.getRunState();
-        if (runState != null && runState.trim().length() > 0) {
-            return RunState.fromJson(flowRun.getRunState(), parsedFlow);
-        }
-
-        // otherwise, create a new run state
-        return runner.start(createOrg(flow.getOrg()),
-                            createContact(flowRun.getContact()), parsedFlow);
-
+    public static RunState getRunState(Runner runner, DBFlow flow, DBContact contact) throws FlowRunException {
+        return runner.start(createOrg(flow.getOrg()), createContact(contact), createFlow(flow));
     }
 }
