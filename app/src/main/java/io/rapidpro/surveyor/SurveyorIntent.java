@@ -1,7 +1,7 @@
 package io.rapidpro.surveyor;
 
 public interface SurveyorIntent {
-    public static String EXTRA_ORG_ID = "surveyor.extra.org_id";
-    public static String EXTRA_FLOW_ID = "surveyor.extra.flow_id";
-    public static String EXTRA_CONTACT_ID = "surveyor.extra.contact_id";
+    String EXTRA_ORG_ID = "surveyor.extra.org_id";
+    String EXTRA_FLOW_ID = "surveyor.extra.flow_id";
+    String EXTRA_SUBMISSION_FILE = "surveyor.extra.submission_file";
 }

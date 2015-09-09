@@ -1,21 +1,24 @@
 package io.rapidpro.surveyor.activity;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.google.gson.annotations.SerializedName;
+import java.io.File;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
 import io.realm.Realm;
 import retrofit.Callback;
@@ -83,8 +86,6 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 }
             }
         }
-
-
     }
 
     @Override
@@ -92,8 +93,8 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         super.onResume();
         ListView list = (ListView) findViewById(android.R.id.list);
         if (list != null) {
-            // FlowListAdapter adapter = ((FlowListAdapter) list.getAdapter());
-            // adapter.notifyDataSetChanged();
+            FlowListAdapter adapter = ((FlowListAdapter) list.getAdapter());
+            adapter.notifyDataSetChanged();
         }
     }
 
@@ -118,5 +119,40 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
 
     public void showFlowList(MenuItem item) {
         startActivity(getIntent(this, RapidFlowsActivity.class));
+    }
+
+    public void confirmSubmissionSending(View view) {
+
+        final DBFlow flow = (DBFlow) view.getTag();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.confirm_send_submissions))
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        File[] submissions = Submission.getPendingSubmissions(flow);
+
+
+                        // Flow parsedFlow = RunnerUtil.createFlow(flow);
+
+                        // get the adapter to notify of changes
+                        final FlowListAdapter adapter = (FlowListAdapter) ((ListView)findViewById(android.R.id.list)).getAdapter();
+
+                        for (File file : submissions) {
+                            Submission.load(file).submit(new Submission.OnSubmitListener() {
+                                @Override
+                                public void onSuccess() {
+                                    adapter.notifyDataSetChanged();
+                                }
+                            });
+                        }
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
     }
 }

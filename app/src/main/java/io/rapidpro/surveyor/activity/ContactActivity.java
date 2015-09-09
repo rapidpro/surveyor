@@ -15,9 +15,9 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.RunnerUtil;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.DBContact;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.Language;
+import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
 
@@ -96,20 +96,13 @@ public class ContactActivity extends BaseActivity {
             lang = new Language(m_flow.getBaseLanguage());
         }
 
-        // create a new contact
-        DBContact contact = new DBContact();
-        Realm realm = getRealm();
-        realm.beginTransaction();
-        contact.setName(name);
-        contact.setPhone(phone);
-        contact.setLanguage(lang.getCode());
-        contact.setUuid(UUID.randomUUID().toString());
-        realm.copyToRealm(contact);
-        realm.commitTransaction();
+        // create a new submission
+        Submission submission = new Submission(getDBFlow(), name, lang.getCode(), phone);
+        submission.save();
 
         // start our flow run activity for our new contact
         Intent intent = getIntent(this, FlowRunActivity.class);
-        intent.putExtra(SurveyorIntent.EXTRA_CONTACT_ID, contact.getUuid());
+        intent.putExtra(SurveyorIntent.EXTRA_SUBMISSION_FILE, submission.getFilename());
         startActivity(intent);
 
         // remove us from the back stack

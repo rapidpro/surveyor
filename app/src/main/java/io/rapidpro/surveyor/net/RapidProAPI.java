@@ -2,7 +2,10 @@ package io.rapidpro.surveyor.net;
 
 import java.util.List;
 
+import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.data.Submission;
+import retrofit.http.Body;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
@@ -35,4 +38,17 @@ public interface RapidProAPI {
             @Header("Authorization") String token,
             @Query("uuid") String uuid,
             Callback<FlowDefinition> callback);
+
+    @POST("/api/v1/steps.json")
+    void addResults(
+            @Header("Authorization") String token,
+            @Body Submission state,
+            Callback<Void> callback);
+
+    @POST("/api/v1/contacts.json")
+    void addContact(
+            @Header("Authorization") String token,
+            @Body Submission.Contact contact,
+            Callback<Submission.Contact> callback);
+
 }

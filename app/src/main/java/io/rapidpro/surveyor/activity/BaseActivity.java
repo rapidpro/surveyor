@@ -11,10 +11,9 @@ import android.view.MenuItem;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.DBContact;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
-import io.rapidpro.surveyor.data.RunStateStorage;
+import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.net.RapidProService;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
@@ -31,7 +30,6 @@ public class BaseActivity extends AppCompatActivity {
 
     private DBOrg m_org;
     private DBFlow m_flow;
-    private DBContact m_contact;
     private ViewCache m_viewCache;
 
     private Realm m_realm;
@@ -83,7 +81,8 @@ public class BaseActivity extends AppCompatActivity {
             realm.commitTransaction();
             finish();
 
-            RunStateStorage.clear();
+            Submission.clear();
+
             startActivity(new Intent(this, LoginActivity.class));
             return true;
         }
@@ -165,19 +164,6 @@ public class BaseActivity extends AppCompatActivity {
         return m_org;
     }
 
-    public DBContact getDBContact() {
-        if (m_contact == null) {
-            String contactId = getIntent().getStringExtra(SurveyorIntent.EXTRA_CONTACT_ID);
-            if (contactId != null) {
-                Surveyor.LOG.d("contact id: " + contactId);
-                m_contact = getRealm().where(DBContact.class).equalTo("uuid", contactId).findFirst();
-                Surveyor.LOG.d("Contact: " + m_contact);
-            }
-        }
-        return m_contact;
-    }
-
-
     public Intent getIntent(Activity from, Class to) {
         Intent intent = new Intent(from, to);
         DBOrg org = getDBOrg();
@@ -188,11 +174,6 @@ public class BaseActivity extends AppCompatActivity {
         DBFlow flow = getDBFlow();
         if (flow != null) {
             intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
-        }
-
-        DBContact contact = getDBContact();
-        if (contact != null){
-            intent.putExtra(SurveyorIntent.EXTRA_CONTACT_ID, contact.getUuid());
         }
 
         return intent;

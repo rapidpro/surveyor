@@ -55,6 +55,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignBaseline="@id/text_flow_name"
         android:text="391"
+        android:onClick="confirmSubmissionSending"
         android:visibility="gone"
         />
 

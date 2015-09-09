@@ -10,9 +10,7 @@ import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.data.DBFlowRun;
-import io.rapidpro.surveyor.data.RunStateStorage;
-import io.realm.Realm;
+import io.rapidpro.surveyor.data.Submission;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
@@ -50,8 +48,9 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
         DBFlow flow = getItem(position);
         cache.titleView.setText(flow.getName());
 
-        int submissions = RunStateStorage.getPendingSubmissions(flow);
+        int submissions = Submission.getPendingSubmissionCount(flow);
         cache.pendingSubmissions.setText("" + submissions);
+        cache.pendingSubmissions.setTag(flow);
 
         if (submissions > 0) {
             cache.pendingSubmissions.setVisibility(View.VISIBLE);

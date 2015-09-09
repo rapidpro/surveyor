@@ -2,6 +2,7 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -29,8 +30,9 @@ import io.rapidpro.flows.runner.Step;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.RunnerUtil;
 import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.data.RunStateStorage;
+import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
 
@@ -46,7 +48,8 @@ public class FlowRunActivity extends BaseActivity {
     private Runner m_runner;
     private RunState m_runningState;
 
-    private File m_runFile;
+    // private File m_runFile;
+    private Submission m_submission;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -87,8 +90,9 @@ public class FlowRunActivity extends BaseActivity {
             });
 
             m_runner = new RunnerBuilder().build();
-            m_runningState = RunnerUtil.getRunState(m_runner, getDBFlow(), getDBContact());
-            m_runFile = RunStateStorage.createRunFile(getDBFlow(), getDBContact());
+            m_submission = Submission.load(new File(getIntent().getStringExtra(SurveyorIntent.EXTRA_SUBMISSION_FILE)));
+            m_runningState = RunnerUtil.getRunState(m_runner, getDBFlow(), m_submission.getContact());
+            // m_submission = new Submission(getDBFlow(), getDBContact());
 
             // show any initial messages
             addMessages(m_runningState);
@@ -165,7 +169,8 @@ public class FlowRunActivity extends BaseActivity {
 
     private void saveSteps() throws FlowRunException {
         // update our persisted state with the newly completed steps
-        RunStateStorage.saveRunState(m_runFile, m_runningState, getDBFlow());
+        m_submission.addSteps(m_runningState.getCompletedSteps());
+        m_submission.save();
     }
 
     private void addMessages(RunState run) {
@@ -214,7 +219,7 @@ public class FlowRunActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // delete our run file
-                        FileUtils.deleteQuietly(m_runFile);
+                        m_submission.delete();
                         finish();
                     }
                 })

@@ -9,11 +9,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
 import java.util.List;
 
+import io.rapidpro.flows.definition.Flow;
+import io.rapidpro.flows.definition.GroupRef;
 import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.data.Submission;
 import io.realm.Realm;
 import io.realm.RealmObject;
 import retrofit.Callback;
@@ -95,6 +102,43 @@ public class RapidProService {
                 callback.failure(error);
             }
         });
+    }
+
+    public void addContact(final Submission.Contact contact, final Submission.ContactAddListener onContactAddListener) {
+
+        Surveyor.LOG.d("Adding contact: " + contact);
+        m_api.addContact(getToken(), contact, new Callback<Submission.Contact>() {
+            @Override
+            public void success(Submission.Contact posted, Response response) {
+                contact.setUuid(posted.getUuid());
+                if (onContactAddListener != null) {
+                    onContactAddListener.onContactAdded();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Surveyor.LOG.e("Failed to add contact", error);
+            }
+        });
+    }
+
+    public void addResults(final Submission submission, final Submission.OnSubmitListener onSubmitListener) {
+        m_api.addResults(getToken(), submission, new Callback<Void>() {
+            @Override
+            public void success(Void aVoid, Response response) {
+                Surveyor.LOG.d("Success!");
+                if (onSubmitListener != null) {
+                    onSubmitListener.onSuccess();
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Surveyor.LOG.d("Failure");
+            }
+        });
 
     }
 
@@ -109,7 +153,8 @@ public class RapidProService {
             public boolean shouldSkipClass(Class<?> clazz) {
                 return false;
             }
-        }).registerTypeAdapterFactory(new FlowListTypeAdapterFactory()).create();
+        }).registerTypeAdapterFactory(new FlowListTypeAdapterFactory())
+                .registerTypeAdapter(Submission.Contact.class, new Submission.Contact.Serializer()).create();
 
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(Surveyor.BASE_URL)
@@ -119,6 +164,8 @@ public class RapidProService {
 
         return restAdapter.create(RapidProAPI.class);
     }
+
+
 
     private class FlowListTypeAdapterFactory extends CustomizedTypeAdapterFactory<FlowList> {
         private FlowListTypeAdapterFactory() {
