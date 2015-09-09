@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,18 +13,19 @@ import android.view.View;
 import android.widget.ListView;
 
 import java.io.File;
+import java.util.List;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
+import io.rapidpro.surveyor.data.DBAlias;
 import io.rapidpro.surveyor.data.DBFlow;
+import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
+import io.rapidpro.surveyor.net.RapidProService;
 import io.realm.Realm;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class OrgActivity extends BaseActivity implements FlowListFragment.OnFragmentInteractionListener {
 
@@ -36,42 +38,11 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         // if we don't know our country yet, fetch it
         if (org.getCountry() == null || org.getCountry().trim().length() == 0) {
             setContentView(R.layout.activity_pending);
-
-            getRapidProService().getOrg(new Callback<DBOrg>() {
-                @Override
-                public void success(DBOrg latest, Response response) {
-
-                    // save to our database
-                    Realm realm = getRealm();
-                    realm.beginTransaction();
-
-                    org.setAnonymous(latest.isAnonymous());
-                    org.setCountry(latest.getCountry());
-                    org.setDateStyle(latest.getDateStyle());
-                    org.setPrimaryLanguage(latest.getPrimaryLanguage());
-                    org.setTimezone(latest.getTimezone());
-
-                    realm.commitTransaction();
-
-                    // restart our activity
-                    startActivity(getIntent());
-                    finish();
-                    overridePendingTransition(0, 0);
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    finish();
-                    overridePendingTransition(0, 0);
-                }
-            });
-
+            new FetchOrgData().execute();
         } else {
             setContentView(R.layout.fragment_container);
 
             setTitle(org.getName());
-
-            getSurveyor().LOG.d("Org: " + org.getTimezone());
 
             if (savedInstanceState == null) {
                 Fragment listFragment = FlowListFragment.newInstance(org.getId());
@@ -154,5 +125,63 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                     }
                 })
                 .show();
+    }
+
+    private class FetchOrgData extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            RapidProService rapid = getRapidProService();
+
+            // get our database
+            Realm realm = Realm.getDefaultInstance();
+
+            int orgId = getIntent().getIntExtra(SurveyorIntent.EXTRA_ORG_ID, 0);
+            DBOrg org = realm.where(DBOrg.class).equalTo("id", orgId).findFirst();
+
+            // save the org properties to the database
+            DBOrg latest = rapid.getOrg();
+            realm.beginTransaction();
+            org.setAnonymous(latest.isAnonymous());
+            org.setCountry(latest.getCountry());
+            org.setDateStyle(latest.getDateStyle());
+            org.setPrimaryLanguage(latest.getPrimaryLanguage());
+            org.setTimezone(latest.getTimezone());
+
+            // now go fetch the locations
+            List<DBLocation> results = rapid.getLocations();
+            for (DBLocation location : results) {
+                location.setOrg(org);
+
+                // create a composite primary key
+                location.setId(org.getId() + ":" + location.getBoundary());
+
+                realm.copyToRealmOrUpdate(location);
+
+                for (String aliasName : location.getAliases()) {
+                    DBAlias alias = new DBAlias();
+
+                    // alias gets a composite primary key too
+                    alias.setId(location.getId() + ":" + aliasName);
+
+                    alias.setName(aliasName);
+                    alias.setLocation(location);
+                    realm.copyToRealmOrUpdate(alias);
+                }
+            }
+
+            realm.commitTransaction();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // restart our activity
+            startActivity(getIntent());
+            finish();
+            overridePendingTransition(0, 0);
+        }
     }
 }

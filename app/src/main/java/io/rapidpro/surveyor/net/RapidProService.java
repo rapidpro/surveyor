@@ -12,6 +12,7 @@ import com.google.gson.JsonPrimitive;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.rapidpro.flows.definition.Flow;
@@ -19,6 +20,7 @@ import io.rapidpro.flows.definition.GroupRef;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.DBFlow;
+import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.data.Submission;
 import io.realm.Realm;
@@ -53,8 +55,8 @@ public class RapidProService {
         m_api.getOrgs(email, password, callback);
     }
 
-    public void getOrg(Callback<DBOrg> callback) {
-        m_api.getOrg(getToken(), callback);
+    public DBOrg getOrg() {
+        return m_api.getOrg(getToken());
     }
 
     public void getFlows(final Callback<FlowList> callback) {
@@ -136,8 +138,6 @@ public class RapidProService {
                 if (onSubmitListener != null) {
                     onSubmitListener.onSuccess();
                 }
-
-
             }
 
             @Override
@@ -145,7 +145,24 @@ public class RapidProService {
                 Surveyor.LOG.d("Failure");
             }
         });
+    }
 
+    public List<DBLocation> getLocations() {
+
+        List<DBLocation> locations = new ArrayList<>();
+
+        int pageNumber = 1;
+        // fetch our first page
+        LocationResultPage page = m_api.getLocationPage(getToken(), true, pageNumber);
+        locations.addAll(page.results);
+
+        // fetch subsequent pages until we are done
+        while (page != null && page.next != null && page.next.trim().length() != 0) {
+            page = m_api.getLocationPage(getToken(), true, ++pageNumber);
+            locations.addAll(page.results);
+        }
+
+        return locations;
     }
 
     private RapidProAPI getAPIAccessor() {

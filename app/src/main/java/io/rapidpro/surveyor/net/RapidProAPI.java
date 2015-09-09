@@ -1,5 +1,7 @@
 package io.rapidpro.surveyor.net;
 
+import android.location.Location;
+
 import java.util.List;
 
 import io.rapidpro.flows.runner.RunState;
@@ -25,7 +27,7 @@ public interface RapidProAPI {
             Callback<List<DBOrg>> callback);
 
     @GET("/api/v1/org.json")
-    void getOrg(@Header("Authorization") String token, Callback<DBOrg> callback);
+    DBOrg getOrg(@Header("Authorization") String token);
 
     @GET("/api/v1/flows.json")
     void getFlows(
@@ -50,5 +52,11 @@ public interface RapidProAPI {
             @Header("Authorization") String token,
             @Body Submission.Contact contact,
             Callback<Submission.Contact> callback);
+
+    @GET("/api/v1/boundaries.json")
+    LocationResultPage getLocationPage(
+            @Header("Authorization") String token,
+            @Query("aliases") boolean aliases,
+            @Query("page") int page);
 
 }
