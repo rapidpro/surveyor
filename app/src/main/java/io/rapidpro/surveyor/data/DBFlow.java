@@ -1,14 +1,5 @@
 package io.rapidpro.surveyor.data;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.annotations.SerializedName;
-
-import java.lang.reflect.Type;
-
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -17,11 +8,11 @@ public class DBFlow extends RealmObject {
     @PrimaryKey
     private String uuid;
     private String name;
-    private int questionCount;
     private String definition;
     private boolean fetching;
 
     private DBOrg org;
+    private int questionCount;
 
     // Realm accessors, do not modify
     public void setOrg(DBOrg org) {
@@ -56,20 +47,20 @@ public class DBFlow extends RealmObject {
         return this.definition;
     }
 
-    public int getQuestionCount() {
-        return this.questionCount;
-    }
-
-    public void setQuestionCount(int questionCount) {
-        this.questionCount = questionCount;
-    }
-
     public void setFetching(boolean fetching) {
         this.fetching = fetching;
     }
 
     public boolean isFetching() {
         return fetching;
+    }
+
+    public int getQuestionCount() {
+        return questionCount;
+    }
+
+    public void setQuestionCount(int questionCount) {
+        this.questionCount = questionCount;
     }
 }
 

@@ -24,8 +24,6 @@ public class DBOrg extends RealmObject {
     private String timezone;
     private boolean anonymous;
 
-    // Realm accessors, do not modify
-
     public String getCountry() {
         return country;
     }

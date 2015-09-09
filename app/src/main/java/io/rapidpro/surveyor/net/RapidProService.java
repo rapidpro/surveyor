@@ -129,9 +129,15 @@ public class RapidProService {
             @Override
             public void success(Void aVoid, Response response) {
                 Surveyor.LOG.d("Success!");
+
+                // remove our submission
+                submission.delete();
+
                 if (onSubmitListener != null) {
                     onSubmitListener.onSuccess();
                 }
+
+
             }
 
             @Override
