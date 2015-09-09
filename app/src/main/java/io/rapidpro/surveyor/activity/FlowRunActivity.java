@@ -24,6 +24,7 @@ import io.rapidpro.flows.definition.actions.Action;
 import io.rapidpro.flows.definition.actions.message.MessageAction;
 import io.rapidpro.flows.runner.FlowRunException;
 import io.rapidpro.flows.runner.Input;
+import io.rapidpro.flows.runner.Location;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Runner;
 import io.rapidpro.flows.runner.Step;
@@ -31,10 +32,13 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.RunnerUtil;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.data.DBAlias;
 import io.rapidpro.surveyor.data.DBFlow;
+import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
+import io.realm.Realm;
 
 /**
  * Starts and runs a given flow
@@ -57,6 +61,8 @@ public class FlowRunActivity extends BaseActivity {
         setContentView(R.layout.activity_flowrun);
 
         DBFlow flow = getDBFlow();
+
+        final Realm realm = getRealm();
 
         try {
 
@@ -89,7 +95,33 @@ public class FlowRunActivity extends BaseActivity {
                 }
             });
 
-            m_runner = new RunnerBuilder().build();
+            m_runner = new RunnerBuilder().withLocationResolver(new Location.Resolver() {
+                @Override
+                public Location resolve(String input, String country, Location.Level levelEnum, String parent) {
+
+                    int level = 1;
+                    if (levelEnum == Location.Level.DISTRICT) {
+                        level = 2;
+                    }
+
+                    DBLocation location = realm.where(DBLocation.class).equalTo("name", input, false).equalTo("level", level).findFirst();
+
+                    if (location == null) {
+                        DBAlias alias = realm.where(DBAlias.class).equalTo("name", input, false).equalTo("location.level", level).findFirst();
+                        if (alias != null) {
+                            location = alias.getLocation();
+                        }
+                    }
+
+                    if (location != null) {
+                        return new Location(location.getName());
+                    }
+
+                    return null;
+
+                }
+            }).build();
+
             m_submission = Submission.load(new File(getIntent().getStringExtra(SurveyorIntent.EXTRA_SUBMISSION_FILE)));
             m_runningState = RunnerUtil.getRunState(m_runner, getDBFlow(), m_submission.getContact());
             // m_submission = new Submission(getDBFlow(), getDBContact());
