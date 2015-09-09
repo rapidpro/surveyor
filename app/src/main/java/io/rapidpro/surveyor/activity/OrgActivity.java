@@ -172,6 +172,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
             }
 
             realm.commitTransaction();
+            realm.close();
 
             return null;
         }

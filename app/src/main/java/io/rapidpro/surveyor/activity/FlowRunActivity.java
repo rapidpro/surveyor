@@ -114,7 +114,7 @@ public class FlowRunActivity extends BaseActivity {
                     }
 
                     if (location != null) {
-                        return new Location(location.getName());
+                        return new Location(location.getBoundary());
                     }
 
                     return null;
