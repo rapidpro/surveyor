@@ -177,7 +177,6 @@ public class Submission {
 
     public void save() {
         String json = JsonUtils.getGson().toJson(this);
-
         try {
             FileUtils.write(m_file, json);
         } catch (IOException e) {

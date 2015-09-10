@@ -17,6 +17,7 @@ import java.util.List;
 
 import io.rapidpro.flows.definition.Flow;
 import io.rapidpro.flows.definition.GroupRef;
+import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.DBFlow;
@@ -127,6 +128,7 @@ public class RapidProService {
     }
 
     public void addResults(final Submission submission, final Submission.OnSubmitListener onSubmitListener) {
+
         m_api.addResults(getToken(), submission, new Callback<Void>() {
             @Override
             public void success(Void aVoid, Response response) {
@@ -166,7 +168,8 @@ public class RapidProService {
     }
 
     private RapidProAPI getAPIAccessor() {
-        Gson gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+
+        Gson gson = JsonUtils.getGsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(FieldAttributes f) {
                 return f.getDeclaringClass().equals(RealmObject.class);

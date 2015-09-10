@@ -172,7 +172,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
                 @Override
                 public void failure(RetrofitError error) {
-                    Surveyor.LOG.e("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error);
+                    Surveyor.LOG.e("Failure logging in", error);
                     showProgress(false);
                 }
             });
