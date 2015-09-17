@@ -2,7 +2,6 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -14,8 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 
@@ -50,7 +47,7 @@ public class FlowRunActivity extends BaseActivity {
     private ScrollView m_scrollView;
 
     private Runner m_runner;
-    private RunState m_runningState;
+    private RunState m_runState;
 
     // private File m_runFile;
     private Submission m_submission;
@@ -114,7 +111,7 @@ public class FlowRunActivity extends BaseActivity {
                     }
 
                     if (location != null) {
-                        return new Location(location.getBoundary());
+                        return new Location(location.getBoundary(), location.getName(), levelEnum);
                     }
 
                     return null;
@@ -123,11 +120,12 @@ public class FlowRunActivity extends BaseActivity {
             }).build();
 
             m_submission = Submission.load(new File(getIntent().getStringExtra(SurveyorIntent.EXTRA_SUBMISSION_FILE)));
-            m_runningState = RunnerUtil.getRunState(m_runner, getDBFlow(), m_submission.getContact());
-            // m_submission = new Submission(getDBFlow(), getDBContact());
+
+            // create a run state based on our contact
+            m_runState = RunnerUtil.getRunState(m_runner, getDBFlow(), m_submission.getContact());
 
             // show any initial messages
-            addMessages(m_runningState);
+            addMessages(m_runState);
 
         } catch (Throwable t) {
             Surveyor.LOG.e("Error running flow", t);
@@ -161,7 +159,7 @@ public class FlowRunActivity extends BaseActivity {
 
     public void sendMessage(View sendButton) {
 
-        if (m_runningState.getState() == RunState.State.COMPLETED) {
+        if (m_runState.getState() == RunState.State.COMPLETED) {
             return;
         }
 
@@ -172,12 +170,12 @@ public class FlowRunActivity extends BaseActivity {
             chatBox.setText("");
 
             try {
-                m_runner.resume(m_runningState, Input.of(message));
+                m_runner.resume(m_runState, Input.of(message));
                 saveSteps();
 
                 addMessage(message, false);
 
-                addMessages(m_runningState);
+                addMessages(m_runState);
 
             } catch (Throwable t) {
                 // addMessage(t.getMessage().toString(), true);
@@ -201,7 +199,7 @@ public class FlowRunActivity extends BaseActivity {
 
     private void saveSteps() throws FlowRunException {
         // update our persisted state with the newly completed steps
-        m_submission.addSteps(m_runningState.getCompletedSteps());
+        m_submission.addSteps(m_runState);
         m_submission.save();
     }
 

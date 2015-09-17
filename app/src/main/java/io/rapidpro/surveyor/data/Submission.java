@@ -6,9 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
+import org.threeten.bp.Instant;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import io.rapidpro.flows.definition.Flow;
+import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Step;
 import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.Surveyor;
@@ -47,6 +50,15 @@ public class Submission {
     // our contact participating in the flow
     @SerializedName("contact")
     private Contact m_contact;
+
+    // when the flow run started
+    @SerializedName("started")
+    @JsonAdapter(JsonUtils.InstantAdapter.class)
+    private Instant m_started;
+
+    // if the flow was completed
+    @SerializedName("completed")
+    private boolean m_completed;
 
     private static FilenameFilter FLOW_FILE_FILTER = new FilenameFilter() {
         @Override
@@ -168,11 +180,19 @@ public class Submission {
         return m_file.getAbsolutePath();
     }
 
-    public void addSteps(List<Step> completed) {
+    public void addSteps(RunState runState) {
+
+        List<Step> completed = runState.getCompletedSteps();
         if (m_steps == null) {
             m_steps = new ArrayList<>();
         }
         m_steps.addAll(completed);
+
+        // keep track of when we were started
+        m_started = runState.getStarted();
+
+        // mark us completed if necessary
+        m_completed = runState.getState() == RunState.State.COMPLETED;
     }
 
     public void save() {
