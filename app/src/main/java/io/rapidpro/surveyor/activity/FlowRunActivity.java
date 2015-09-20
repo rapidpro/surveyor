@@ -127,6 +127,8 @@ public class FlowRunActivity extends BaseActivity {
             // show any initial messages
             addMessages(m_runState);
 
+            saveSteps();
+
         } catch (Throwable t) {
             Surveyor.LOG.e("Error running flow", t);
             Toast.makeText(this, "Sorry, this flow is not supported.", Toast.LENGTH_SHORT).show();
@@ -143,6 +145,7 @@ public class FlowRunActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_run, menu);
+        menu.findItem(R.id.action_cancel).setVisible(!m_submission.isCompleted());
         return true;
     }
 
@@ -195,6 +198,9 @@ public class FlowRunActivity extends BaseActivity {
                 }
             }, 100);
         }
+
+        // refresh our menu
+        invalidateOptionsMenu();
     }
 
     private void saveSteps() throws FlowRunException {

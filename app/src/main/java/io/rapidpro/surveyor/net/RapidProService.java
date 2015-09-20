@@ -61,7 +61,7 @@ public class RapidProService {
     }
 
     public void getFlows(final Callback<FlowList> callback) {
-        m_api.getFlows(getToken(), "F", new Callback<FlowList>() {
+        m_api.getFlows(getToken(), "S", new Callback<FlowList>() {
             @Override
             public void success(FlowList flowList, Response response) {
                 m_flowList = flowList;

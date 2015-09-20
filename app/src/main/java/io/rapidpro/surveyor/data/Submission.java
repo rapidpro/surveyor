@@ -231,6 +231,10 @@ public class Submission {
         m_file = file;
     }
 
+    public boolean isCompleted() {
+        return m_completed;
+    }
+
     public interface OnSubmitListener {
         void onSuccess();
     }

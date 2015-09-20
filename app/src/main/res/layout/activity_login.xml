@@ -12,6 +12,7 @@
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
         android:layout_marginBottom="8dp"
         android:visibility="gone"/>
 
@@ -58,7 +59,7 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:text="eric@nyaruka.com"
+                    android:text=""
                     android:textColor="@color/white"/>
 
                 <EditText
@@ -72,7 +73,7 @@
                     android:inputType="textPassword"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:text="Password123"
+                    android:text=""
                     android:textColor="@color/white"/>
 
                 <Button

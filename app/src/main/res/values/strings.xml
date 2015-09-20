@@ -822,7 +822,7 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="pref_default_host">http://textit.ngrok.com</string>
+    <string name="pref_default_host">https://app.rapidpro.io</string>
     <string name="pref_title_rapidpro_host">RapidPro Host</string>
     <string name="pref_summary_rapidpro_host">The address for your RapidPro installation</string>
     <string name="download_blurb">Download a Flow to run it later without a network connection.</string>
@@ -835,7 +835,7 @@
     <string name="prompt_phone">Phone Number</string>
     <string name="log_flow_complete">Flow complete</string>
     <string name="action_save_run">Save Results</string>
-    <string name="confirm_run_removal">Are you sure you want to remove this flow run?</string>
+    <string name="confirm_run_removal">This survey is not complete. Are you sure you want to discard it?</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_discard_run">Discard</string>
     <string name="confirm_send_submissions">Are you sure you want to send all pending submissions for this flow?</string>
