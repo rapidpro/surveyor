@@ -59,18 +59,22 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
+                    android:textColorHint="@color/primary_lightest"
                     android:text=""
+                    android:theme="@style/LoginTheme"
                     android:textColor="@color/white"/>
 
                 <EditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:theme="@style/LoginTheme"
                     android:hint="@string/prompt_password"
                     android:imeActionId="@+id/login"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
+                    android:textColorHint="@color/primary_lightest"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:text=""
