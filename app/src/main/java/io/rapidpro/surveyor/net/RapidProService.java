@@ -107,50 +107,25 @@ public class RapidProService {
         });
     }
 
-    public void addContact(final Submission.Contact contact, final Submission.ContactAddListener onContactAddListener) {
+    public Submission.Contact addContact(final Submission.Contact contact) {
 
         Surveyor.LOG.d("Adding contact: " + contact);
         if (contact.getLanguage().equals("base")) {
             contact.setLanguage(null);
         }
 
-        m_api.addContact(getToken(), contact, new Callback<Submission.Contact>() {
-            @Override
-            public void success(Submission.Contact posted, Response response) {
-                contact.setUuid(posted.getUuid());
-                if (onContactAddListener != null) {
-                    onContactAddListener.onContactAdded();
-                }
-
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Surveyor.LOG.e("Failed to add contact", error);
-            }
-        });
+        Submission.Contact result =  m_api.addContact(getToken(), contact);
+        contact.setUuid(result.getUuid());
+        return contact;
     }
 
-    public void addResults(final Submission submission, final Submission.OnSubmitListener onSubmitListener) {
-
-        m_api.addResults(getToken(), submission, new Callback<Void>() {
-            @Override
-            public void success(Void aVoid, Response response) {
-                Surveyor.LOG.d("Success!");
-
-                // remove our submission
-                submission.delete();
-
-                if (onSubmitListener != null) {
-                    onSubmitListener.onSuccess();
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Surveyor.LOG.d("Failure");
-            }
-        });
+    public void addResults(final Submission submission) {
+        try {
+            m_api.addResults(getToken(), submission);
+            submission.delete();
+        } catch (RetrofitError e) {
+            Surveyor.LOG.e("Failed submitting results", e);
+        }
     }
 
     public List<DBLocation> getLocations() {

@@ -26,6 +26,7 @@ import io.rapidpro.flows.runner.Step;
 import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.net.RapidProService;
+import retrofit.RetrofitError;
 
 /**
  * Represents a single flow run. Manages saving run progress and
@@ -204,17 +205,15 @@ public class Submission {
         }
     }
 
-    public void submit(final OnSubmitListener onSubmitListener) {
+    public void submit() {
         final RapidProService rapid = Surveyor.get().getRapidProService();
         final Submission submission = this;
 
         // first we need to create our contact
-        rapid.addContact(m_contact, new ContactAddListener() {
-            @Override
-            public void onContactAdded() {
-                rapid.addResults(submission, onSubmitListener);
-            }
-        });
+        rapid.addContact(m_contact);
+
+        // then post the results
+        rapid.addResults(submission);
     }
 
     public void delete() {
@@ -237,6 +236,7 @@ public class Submission {
 
     public interface OnSubmitListener {
         void onSuccess();
+        void onError(RetrofitError error);
     }
 
     /**

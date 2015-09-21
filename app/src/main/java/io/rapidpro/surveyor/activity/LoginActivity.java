@@ -30,6 +30,7 @@ import android.widget.TextView;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
@@ -87,12 +88,19 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         m_loginFormView = findViewById(R.id.login_form);
         m_progressView = findViewById(R.id.login_progress);
 
-        String error = getIntent().getStringExtra(SurveyorIntent.EXTRA_ERROR);
+        // set our error message if we have one
+        setErrorMessage(getIntent().getStringExtra(SurveyorIntent.EXTRA_ERROR));
 
-        if (error != null) {
-            TextView errorBox  = (TextView) findViewById(R.id.text_error_message);
+    }
+
+    private void setErrorMessage(String message) {
+
+        TextView errorBox  = (TextView) findViewById(R.id.text_error_message);
+        if (message != null) {
             errorBox.setVisibility(View.VISIBLE);
-            errorBox.setText(error);
+            errorBox.setText(message);
+        } else {
+            errorBox.setVisibility(View.GONE);
         }
     }
 
@@ -171,10 +179,19 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
             getRapidProService().getOrgs(email, password, new Callback<List<DBOrg>>() {
                 @Override
                 public void success(List<DBOrg> orgs, Response response) {
+
                     Realm realm = getRealm();
                     realm.beginTransaction();
                     realm.where(DBOrg.class).findAll().clear();
-                    realm.copyToRealm(orgs);
+
+                    // add our orgs, make sure we don't consider duplicates
+                    HashSet<Integer> added = new HashSet<>();
+                    for (DBOrg org : orgs) {
+                        if (!added.add(org.getId())) {
+                            realm.copyToRealm(org);
+                        }
+                    }
+
                     realm.commitTransaction();
                     finish();
 
@@ -187,7 +204,17 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                 @Override
                 public void failure(RetrofitError error) {
                     Surveyor.LOG.e("Failure logging in", error);
+                    if (error.getResponse().getStatus() == 404) {
+                        setErrorMessage(getString(R.string.error_server_not_found));
+                    } else if (error.getResponse().getStatus() == 500) {
+                        setErrorMessage(getString(R.string.error_server_failure));
+                    } else if (error.getResponse().getStatus() == 403) {
+                        setErrorMessage(getString(R.string.error_invalid_login));
+                    } else {
+                        setErrorMessage(getString(R.string.error_server_failure));
+                    }
                     showProgress(false);
+
                 }
             });
         }

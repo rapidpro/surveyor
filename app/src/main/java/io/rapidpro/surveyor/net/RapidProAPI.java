@@ -42,16 +42,14 @@ public interface RapidProAPI {
             Callback<FlowDefinition> callback);
 
     @POST("/api/v1/steps.json")
-    void addResults(
+    Void addResults(
             @Header("Authorization") String token,
-            @Body Submission state,
-            Callback<Void> callback);
+            @Body Submission state);
 
     @POST("/api/v1/contacts.json")
-    void addContact(
+    Submission.Contact addContact(
             @Header("Authorization") String token,
-            @Body Submission.Contact contact,
-            Callback<Submission.Contact> callback);
+            @Body Submission.Contact contact);
 
     @GET("/api/v1/boundaries.json")
     LocationResultPage getLocationPage(

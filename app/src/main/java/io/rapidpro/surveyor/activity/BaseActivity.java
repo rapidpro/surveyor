@@ -1,6 +1,7 @@
 package io.rapidpro.surveyor.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -180,5 +181,16 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         return intent;
+    }
+
+    public AlertDialog showAlert(int title, int body) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(body)
+                .setIcon(android.R.drawable.ic_dialog_alert).create();
+
+        dialog.show();
+        return dialog;
+
     }
 }
