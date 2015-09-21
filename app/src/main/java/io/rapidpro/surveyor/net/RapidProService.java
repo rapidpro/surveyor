@@ -110,6 +110,10 @@ public class RapidProService {
     public void addContact(final Submission.Contact contact, final Submission.ContactAddListener onContactAddListener) {
 
         Surveyor.LOG.d("Adding contact: " + contact);
+        if (contact.getLanguage().equals("base")) {
+            contact.setLanguage(null);
+        }
+
         m_api.addContact(getToken(), contact, new Callback<Submission.Contact>() {
             @Override
             public void success(Submission.Contact posted, Response response) {

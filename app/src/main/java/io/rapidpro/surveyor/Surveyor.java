@@ -25,9 +25,10 @@ public class Surveyor extends Application {
         s_this = this;
         updatePrefs();
 
-        // Temporary: nuke our db on every start until the schema is ironed out
         RealmConfiguration config = new RealmConfiguration.Builder(this).build();
-        Realm.deleteRealm(config);
+
+        // Testing: nuke our db on every start until the schema is ironed out
+        // Realm.deleteRealm(config);
 
         // set our default database config
         Realm.setDefaultConfiguration(config);

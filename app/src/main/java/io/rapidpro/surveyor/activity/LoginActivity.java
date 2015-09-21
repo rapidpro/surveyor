@@ -7,11 +7,13 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -32,6 +34,7 @@ import java.util.List;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.realm.Realm;
 import retrofit.Callback;
@@ -83,6 +86,14 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
         m_loginFormView = findViewById(R.id.login_form);
         m_progressView = findViewById(R.id.login_progress);
+
+        String error = getIntent().getStringExtra(SurveyorIntent.EXTRA_ERROR);
+
+        if (error != null) {
+            TextView errorBox  = (TextView) findViewById(R.id.text_error_message);
+            errorBox.setVisibility(View.VISIBLE);
+            errorBox.setText(error);
+        }
     }
 
     public void finish() {
@@ -166,6 +177,9 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                     realm.copyToRealm(orgs);
                     realm.commitTransaction();
                     finish();
+
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                    prefs.edit().putBoolean(SurveyorIntent.PREF_LOGGED_IN, true).commit();
 
                     startActivity(new Intent(LoginActivity.this, OrgListActivity.class));
                 }

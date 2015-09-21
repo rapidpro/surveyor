@@ -50,8 +50,6 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 ft.add(R.id.fragment_container, listFragment).commit();
 
                 // if we don't have flows, start download activity
-
-
                 if (getRealm().where(DBFlow.class).equalTo("org.id", org.getId()).findFirst() == null) {
                     startActivity(getIntent(OrgActivity.this, RapidFlowsActivity.class));
                 }
@@ -146,7 +144,13 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
             org.setAnonymous(latest.isAnonymous());
             org.setCountry(latest.getCountry());
             org.setDateStyle(latest.getDateStyle());
-            org.setPrimaryLanguage(latest.getPrimaryLanguage());
+
+            if (latest.getPrimaryLanguage() == null) {
+                org.setPrimaryLanguage("base");
+            } else {
+                org.setPrimaryLanguage(latest.getPrimaryLanguage());
+            }
+
             org.setTimezone(latest.getTimezone());
 
             // now go fetch the locations

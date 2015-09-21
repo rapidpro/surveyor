@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -80,6 +81,8 @@ public class BaseActivity extends AppCompatActivity {
             realm.clear(DBOrg.class);
             realm.commitTransaction();
             finish();
+
+            PreferenceManager.getDefaultSharedPreferences(this).edit().remove(SurveyorIntent.PREF_LOGGED_IN).commit();
 
             Submission.clear();
 
