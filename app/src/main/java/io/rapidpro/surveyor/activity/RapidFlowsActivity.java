@@ -27,7 +27,6 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         final DBOrg org = getDBOrg();
         Surveyor.LOG.d("Fetching flows for " + org.getName());
 
-
         getRapidProService().getFlows(new Callback<FlowList>() {
             @Override
             public void success(FlowList flows, Response response) {

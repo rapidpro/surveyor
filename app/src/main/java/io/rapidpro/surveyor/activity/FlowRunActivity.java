@@ -119,10 +119,10 @@ public class FlowRunActivity extends BaseActivity {
                 }
             }).build();
 
-            m_submission = Submission.load(new File(getIntent().getStringExtra(SurveyorIntent.EXTRA_SUBMISSION_FILE)));
+            m_submission = new Submission(getDBFlow());
 
             // create a run state based on our contact
-            m_runState = RunnerUtil.getRunState(m_runner, getDBFlow(), m_submission.getContact());
+            m_runState = RunnerUtil.getRunState(m_runner, getDBFlow());
 
             // show any initial messages
             addMessages(m_runState);

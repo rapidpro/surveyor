@@ -3,23 +3,17 @@ package io.rapidpro.surveyor.net;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.rapidpro.flows.definition.Flow;
-import io.rapidpro.flows.definition.GroupRef;
+import io.rapidpro.flows.runner.Contact;
 import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.DBOrg;
@@ -107,14 +101,13 @@ public class RapidProService {
         });
     }
 
-    public Submission.Contact addContact(final Submission.Contact contact) {
+    public Contact addContact(final Contact contact) {
 
-        Surveyor.LOG.d("Adding contact: " + contact);
-        if (contact.getLanguage().equals("base")) {
+        if ("base".equals(contact.getLanguage())) {
             contact.setLanguage(null);
         }
 
-        Submission.Contact result =  m_api.addContact(getToken(), contact);
+        Contact result =  m_api.addContact(getToken(), contact);
         contact.setUuid(result.getUuid());
         return contact;
     }
@@ -159,7 +152,7 @@ public class RapidProService {
                 return false;
             }
         }).registerTypeAdapterFactory(new FlowListTypeAdapterFactory())
-                .registerTypeAdapter(Submission.Contact.class, new Submission.Contact.Serializer()).create();
+                .registerTypeAdapter(Contact.class, new Submission.ContactSerializer()).create();
 
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(Surveyor.BASE_URL)
@@ -200,7 +193,4 @@ public class RapidProService {
             }
         }
     }
-
-
-
 }

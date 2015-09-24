@@ -4,6 +4,7 @@ import android.location.Location;
 
 import java.util.List;
 
+import io.rapidpro.flows.runner.Contact;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.data.Submission;
@@ -47,9 +48,9 @@ public interface RapidProAPI {
             @Body Submission state);
 
     @POST("/api/v1/contacts.json")
-    Submission.Contact addContact(
+    Contact addContact(
             @Header("Authorization") String token,
-            @Body Submission.Contact contact);
+            @Body Contact contact);
 
     @GET("/api/v1/boundaries.json")
     LocationResultPage getLocationPage(

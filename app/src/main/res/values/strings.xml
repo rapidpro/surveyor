@@ -843,6 +843,6 @@
     <string name="submit_title">Submit</string>
     <string name="submit_body">Submitting flow runs to the server.</string>
     <string name="error_server_not_found">Server is unavailable. Please check your settings or try again later.</string>
-    <string name="error_server_failure">There was an error logging in. Please try again later.</string>
+    <string name="error_server_failure">Server error, please try again later.</string>
     <string name="error_invalid_login">Invalid login. Check your username and password and try again.</string>
 </resources>

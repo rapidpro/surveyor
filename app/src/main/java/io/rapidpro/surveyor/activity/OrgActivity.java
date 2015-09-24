@@ -88,7 +88,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
 
     @Override
     public void onFragmentInteraction(DBFlow flow) {
-        Intent intent = new Intent(this, ContactActivity.class);
+        Intent intent = new Intent(this, FlowRunActivity.class);
         intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
         startActivity(intent);
     }

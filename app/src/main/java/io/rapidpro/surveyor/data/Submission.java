@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.UUID;
 
 import io.rapidpro.flows.definition.Flow;
+import io.rapidpro.flows.runner.Contact;
+import io.rapidpro.flows.runner.ContactUrn;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Step;
 import io.rapidpro.flows.utils.JsonUtils;
@@ -150,10 +152,10 @@ public class Submission {
     /**
      * Create a new submission for a flow
      */
-    public Submission(DBFlow flow, String name, String language, String phone) {
+    public Submission(DBFlow flow) {
 
         m_flow = flow.getUuid();
-        m_contact = new Contact(name, language, phone);
+        m_contact = new Contact();
 
         String uuid = UUID.randomUUID().toString();
 
@@ -196,6 +198,7 @@ public class Submission {
 
         // mark us completed if necessary
         m_completed = runState.getState() == RunState.State.COMPLETED;
+
     }
 
     public void save() {
@@ -224,10 +227,6 @@ public class Submission {
         }
     }
 
-    public Contact getContact() {
-        return m_contact;
-    }
-
     public void setFile(File file) {
         m_file = file;
     }
@@ -236,98 +235,31 @@ public class Submission {
         return m_completed;
     }
 
-    public interface OnSubmitListener {
-        void onSuccess();
-        void onError(RetrofitError error);
-    }
+    public static class ContactSerializer implements JsonSerializer<Contact> {
+        @Override
+        public JsonElement serialize(Contact src, Type typeOfSrc, JsonSerializationContext context) {
 
-    /**
-     * The Contact for this submission, manages serialization to disk and over the wire
-     */
-    public static class Contact {
+            // if we have a uuid, it's been provided from the server, so we can
+            // represent ourselves with the uuid
+            if (src.getUuid() != null) {
+                return new JsonPrimitive(src.getUuid());
+            }
 
-        @SerializedName("name")
-        private String m_name;
-
-        @SerializedName("phone")
-        private String m_phone;
-
-        @SerializedName("language")
-        private String m_language;
-
-        @SerializedName("uuid")
-        private String m_uuid;
-
-        public Contact(String name, String language, String phone) {
-            m_name = name;
-            m_language = language;
-            m_phone = phone;
-        }
-
-        public void setUuid(String uuid) {
-            m_uuid = uuid;
-        }
-
-        public String getName() {
-            return m_name;
-        }
-
-        public void setName(String name) {
-            m_name = name;
-        }
-
-        public String getPhone() {
-            return m_phone;
-        }
-
-        public void setPhone(String phone) {
-            m_phone = phone;
-        }
-
-        public String getLanguage() {
-            return m_language;
-        }
-
-        public void setLanguage(String language) {
-            m_language = language;
-        }
-
-        public String getUuid() {
-            return m_uuid;
-        }
-
-        public String toString() {
-            return "Contact[" + m_uuid + ";" + m_name + ";" + m_language + ";" + m_phone + "]";
-
-        }
-
-        public static class Serializer implements JsonSerializer<Contact> {
-            @Override
-            public JsonElement serialize(Contact src, Type typeOfSrc, JsonSerializationContext context) {
-
-                // if we have a uuid, it's been provided from the server, so we can
-                // represent ourselves with the uuid
-                if (src.getUuid() != null) {
-                    return new JsonPrimitive(src.getUuid());
+            // if we don't know the uuid yet, create a json object
+            // with all of our known properties
+            else {
+                JsonArray urns = new JsonArray();
+                for (ContactUrn urn : src.getUrns()) {
+                    urns.add(new JsonPrimitive(urn.toString()));
                 }
 
-                // if we don't know the uuid yet, create a json object
-                // with all of our known properties
-                else {
-                    JsonArray urns = new JsonArray();
-                    urns.add(new JsonPrimitive("tel:" + src.getPhone()));
-                    JsonObject obj = new JsonObject();
-                    obj.addProperty("name", src.getName());
-                    obj.addProperty("language", src.getLanguage());
-                    obj.add("urns", urns);
-                    return obj;
-                }
+                JsonObject obj = new JsonObject();
+                obj.addProperty("name", src.getName());
+                obj.addProperty("language", src.getLanguage());
+                obj.add("urns", urns);
+                return obj;
             }
         }
-    }
-
-    public interface ContactAddListener {
-        void onContactAdded();
     }
 }
 
