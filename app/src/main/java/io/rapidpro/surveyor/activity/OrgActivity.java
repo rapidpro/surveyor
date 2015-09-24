@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.drive.events.ProgressEvent;
 
@@ -131,6 +132,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         private File[] m_submissions;
         private FlowListAdapter m_adapter;
         private BlockingProgress m_progress;
+        private int m_error;
 
         public SubmitSubmissions(File[] submissions, BlockingProgress progress, FlowListAdapter toNotify) {
             m_submissions = submissions;
@@ -144,7 +146,23 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
             for (File submission : m_submissions) {
                 Submission sub = Submission.load(submission);
                 if (sub != null){
-                    sub.submit();
+                    try {
+                        sub.submit();
+                    } catch (RetrofitError e) {
+                        Surveyor.LOG.e("Failed to submit flow run", e);
+
+                        int status = e.getResponse().getStatus();
+                        if (status == 404 || status == 502) {
+                            m_error = R.string.error_server_not_found;
+
+                            // can't find server, just give up
+                            return null;
+                        }
+                        else {
+                            m_error = R.string.error_server_failure;
+                        }
+                    }
+
                 }
 
                 m_progress.incrementProgressBy(1);
@@ -156,6 +174,10 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         protected void onPostExecute(Void result) {
             m_progress.dismiss();
             m_adapter.notifyDataSetChanged();
+
+            if (m_error > 0) {
+                Toast.makeText(OrgActivity.this, m_error, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
