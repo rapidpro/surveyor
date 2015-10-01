@@ -112,6 +112,23 @@ public class Submission {
     }
 
     /**
+     * Get all submission files across all flows
+     */
+    public static File[] getPendingSubmissions() {
+        List<File> files = new ArrayList<>();
+        for (File dir : getSubmissionsDir().listFiles()) {
+            if (dir.isDirectory()) {
+                for (File submission : dir.listFiles(FLOW_FILE_FILTER)) {
+                    files.add(submission);
+                }
+            }
+        }
+
+        File[] results = new File[files.size()];
+        return files.toArray(results);
+    }
+
+    /**
      * Read the flow definition from disk
      */
     private static Flow getFlow(File file) {

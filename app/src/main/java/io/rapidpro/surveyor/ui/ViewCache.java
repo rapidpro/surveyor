@@ -2,6 +2,8 @@ package io.rapidpro.surveyor.ui;
 
 import android.util.SparseArray;
 import android.view.View;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -70,5 +72,26 @@ public class ViewCache {
 
     public void setText(int id, String text) {
         getTextView(id).setText(text);
+    }
+
+    public void setVisible(int id, boolean visible) {
+        View view = getCachedView(id);
+        if (visible) {
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
+        }
+    }
+
+    public ListView getListView(int id) {
+        return (ListView)getCachedView(id);
+    }
+
+    public ListAdapter getListViewAdapter(int list) {
+        ListView listView = getListView(list);
+        if (listView != null) {
+            return listView.getAdapter();
+        }
+        return null;
     }
 }

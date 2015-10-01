@@ -3,7 +3,6 @@ package io.rapidpro.surveyor.activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -11,10 +10,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.google.android.gms.drive.events.ProgressEvent;
 
 import java.io.File;
 import java.util.List;
@@ -47,8 +45,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
             setContentView(R.layout.activity_pending);
             new FetchOrgData().execute();
         } else {
-            setContentView(R.layout.fragment_container);
-
+            setContentView(R.layout.activity_org);
             setTitle(org.getName());
 
             if (savedInstanceState == null) {
@@ -67,11 +64,17 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
     @Override
     protected void onResume() {
         super.onResume();
-        ListView list = (ListView) findViewById(android.R.id.list);
-        if (list != null) {
-            FlowListAdapter adapter = ((FlowListAdapter) list.getAdapter());
+        refreshFlowList();
+    }
+
+    private void refreshFlowList() {
+        FlowListAdapter adapter = (FlowListAdapter)getViewCache().getListViewAdapter(android.R.id.list);
+        if (adapter != null){
             adapter.notifyDataSetChanged();
         }
+
+        boolean pending = Submission.getPendingSubmissions().length > 0;
+        getViewCache().setVisible(R.id.bottom_options, pending);
     }
 
     @Override
@@ -107,6 +110,34 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                     public void onClick(DialogInterface dialog, int id) {
 
                         final File[] submissions = Submission.getPendingSubmissions(flow);
+
+                        final BlockingProgress progress = new BlockingProgress(OrgActivity.this,
+                                R.string.submit_title, R.string.submit_body, submissions.length);
+
+                        progress.show();
+
+                        // get the adapter to notify of changes
+                        final FlowListAdapter adapter = (FlowListAdapter) ((ListView)findViewById(android.R.id.list)).getAdapter();
+                        new SubmitSubmissions(submissions, progress, adapter).execute();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
+    }
+
+    public void onClickSubmit(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.confirm_send_all_submissions))
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        final File[] submissions = Submission.getPendingSubmissions();
 
                         final BlockingProgress progress = new BlockingProgress(OrgActivity.this,
                                 R.string.submit_title, R.string.submit_body, submissions.length);
@@ -173,7 +204,8 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         @Override
         protected void onPostExecute(Void result) {
             m_progress.dismiss();
-            m_adapter.notifyDataSetChanged();
+
+            refreshFlowList();
 
             if (m_error > 0) {
                 Toast.makeText(OrgActivity.this, m_error, Toast.LENGTH_SHORT).show();
