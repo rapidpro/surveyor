@@ -76,10 +76,12 @@ public class ViewCache {
 
     public void setVisible(int id, boolean visible) {
         View view = getCachedView(id);
-        if (visible) {
-            view.setVisibility(View.VISIBLE);
-        } else {
-            view.setVisibility(View.GONE);
+        if (view != null) {
+            if (visible) {
+                view.setVisibility(View.VISIBLE);
+            } else {
+                view.setVisibility(View.GONE);
+            }
         }
     }
 

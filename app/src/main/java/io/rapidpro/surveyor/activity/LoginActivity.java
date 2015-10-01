@@ -187,7 +187,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                     // add our orgs, make sure we don't consider duplicates
                     HashSet<Integer> added = new HashSet<>();
                     for (DBOrg org : orgs) {
-                        if (!added.add(org.getId())) {
+                        if (added.add(org.getId())) {
                             realm.copyToRealm(org);
                         }
                     }

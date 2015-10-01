@@ -35,7 +35,7 @@ public class OrgListFragment extends BaseFragment implements AbsListView.OnItemC
     }
 
     public RealmResults<DBOrg> getItems() {
-        return getRealm().where(DBOrg.class).findAll();
+        return getRealm().where(DBOrg.class).findAllSorted("name", true);
     }
 
     @Override
