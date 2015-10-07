@@ -10,8 +10,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import io.rapidpro.surveyor.R;
@@ -55,23 +57,28 @@ public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnIt
         List<DBFlow> existing = getRealm().where(DBFlow.class).equalTo("org.id", orgId).findAllSorted("name");
 
         // create a quick lookup for existing DBFlows
-        Set<String> existingIds = new HashSet<String>();
-        for (DBFlow DBFlow : existing) {
-            existingIds.add(DBFlow.getUuid());
+        Map<String,Integer> existingIds = new HashMap<>();
+        for (DBFlow flow : existing) {
+            existingIds.put(flow.getUuid(), flow.getVersion());
         }
 
         // exclude any DBFlows that are already in our database
         FlowList flowList = ((BaseActivity)getActivity()).getRapidProService().getLastFlows();
-        List<DBFlow> DBFlows = new ArrayList<>();
+        List<DBFlow> dbFlows = new ArrayList<>();
         if (flowList != null) {
-            for (DBFlow DBFlow : flowList.results) {
-                if (!existingIds.contains(DBFlow.getUuid())) {
-                    DBFlows.add(DBFlow);
-                }
+            for (DBFlow newFlow : flowList.results) {
+
+                if (!existingIds.keySet().contains(newFlow.getUuid())) {
+                    dbFlows.add(newFlow);
+                }/* else {
+                    if (newFlow.getVersion() != existingIds.get(newFlow.getUuid())){
+                        dbFlows.add(newFlow);
+                    }
+                }*/
             }
         }
 
-        return DBFlows;
+        return dbFlows;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package io.rapidpro.surveyor.data;
 
+import com.google.gson.annotations.SerializedName;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -13,6 +15,26 @@ public class DBFlow extends RealmObject {
 
     private DBOrg org;
     private int questionCount;
+    private int version;
+
+    @SerializedName("spec_version")
+    private int specVersion;
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public int getSpecVersion() {
+        return specVersion;
+    }
+
+    public void setSpecVersion(int specVersion) {
+        this.specVersion = specVersion;
+    }
 
     // Realm accessors, do not modify
     public void setOrg(DBOrg org) {

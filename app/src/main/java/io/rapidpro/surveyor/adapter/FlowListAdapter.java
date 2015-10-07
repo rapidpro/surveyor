@@ -63,7 +63,7 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
             questionString = "Question";
         }
 
-        cache.questionView.setText(flow.getQuestionCount() + " " + questionString);
+        cache.questionView.setText(flow.getQuestionCount() + " " + questionString + " (v"+ flow.getVersion() + ")");
 
         return row;
     }

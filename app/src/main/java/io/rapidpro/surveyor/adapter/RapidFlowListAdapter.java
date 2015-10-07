@@ -51,6 +51,7 @@ public class RapidFlowListAdapter extends ArrayAdapter {
             questionString = "Question";
         }
 
+        //cache.questionView.setText(flow.getQuestionCount() + " " + questionString + " (v" + flow.getVersion() + ")");
         cache.questionView.setText(flow.getQuestionCount() + " " + questionString);
 
         return row;

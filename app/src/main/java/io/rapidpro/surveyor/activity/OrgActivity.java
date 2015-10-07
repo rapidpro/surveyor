@@ -181,19 +181,10 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                         sub.submit();
                     } catch (RetrofitError e) {
                         Surveyor.LOG.e("Failed to submit flow run", e);
+                        m_error = getRapidProService().getErrorMessage(e);
+                        return null;
 
-                        int status = e.getResponse().getStatus();
-                        if (status == 404 || status == 502) {
-                            m_error = R.string.error_server_not_found;
-
-                            // can't find server, just give up
-                            return null;
-                        }
-                        else {
-                            m_error = R.string.error_server_failure;
-                        }
                     }
-
                 }
 
                 m_progress.incrementProgressBy(1);

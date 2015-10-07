@@ -3,6 +3,7 @@ package io.rapidpro.surveyor.activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
@@ -42,7 +43,10 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
 
             @Override
             public void failure(RetrofitError error) {
-                Surveyor.LOG.e("Boom: " + error.getMessage(), error.getCause());
+                Surveyor.LOG.e(error.getMessage(), error.getCause());
+                int message = getRapidProService().getErrorMessage(error);
+                Toast.makeText(RapidFlowsActivity.this, message, Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }
@@ -66,7 +70,9 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
             @Override
             public void success(FlowDefinition flowDefinition, Response response) {
                 realm.beginTransaction();
-                flow.setDefinition("{\"flow\":" + flowDefinition.results.toString() + "}");
+                flow.setDefinition(flowDefinition.definition.toString());
+                flow.setVersion(flowDefinition.version);
+                flow.setName(flowDefinition.name);
                 realm.copyToRealmOrUpdate(flow);
                 realm.commitTransaction();
             }

@@ -13,6 +13,7 @@ import java.util.List;
 
 import io.rapidpro.flows.runner.Contact;
 import io.rapidpro.flows.utils.JsonUtils;
+import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
@@ -163,6 +164,15 @@ public class RapidProService {
         return restAdapter.create(RapidProAPI.class);
     }
 
+    public int getErrorMessage(RetrofitError e) {
+        int status = e.getResponse().getStatus();
+        if (status == 404 || status == 502) {
+            return R.string.error_server_not_found;
+        }
+        else {
+            return R.string.error_server_failure;
+        }
+    }
 
 
     private class FlowListTypeAdapterFactory extends CustomizedTypeAdapterFactory<FlowList> {

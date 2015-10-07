@@ -12,6 +12,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.threeten.bp.Instant;
 
 import java.io.File;
@@ -60,6 +61,9 @@ public class Submission {
     @SerializedName("started")
     @JsonAdapter(JsonUtils.InstantAdapter.class)
     private Instant m_started;
+
+    @SerializedName("version")
+    private int m_version;
 
     // if the flow was completed
     @SerializedName("completed")
@@ -140,6 +144,7 @@ public class Submission {
         } catch (IOException e) {
             Surveyor.LOG.e("Error loading flow", e);
         }
+        Surveyor.LOG.d("From file: " + flow);
         return Flow.fromJson(flow);
     }
 
@@ -173,6 +178,7 @@ public class Submission {
 
         m_flow = flow.getUuid();
         m_contact = new Contact();
+        m_version = flow.getVersion();
 
         String uuid = UUID.randomUUID().toString();
 
@@ -188,8 +194,14 @@ public class Submission {
         File flowFile = new File(flowDir, FLOW_FILE);
         if (!flowFile.exists()) {
             try {
-                FileUtils.writeStringToFile(flowFile, flow.getDefinition());
-            } catch (IOException e) {
+                JSONObject flowJson = new JSONObject();
+                flowJson.put("name", flow.getName());
+                flowJson.put("version", flow.getVersion());
+                flowJson.put("spec_version", flow.getSpecVersion());
+                flowJson.put("flow_type", "S");
+                flowJson.put("definition", new JSONObject(flow.getDefinition()));
+                FileUtils.writeStringToFile(flowFile, flowJson.toString());
+            } catch (Exception e) {
                 Surveyor.LOG.e("Failed to write flow to disk", e);
                 // TODO: this should probably fail hard
             }

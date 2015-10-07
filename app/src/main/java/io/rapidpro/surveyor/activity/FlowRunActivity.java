@@ -93,8 +93,9 @@ public class FlowRunActivity extends BaseActivity {
             });
 
             m_runner = new RunnerBuilder().withLocationResolver(new Location.Resolver() {
+
                 @Override
-                public Location resolve(String input, String country, Location.Level levelEnum, String parent) {
+                public Location resolve(String input, String country, Location.Level levelEnum, Location parent) {
 
                     int level = 1;
                     if (levelEnum == Location.Level.DISTRICT) {
