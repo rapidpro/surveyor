@@ -178,7 +178,7 @@ public class Submission {
 
         m_flow = flow.getUuid();
         m_contact = new Contact();
-        m_version = flow.getVersion();
+        m_version = flow.getRevision();
 
         String uuid = UUID.randomUUID().toString();
 
@@ -194,13 +194,7 @@ public class Submission {
         File flowFile = new File(flowDir, FLOW_FILE);
         if (!flowFile.exists()) {
             try {
-                JSONObject flowJson = new JSONObject();
-                flowJson.put("name", flow.getName());
-                flowJson.put("version", flow.getVersion());
-                flowJson.put("spec_version", flow.getSpecVersion());
-                flowJson.put("flow_type", "S");
-                flowJson.put("definition", new JSONObject(flow.getDefinition()));
-                FileUtils.writeStringToFile(flowFile, flowJson.toString());
+                FileUtils.writeStringToFile(flowFile, flow.getDefinition());
             } catch (Exception e) {
                 Surveyor.LOG.e("Failed to write flow to disk", e);
                 // TODO: this should probably fail hard

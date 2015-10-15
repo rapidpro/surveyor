@@ -16,6 +16,7 @@ import io.realm.Realm;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragment.RapidFlowListener {
 
@@ -68,11 +69,11 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         // go fetch our DBFlow definition async
         getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
             @Override
-            public void success(FlowDefinition flowDefinition, Response response) {
+            public void success(FlowDefinition definition, Response response) {
                 realm.beginTransaction();
-                flow.setDefinition(flowDefinition.definition.toString());
-                flow.setVersion(flowDefinition.version);
-                flow.setName(flowDefinition.name);
+                flow.setDefinition(new String(((TypedByteArray) response.getBody()).getBytes()));
+                flow.setRevision(definition.metadata.revision);
+                flow.setName(definition.metadata.name);
                 realm.copyToRealmOrUpdate(flow);
                 realm.commitTransaction();
             }

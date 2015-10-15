@@ -25,6 +25,7 @@ public interface RapidProAPI {
     void getOrgs(
             @Field("email") String email,
             @Field("password") String password,
+            @Field("role") String role,
             Callback<List<DBOrg>> callback);
 
     @GET("/api/v1/org.json")

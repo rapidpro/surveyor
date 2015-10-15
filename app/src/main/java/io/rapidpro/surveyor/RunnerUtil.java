@@ -32,13 +32,7 @@ public class RunnerUtil {
 
 
     public static Flow createFlow(DBFlow flow) throws JSONException {
-        JSONObject flowJson = new JSONObject();
-        flowJson.put("name", flow.getName());
-        flowJson.put("flow_type", "S");
-        flowJson.put("version", flow.getVersion());
-        flowJson.put("spec_version", flow.getSpecVersion());
-        flowJson.put("definition", new JSONObject(flow.getDefinition()));
-        return Flow.fromJson(flowJson.toString());
+        return Flow.fromJson(flow.getDefinition());
     }
 
     public static DateStyle getDateStyle (DBOrg org){

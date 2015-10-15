@@ -15,17 +15,17 @@ public class DBFlow extends RealmObject {
 
     private DBOrg org;
     private int questionCount;
-    private int version;
+    private int revision;
 
     @SerializedName("spec_version")
     private int specVersion;
 
-    public int getVersion() {
-        return version;
+    public int getRevision() {
+        return revision;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
+    public void setRevision(int revision) {
+        this.revision = revision;
     }
 
     public int getSpecVersion() {

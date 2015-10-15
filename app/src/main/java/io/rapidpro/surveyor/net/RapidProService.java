@@ -48,7 +48,7 @@ public class RapidProService {
     }
 
     public void getOrgs(String email, String password, Callback<List<DBOrg>> callback) {
-        m_api.getOrgs(email, password, callback);
+        m_api.getOrgs(email, password, "S", callback);
     }
 
     public DBOrg getOrg() {

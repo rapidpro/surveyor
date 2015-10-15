@@ -59,7 +59,7 @@ public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnIt
         // create a quick lookup for existing DBFlows
         Map<String,Integer> existingIds = new HashMap<>();
         for (DBFlow flow : existing) {
-            existingIds.put(flow.getUuid(), flow.getVersion());
+            existingIds.put(flow.getUuid(), flow.getRevision());
         }
 
         // exclude any DBFlows that are already in our database
