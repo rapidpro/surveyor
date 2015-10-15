@@ -39,6 +39,7 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
             cache.titleView = (TextView)row.findViewById(R.id.text_flow_name);
             cache.questionView = (TextView)row.findViewById(R.id.text_flow_questions);
             cache.pendingSubmissions = (TextView)row.findViewById(R.id.text_pending_submissions);
+            cache.refreshButton = (TextView)row.findViewById(R.id.text_refresh_button);
 
             row.setTag(cache);
         } else {
@@ -51,6 +52,7 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
         int submissions = Submission.getPendingSubmissionCount(flow);
         cache.pendingSubmissions.setText("" + submissions);
         cache.pendingSubmissions.setTag(flow);
+        cache.refreshButton.setTag(flow);
 
         if (submissions > 0) {
             cache.pendingSubmissions.setVisibility(View.VISIBLE);
@@ -64,7 +66,6 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
         }
 
         cache.questionView.setText(flow.getQuestionCount() + " " + questionString + " (v"+ flow.getRevision() + ")");
-
         return row;
     }
 
@@ -72,5 +73,6 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
         TextView titleView;
         TextView questionView;
         TextView pendingSubmissions;
+        TextView refreshButton;
     }
 }

@@ -847,6 +847,12 @@
     <string name="error_server_failure">Server error, please try again later.</string>
     <string name="error_invalid_login">Invalid login. Check your username and password and try again.</string>
     <string name="button_submit">Submit Flow Runs</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="refresh_org">Refreshing organization details</string>
+    <string name="refresh_title">Refresh</string>
+    <string name="confirm_flow_refresh">Are you sure you want to refresh the flow definition? This will overwrite the existing version of the flow with the latest from the server and cannot be undone.</string>
+    <string name="refresh_flow">Refreshing flow definition.</string>
+    <string name="confirm_org_refresh">Refresh the contact fields and locations for this organization?</string>
 
 
 </resources>

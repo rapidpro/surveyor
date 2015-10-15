@@ -34,6 +34,7 @@ import io.rapidpro.surveyor.data.DBAlias;
 import io.rapidpro.surveyor.data.DBField;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
+import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
@@ -125,8 +126,8 @@ public class FlowRunActivity extends BaseActivity {
             m_submission = new Submission(getDBFlow());
 
             // create a run state based on our contact
-            List<DBField> fields = realm.where(DBField.class).equalTo("org.id", getDBFlow().getOrg().getId()).findAll();
-            m_runState = RunnerUtil.getRunState(m_runner, getDBFlow(), fields);
+            OrgDetails details = OrgDetails.load(flow.getOrg());
+            m_runState = RunnerUtil.getRunState(m_runner, getDBFlow(), details.getFields());
 
             // show any initial messages
             addMessages(m_runState);
@@ -161,6 +162,10 @@ public class FlowRunActivity extends BaseActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void refreshRun(MenuItem item) {
+
     }
 
 

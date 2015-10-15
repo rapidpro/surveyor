@@ -9,9 +9,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import io.rapidpro.flows.runner.Contact;
+import io.rapidpro.flows.runner.Field;
 import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
@@ -123,6 +125,12 @@ public class RapidProService {
         }
     }
 
+    public void addCreatedFields(HashMap<String, Field> fields) {
+        for (Field field : fields.values()) {
+            m_api.addCreatedField(getToken(), field);
+        }
+    }
+
     public List<DBLocation> getLocations() {
 
         List<DBLocation> locations = new ArrayList<>();
@@ -141,8 +149,8 @@ public class RapidProService {
         return locations;
     }
 
-    public List<DBField> getFields() {
-        List<DBField> fields = new ArrayList<>();
+    public List<Field> getFields() {
+        List<Field> fields = new ArrayList<>();
         int pageNumber = 1;
         FieldResultPage page = m_api.getFieldPage(getToken(), pageNumber);
         fields.addAll(page.results);

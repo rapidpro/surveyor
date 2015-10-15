@@ -63,4 +63,10 @@ public interface RapidProAPI {
     FieldResultPage getFieldPage(
             @Header("Authorization") String token,
             @Query("page") int page);
+
+    @POST("/api/v1/fields.json")
+    Void addCreatedField(
+            @Header("Authorization") String token,
+            @Body io.rapidpro.flows.runner.Field field);
+
 }

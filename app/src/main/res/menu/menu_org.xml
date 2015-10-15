@@ -4,8 +4,14 @@
       tools:context="io.rapidpro.surveyor.activity.OrgActivity">
       <item android:id="@+id/action_download"
             android:title="@string/action_download"
-            android:orderInCategory="100"
+            android:orderInCategory="1"
             app:showAsAction="ifRoom"
             android:onClick="showFlowList"
             android:icon="@drawable/ic_cloud_download_white_24dp"/>
+    <item android:id="@+id/action_refresh"
+          android:title="@string/action_refresh"
+          android:orderInCategory="2"
+          app:showAsAction="never"
+          android:onClick="confirmRefreshOrg"/>
+
 </menu>

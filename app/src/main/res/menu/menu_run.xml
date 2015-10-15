@@ -5,4 +5,5 @@
           android:title="@string/action_discard_run"
           android:orderInCategory="1"
           app:showAsAction="never"/>
+
 </menu>

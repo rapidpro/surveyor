@@ -59,13 +59,7 @@ public class RunnerUtil {
 
     }
 
-    public static RunState getRunState(Runner runner, DBFlow flow, List<DBField> fields) throws FlowRunException, JSONException {
-
-        List<Field> flowFields = new ArrayList<>();
-        for (DBField dbField  : fields) {
-            flowFields.add(new Field(dbField.getKey(), dbField.getLabel(),
-                    RunnerUtil.getValueType(dbField.getValueType())));
-        }
-        return runner.start(createOrg(flow.getOrg()), flowFields, new Contact(), createFlow(flow));
+    public static RunState getRunState(Runner runner, DBFlow flow, List<Field> fields) throws FlowRunException, JSONException {
+        return runner.start(createOrg(flow.getOrg()), fields, new Contact(), createFlow(flow));
     }
 }

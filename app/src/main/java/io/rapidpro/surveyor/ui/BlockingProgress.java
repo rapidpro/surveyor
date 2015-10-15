@@ -3,10 +3,8 @@ package io.rapidpro.surveyor.ui;
 import android.app.ProgressDialog;
 import android.content.Context;
 
-import io.rapidpro.surveyor.R;
-
 /**
- * Created by eric on 9/21/15.
+ * A blocking progress dialog
  */
 public class BlockingProgress extends ProgressDialog {
 
@@ -19,8 +17,8 @@ public class BlockingProgress extends ProgressDialog {
         setIndeterminate(false);
         setMax(total);
         setCancelable(false);
-        setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         setCanceledOnTouchOutside(false);
+        setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         setProgress(0);
     }
 

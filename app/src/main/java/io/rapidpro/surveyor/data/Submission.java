@@ -1,7 +1,5 @@
 package io.rapidpro.surveyor.data;
 
-import android.media.MediaMetadataRetriever;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -12,7 +10,6 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
-import org.json.JSONObject;
 import org.threeten.bp.Instant;
 
 import java.io.File;
@@ -20,18 +17,19 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 import io.rapidpro.flows.definition.Flow;
 import io.rapidpro.flows.runner.Contact;
 import io.rapidpro.flows.runner.ContactUrn;
+import io.rapidpro.flows.runner.Field;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Step;
 import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.net.RapidProService;
-import retrofit.RetrofitError;
 
 /**
  * Represents a single flow run. Manages saving run progress and
@@ -45,6 +43,10 @@ public class Submission {
 
     // the file we will be persisted in
     private transient File m_file;
+
+    // fields created during this submission
+    @SerializedName("fields")
+    protected HashMap<String,Field> m_fields = new HashMap<>();
 
     @SerializedName("steps")
     protected List<Step> m_steps;
@@ -63,16 +65,16 @@ public class Submission {
     private Instant m_started;
 
     @SerializedName("version")
-    private int m_version;
+    private int m_revision;
 
     // if the flow was completed
     @SerializedName("completed")
     private boolean m_completed;
 
-    private static FilenameFilter FLOW_FILE_FILTER = new FilenameFilter() {
+    private static FilenameFilter NOT_FLOW_FILE_FILTER = new FilenameFilter() {
         @Override
         public boolean accept(File dir, String filename) {
-            return !filename.equals(FLOW_FILE);
+            return !filename.endsWith(FLOW_FILE);
         }
     };
 
@@ -105,14 +107,14 @@ public class Submission {
      * Get the number of pending submissions for this flow
      */
     public static int getPendingSubmissionCount(DBFlow flow) {
-        return getFlowDir(flow).list(FLOW_FILE_FILTER).length;
+        return getFlowDir(flow).list(NOT_FLOW_FILE_FILTER).length;
     }
 
     /**
      * Get all the submission files for the given flow
      */
     public static File[] getPendingSubmissions(DBFlow flow) {
-        return getFlowDir(flow).listFiles(FLOW_FILE_FILTER);
+        return getFlowDir(flow).listFiles(NOT_FLOW_FILE_FILTER);
     }
 
     /**
@@ -122,7 +124,7 @@ public class Submission {
         List<File> files = new ArrayList<>();
         for (File dir : getSubmissionsDir().listFiles()) {
             if (dir.isDirectory()) {
-                for (File submission : dir.listFiles(FLOW_FILE_FILTER)) {
+                for (File submission : dir.listFiles(NOT_FLOW_FILE_FILTER)) {
                     files.add(submission);
                 }
             }
@@ -136,7 +138,8 @@ public class Submission {
      * Read the flow definition from disk
      */
     private static Flow getFlow(File file) {
-        File flowFile = new File(file.getParent(), FLOW_FILE);
+        String revision = file.getName().split("_")[0];
+        File flowFile = new File(file.getParent(), revision + "_" + FLOW_FILE);
         Surveyor.LOG.d("Reading flow: " + flowFile.getName());
         String flow = null;
         try {
@@ -159,7 +162,6 @@ public class Submission {
             JsonUtils.setDeserializationContext(context);
             String json = FileUtils.readFileToString(file);
             Submission submission = JsonUtils.getGson().fromJson(json, Submission.class);
-
             submission.setFile(file);
             return submission;
         } catch (IOException e) {
@@ -178,20 +180,20 @@ public class Submission {
 
         m_flow = flow.getUuid();
         m_contact = new Contact();
-        m_version = flow.getRevision();
+        m_revision = flow.getRevision();
 
         String uuid = UUID.randomUUID().toString();
 
         // get a unique filename
         File flowDir = getFlowDir(flow);
-        File file =  new File(flowDir, uuid + "_1.json");
+        File file =  new File(flowDir, flow.getRevision() + "_" + uuid + "_1.json");
         int count = 2;
         while (file.exists()) {
-            file =  new File(flowDir, uuid + "_" + count + ".json");
+            file =  new File(flowDir, flow.getRevision() + "_" + uuid + "_" + count + ".json");
             count++;
         }
 
-        File flowFile = new File(flowDir, FLOW_FILE);
+        File flowFile = new File(flowDir, flow.getRevision() + "_" + FLOW_FILE);
         if (!flowFile.exists()) {
             try {
                 FileUtils.writeStringToFile(flowFile, flow.getDefinition());
@@ -222,6 +224,12 @@ public class Submission {
         // mark us completed if necessary
         m_completed = runState.getState() == RunState.State.COMPLETED;
 
+        // save off our current set of created fields
+        for (Field field : runState.getCreatedFields()) {
+            if (field.isNew()) {
+                m_fields.put(field.getKey(), field);
+            }
+        }
     }
 
     public void save() {
@@ -236,6 +244,9 @@ public class Submission {
     public void submit() {
         final RapidProService rapid = Surveyor.get().getRapidProService();
         final Submission submission = this;
+
+        // submit any created fields
+        rapid.addCreatedFields(m_fields);
 
         // first we need to create our contact
         rapid.addContact(m_contact);
