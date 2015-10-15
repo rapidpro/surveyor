@@ -15,6 +15,7 @@ import io.rapidpro.flows.runner.Contact;
 import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.data.DBField;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.DBOrg;
@@ -138,6 +139,19 @@ public class RapidProService {
         }
 
         return locations;
+    }
+
+    public List<DBField> getFields() {
+        List<DBField> fields = new ArrayList<>();
+        int pageNumber = 1;
+        FieldResultPage page = m_api.getFieldPage(getToken(), pageNumber);
+        fields.addAll(page.results);
+
+        while (page != null && page.next != null && page.next.trim().length() != 0) {
+            page = m_api.getFieldPage(getToken(), ++pageNumber);
+            fields.addAll(page.results);
+        }
+        return fields;
     }
 
     private RapidProAPI getAPIAccessor() {

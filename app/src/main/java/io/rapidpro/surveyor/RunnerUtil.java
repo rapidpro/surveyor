@@ -1,15 +1,10 @@
 package io.rapidpro.surveyor;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.threeten.bp.ZoneId;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.rapidpro.expressions.dates.DateStyle;
 import io.rapidpro.flows.definition.Flow;
@@ -19,10 +14,10 @@ import io.rapidpro.flows.runner.FlowRunException;
 import io.rapidpro.flows.runner.Org;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Runner;
-import io.rapidpro.flows.utils.JsonUtils;
+import io.rapidpro.surveyor.data.DBField;
 import io.rapidpro.surveyor.data.DBFlow;
+import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.DBOrg;
-import io.realm.RealmObject;
 
 
 /**
@@ -49,7 +44,28 @@ public class RunnerUtil {
                        org.isAnonymous());
     }
 
-    public static RunState getRunState(Runner runner, DBFlow flow) throws FlowRunException, JSONException {
-        return runner.start(createOrg(flow.getOrg()), new ArrayList<Field>(), new Contact(), createFlow(flow));
+    public static Field.ValueType getValueType(String valueType) {
+        if (valueType.equals("D")) {
+            return Field.ValueType.DATETIME;
+        } else if (valueType.equals("I")) {
+            return Field.ValueType.DISTRICT;
+        } else if (valueType.equals("S")) {
+            return Field.ValueType.STATE;
+        } else if (valueType.equals("N")) {
+            return Field.ValueType.DECIMAL;
+        } else {
+            return Field.ValueType.TEXT;
+        }
+
+    }
+
+    public static RunState getRunState(Runner runner, DBFlow flow, List<DBField> fields) throws FlowRunException, JSONException {
+
+        List<Field> flowFields = new ArrayList<>();
+        for (DBField dbField  : fields) {
+            flowFields.add(new Field(dbField.getKey(), dbField.getLabel(),
+                    RunnerUtil.getValueType(dbField.getValueType())));
+        }
+        return runner.start(createOrg(flow.getOrg()), flowFields, new Contact(), createFlow(flow));
     }
 }

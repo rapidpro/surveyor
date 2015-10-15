@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.List;
 
 import io.rapidpro.flows.RunnerBuilder;
 import io.rapidpro.flows.definition.actions.Action;
@@ -30,6 +31,7 @@ import io.rapidpro.surveyor.RunnerUtil;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBAlias;
+import io.rapidpro.surveyor.data.DBField;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.Submission;
@@ -102,7 +104,7 @@ public class FlowRunActivity extends BaseActivity {
                         level = 2;
                     }
 
-                    DBLocation location = realm.where(DBLocation.class).equalTo("name", input, false).equalTo("level", level).findFirst();
+                    DBLocation location = realm.where(DBLocation.class).equalTo("org.id", getDBOrg().getId()).equalTo("name", input, false).equalTo("level", level).findFirst();
 
                     if (location == null) {
                         DBAlias alias = realm.where(DBAlias.class).equalTo("name", input, false).equalTo("location.level", level).findFirst();
@@ -123,7 +125,8 @@ public class FlowRunActivity extends BaseActivity {
             m_submission = new Submission(getDBFlow());
 
             // create a run state based on our contact
-            m_runState = RunnerUtil.getRunState(m_runner, getDBFlow());
+            List<DBField> fields = realm.where(DBField.class).equalTo("org.id", getDBFlow().getOrg().getId()).findAll();
+            m_runState = RunnerUtil.getRunState(m_runner, getDBFlow(), fields);
 
             // show any initial messages
             addMessages(m_runState);

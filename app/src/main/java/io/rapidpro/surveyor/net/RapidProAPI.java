@@ -59,4 +59,8 @@ public interface RapidProAPI {
             @Query("aliases") boolean aliases,
             @Query("page") int page);
 
+    @GET("/api/v1/fields.json")
+    FieldResultPage getFieldPage(
+            @Header("Authorization") String token,
+            @Query("page") int page);
 }

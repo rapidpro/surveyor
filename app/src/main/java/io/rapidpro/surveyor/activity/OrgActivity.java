@@ -22,6 +22,7 @@ import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.DBAlias;
+import io.rapidpro.surveyor.data.DBField;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.DBOrg;
@@ -253,6 +254,14 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                     alias.setLocation(location);
                     realm.copyToRealmOrUpdate(alias);
                 }
+            }
+
+            // finally the fields for our org
+            List<DBField> fields = rapid.getFields();
+            for (DBField field : fields) {
+                field.setOrg(org);
+                field.setId(org.getId() + ":" + field.getLabel());
+                realm.copyToRealmOrUpdate(field);
             }
 
             realm.commitTransaction();
