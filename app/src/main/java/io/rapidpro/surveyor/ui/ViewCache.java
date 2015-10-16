@@ -2,6 +2,7 @@ package io.rapidpro.surveyor.ui;
 
 import android.util.SparseArray;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -95,5 +96,14 @@ public class ViewCache {
             return listView.getAdapter();
         }
         return null;
+    }
+
+    public Button getButton(int id) {
+        return (Button)getCachedView(id);
+    }
+
+    public void setButtonText(int id, String text) {
+        Button button = getButton(id);
+        button.setText(text);
     }
 }

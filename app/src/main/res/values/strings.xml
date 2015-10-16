@@ -19,7 +19,7 @@
     <string name="action_sync">Sync</string>
     <string name="action_logout">Logout</string>
     <string name="title_activity_org_list">Choose Organization</string>
-    <string name="title_activity_org">Nyaruka</string>
+    <string name="title_activity_org">Organization</string>
     <string name="title_activity_flow_list">Download Flow</string>
     <string name="title_activity_flowrun">Flow Run</string>
     <string name="error_org_missing">Org couldn\'t be found</string>
@@ -848,11 +848,20 @@
     <string name="error_invalid_login">Invalid login. Check your username and password and try again.</string>
     <string name="button_submit">Submit Flow Runs</string>
     <string name="action_refresh">Refresh</string>
-    <string name="refresh_org">Refreshing organization details</string>
+    <string name="refresh_org">Refreshing organization details..</string>
     <string name="refresh_title">Refresh</string>
-    <string name="confirm_flow_refresh">Are you sure you want to refresh the flow definition? This will overwrite the existing version of the flow with the latest from the server and cannot be undone.</string>
+    <string name="confirm_flow_refresh">Are you sure you want to refresh the flow definition? This will overwrite the existing version and cannot be undone.</string>
     <string name="refresh_flow">Refreshing flow definition.</string>
     <string name="confirm_org_refresh">Refresh the contact fields and locations for this organization?</string>
+    <string name="action_delete">Delete</string>
+    <string name="flow_delete_warning">Delete this flow and all existing submissions.</string>
+    <string name="action_submit">Submit</string>
+    <string name="pending_summary_flow">You have pending submissions for this flow to save on the server.</string>
+    <string name="pending_summary">You have pending submissions to save on the server.</string>
+    <string name="title_activity_flow">Flow Details</string>
+    <string name="confirm_flow_delete">Are you sure you want to delete this flow? All pending submissions will also be deleted.</string>
+    <string name="one_moment">One Moment</string>
+    <string name="delete_body">Deleting flow and all submissions..</string>
 
 
 </resources>

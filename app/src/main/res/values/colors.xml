@@ -30,6 +30,14 @@
     <color name="chat_in">#c4ddfb</color>
     <color name="chat_out">#dddddd</color>
     <color name="white">#FFFFFF</color>
+    <color name="warning_background">#bc8181</color>
+    <color name="warning">#b93b3b</color>
+    <color name="warning_text">#481313</color>
+
+    <color name="pending_background">#b0c2ae</color>
+    <color name="pending">#6e946a</color>
+    <color name="pending_button_text">#ebf2ea</color>
+    <color name="pending_text">#2c4b27</color>
 
 
 </resources>

@@ -14,9 +14,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.util.List;
-
 import io.rapidpro.flows.RunnerBuilder;
 import io.rapidpro.flows.definition.actions.Action;
 import io.rapidpro.flows.definition.actions.message.MessageAction;
@@ -29,9 +26,7 @@ import io.rapidpro.flows.runner.Step;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.RunnerUtil;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBAlias;
-import io.rapidpro.surveyor.data.DBField;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.OrgDetails;
@@ -52,7 +47,6 @@ public class FlowRunActivity extends BaseActivity {
     private Runner m_runner;
     private RunState m_runState;
 
-    // private File m_runFile;
     private Submission m_submission;
 
     @Override

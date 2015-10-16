@@ -114,6 +114,10 @@ public class BaseActivity extends AppCompatActivity {
         return m_viewCache;
     }
 
+    public void refresh() {
+
+    }
+
     public SharedPreferences getPreferences() {
         return getSurveyor().getPreferences();
     }

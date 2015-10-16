@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.List;
 
 import io.rapidpro.flows.runner.Field;
@@ -28,14 +29,10 @@ import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
-import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.net.RapidProService;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.realm.Realm;
-import retrofit.Callback;
 import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
 
 public class OrgActivity extends BaseActivity implements FlowListFragment.OnFragmentInteractionListener {
 
@@ -72,17 +69,18 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
     @Override
     protected void onResume() {
         super.onResume();
-        refreshFlowList();
+        refresh();
     }
 
-    private void refreshFlowList() {
+     public void refresh() {
         FlowListAdapter adapter = (FlowListAdapter)getViewCache().getListViewAdapter(android.R.id.list);
         if (adapter != null){
             adapter.notifyDataSetChanged();
         }
 
-        boolean pending = Submission.getPendingSubmissions().length > 0;
-        getViewCache().setVisible(R.id.bottom_options, pending);
+        int pending = Submission.getPendingSubmissions().length;
+        getViewCache().setVisible(R.id.container_pending, pending > 0);
+        getViewCache().setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
     }
 
     @Override
@@ -99,7 +97,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
 
     @Override
     public void onFragmentInteraction(DBFlow flow) {
-        Intent intent = new Intent(this, FlowRunActivity.class);
+        Intent intent = new Intent(this, FlowActivity.class);
         intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
         startActivity(intent);
     }
@@ -116,7 +114,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         m_refreshProgress = new BlockingProgress(OrgActivity.this,
-                                R.string.refresh_title, R.string.refresh_org, 3);
+                                R.string.one_moment, R.string.refresh_org, 3);
                         m_refreshProgress.show();
                         new FetchOrgData().execute();
                     }
@@ -130,83 +128,8 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 .show();
     }
 
-    public void confirmFlowRefresh(View view) {
-
-        final DBFlow flow = (DBFlow) view.getTag();
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.confirm_flow_refresh))
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-
-                        m_refreshProgress = new BlockingProgress(OrgActivity.this,
-                                R.string.refresh_title, R.string.refresh_flow, 1);
-                        m_refreshProgress.show();
-
-                        // go fetch our DBFlow definition async
-                        getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
-                            @Override
-                            public void success(FlowDefinition definition, Response response) {
-                                Realm realm = getRealm();
-                                realm.beginTransaction();
-                                flow.setDefinition(new String(((TypedByteArray) response.getBody()).getBytes()));
-                                flow.setRevision(definition.metadata.revision);
-                                flow.setName(definition.metadata.name);
-                                realm.copyToRealmOrUpdate(flow);
-                                realm.commitTransaction();
-
-                                m_refreshProgress.incrementProgressBy(1);
-                                m_refreshProgress.hide();
-                                m_refreshProgress = null;
-                            }
-
-                            @Override
-                            public void failure(RetrofitError error) {
-                                Surveyor.LOG.e("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error.getCause());
-                            }
-                        });
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
-                .show();
-    }
-
-    public void confirmSubmissionSending(View view) {
-
-        final DBFlow flow = (DBFlow) view.getTag();
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.confirm_send_submissions))
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-
-                        final File[] submissions = Submission.getPendingSubmissions(flow);
-
-                        final BlockingProgress progress = new BlockingProgress(OrgActivity.this,
-                                R.string.submit_title, R.string.submit_body, submissions.length);
-
-                        progress.show();
-
-                        // get the adapter to notify of changes
-                        final FlowListAdapter adapter = (FlowListAdapter) ((ListView)findViewById(android.R.id.list)).getAdapter();
-                        new SubmitSubmissions(submissions, progress, adapter).execute();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
-                .show();
-    }
-
     public void onClickSubmit(View view) {
+        Surveyor.LOG.d("Clicked on submit..");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirm_send_all_submissions))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -217,12 +140,9 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
 
                         final BlockingProgress progress = new BlockingProgress(OrgActivity.this,
                                 R.string.submit_title, R.string.submit_body, submissions.length);
-
                         progress.show();
 
-                        // get the adapter to notify of changes
-                        final FlowListAdapter adapter = (FlowListAdapter) ((ListView)findViewById(android.R.id.list)).getAdapter();
-                        new SubmitSubmissions(submissions, progress, adapter).execute();
+                        new SubmitSubmissions(OrgActivity.this, submissions, progress).execute();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -232,51 +152,6 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                     }
                 })
                 .show();
-    }
-
-    private class SubmitSubmissions extends AsyncTask<String, Void, Void> {
-
-        private File[] m_submissions;
-        private FlowListAdapter m_adapter;
-        private BlockingProgress m_progress;
-        private int m_error;
-
-        public SubmitSubmissions(File[] submissions, BlockingProgress progress, FlowListAdapter toNotify) {
-            m_submissions = submissions;
-            m_adapter = toNotify;
-            m_progress = progress;
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-
-            for (File submission : m_submissions) {
-                Submission sub = Submission.load(submission);
-                if (sub != null){
-                    try {
-                        sub.submit();
-                    } catch (RetrofitError e) {
-                        Surveyor.LOG.e("Failed to submit flow run", e);
-                        m_error = getRapidProService().getErrorMessage(e);
-                        return null;
-                    }
-                }
-
-                m_progress.incrementProgressBy(1);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            m_progress.dismiss();
-
-            refreshFlowList();
-
-            if (m_error > 0) {
-                Toast.makeText(OrgActivity.this, m_error, Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     private void incrementProgress() {

@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import java.text.NumberFormat;
+
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.Submission;
@@ -39,7 +41,6 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
             cache.titleView = (TextView)row.findViewById(R.id.text_flow_name);
             cache.questionView = (TextView)row.findViewById(R.id.text_flow_questions);
             cache.pendingSubmissions = (TextView)row.findViewById(R.id.text_pending_submissions);
-            cache.refreshButton = (TextView)row.findViewById(R.id.text_refresh_button);
 
             row.setTag(cache);
         } else {
@@ -49,10 +50,10 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
         DBFlow flow = getItem(position);
         cache.titleView.setText(flow.getName());
 
+        NumberFormat nf = NumberFormat.getInstance();
         int submissions = Submission.getPendingSubmissionCount(flow);
-        cache.pendingSubmissions.setText("" + submissions);
+        cache.pendingSubmissions.setText(nf.format(submissions));
         cache.pendingSubmissions.setTag(flow);
-        cache.refreshButton.setTag(flow);
 
         if (submissions > 0) {
             cache.pendingSubmissions.setVisibility(View.VISIBLE);
@@ -65,7 +66,7 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
             questionString = "Question";
         }
 
-        cache.questionView.setText(flow.getQuestionCount() + " " + questionString + " (v"+ flow.getRevision() + ")");
+        cache.questionView.setText(nf.format(flow.getQuestionCount()) + " " + questionString + " (v"+ nf.format(flow.getRevision()) + ")");
         return row;
     }
 
@@ -73,6 +74,5 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
         TextView titleView;
         TextView questionView;
         TextView pendingSubmissions;
-        TextView refreshButton;
     }
 }

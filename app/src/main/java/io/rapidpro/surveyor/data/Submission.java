@@ -97,8 +97,8 @@ public class Submission {
     /**
      * The submission directory for the given flow
      */
-    private static File getFlowDir(DBFlow flow) {
-        File flowDir = new File(getSubmissionsDir(), flow.getUuid());
+    private static File getFlowDir(String flowUuid) {
+        File flowDir = new File(getSubmissionsDir(), flowUuid);
         flowDir.mkdirs();
         return flowDir;
     }
@@ -107,20 +107,31 @@ public class Submission {
      * Get the number of pending submissions for this flow
      */
     public static int getPendingSubmissionCount(DBFlow flow) {
-        return getFlowDir(flow).list(NOT_FLOW_FILE_FILTER).length;
+
+        long start = System.currentTimeMillis();
+        Surveyor.get().LOG.d("Looking up submission count for " + flow.getName());
+        int submissions = getFlowDir(flow.getUuid()).list(NOT_FLOW_FILE_FILTER).length;
+        Surveyor.get().LOG.d("Done: " + (System.currentTimeMillis() - start) + "ms");
+        return submissions;
     }
 
     /**
      * Get all the submission files for the given flow
      */
     public static File[] getPendingSubmissions(DBFlow flow) {
-        return getFlowDir(flow).listFiles(NOT_FLOW_FILE_FILTER);
+        long start = System.currentTimeMillis();
+        Surveyor.get().LOG.d("Looking up submissions for " + flow.getName());
+        File[] submissions = getFlowDir(flow.getUuid()).listFiles(NOT_FLOW_FILE_FILTER);
+        Surveyor.get().LOG.d("Done: " + (System.currentTimeMillis() - start) + "ms");
+        return submissions;
     }
 
     /**
      * Get all submission files across all flows
      */
     public static File[] getPendingSubmissions() {
+        long start = System.currentTimeMillis();
+        Surveyor.get().LOG.d("Looking up all submissions..");
         List<File> files = new ArrayList<>();
         for (File dir : getSubmissionsDir().listFiles()) {
             if (dir.isDirectory()) {
@@ -131,7 +142,9 @@ public class Submission {
         }
 
         File[] results = new File[files.size()];
-        return files.toArray(results);
+        results = files.toArray(results);
+        Surveyor.get().LOG.d("Done: " + (System.currentTimeMillis() - start) + "ms");
+        return results;
     }
 
     /**
@@ -185,7 +198,7 @@ public class Submission {
         String uuid = UUID.randomUUID().toString();
 
         // get a unique filename
-        File flowDir = getFlowDir(flow);
+        File flowDir = getFlowDir(flow.getUuid());
         File file =  new File(flowDir, flow.getRevision() + "_" + uuid + "_1.json");
         int count = 2;
         while (file.exists()) {
@@ -267,6 +280,12 @@ public class Submission {
 
     public boolean isCompleted() {
         return m_completed;
+    }
+
+    public static void deleteFlowSubmissions(String uuid) {
+        try {
+            FileUtils.deleteDirectory(getFlowDir(uuid));
+        } catch (IOException e) {}
     }
 
     public static class ContactSerializer implements JsonSerializer<Contact> {
