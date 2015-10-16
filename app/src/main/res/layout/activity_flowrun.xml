@@ -25,17 +25,19 @@
                     android:layout_width="0dp"
                     android:layout_weight=".5"
                     android:layout_height="wrap_content"
-                    android:onClick="saveRunButton"
-                    android:text="@string/action_save_run"
+                    android:onClick="discardRunButton"
+                    android:text="@string/action_discard_run"
                     android:textStyle="bold" />
 
             <Button style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
                     android:layout_weight=".5"
                     android:layout_height="wrap_content"
-                    android:onClick="discardRunButton"
-                    android:text="@string/action_discard_run"
+                    android:onClick="saveRunButton"
+                    android:text="@string/action_save_run"
                     android:textStyle="bold" />
+
+
         </LinearLayout>
 
         <RelativeLayout

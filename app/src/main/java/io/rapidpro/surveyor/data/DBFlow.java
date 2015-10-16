@@ -2,6 +2,8 @@ package io.rapidpro.surveyor.data;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -17,8 +19,18 @@ public class DBFlow extends RealmObject {
     private int questionCount;
     private int revision;
 
+    private Date lastRunDate;
+
     @SerializedName("spec_version")
     private int specVersion;
+
+    public Date getLastRunDate() {
+        return lastRunDate;
+    }
+
+    public void setLastRunDate(Date lastRunDate) {
+        this.lastRunDate = lastRunDate;
+    }
 
     public int getRevision() {
         return revision;

@@ -18,6 +18,7 @@ public class Surveyor extends Application {
 
     private SharedPreferences m_prefs = null;
     private RapidProService m_rapidProService = null;
+    private RealmConfiguration m_realmConfig;
 
     @Override
     public void onCreate() {
@@ -25,19 +26,23 @@ public class Surveyor extends Application {
         s_this = this;
         updatePrefs();
 
-        RealmConfiguration config = new RealmConfiguration.Builder(this).build();
+        m_realmConfig = new RealmConfiguration.Builder(this).build();
 
         // Testing: nuke our db on every start until the schema is ironed out
         // Realm.deleteRealm(config);
 
         // set our default database config
-        Realm.setDefaultConfiguration(config);
+        Realm.setDefaultConfiguration(m_realmConfig);
 
         AndroidThreeTen.init(this);
     }
 
     public static Surveyor get() {
         return s_this;
+    }
+
+    public RealmConfiguration getRealmConfig() {
+        return m_realmConfig;
     }
 
     public SharedPreferences getPreferences() {

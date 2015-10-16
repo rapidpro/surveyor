@@ -14,6 +14,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Date;
+
 import io.rapidpro.flows.RunnerBuilder;
 import io.rapidpro.flows.definition.actions.Action;
 import io.rapidpro.flows.definition.actions.message.MessageAction;
@@ -272,6 +274,15 @@ public class FlowRunActivity extends BaseActivity {
     }
 
     public void saveRunButton(View view) {
+
+        // update the time of our last run
+        Realm realm = getRealm();
+        realm.beginTransaction();
+        DBFlow flow = getDBFlow();
+        flow.setLastRunDate(new Date());
+        realm.copyToRealmOrUpdate(flow);
+        realm.commitTransaction();
+
         finish();
     }
 

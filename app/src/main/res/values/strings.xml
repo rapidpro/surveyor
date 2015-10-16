@@ -834,7 +834,7 @@
     <string name="action_start_flow">Start Flow</string>
     <string name="prompt_phone">Phone Number</string>
     <string name="log_flow_complete">Flow complete</string>
-    <string name="action_save_run">Save Results</string>
+    <string name="action_save_run">Save</string>
     <string name="confirm_run_removal">This survey is not complete. Are you sure you want to discard it?</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_discard_run">Discard</string>
@@ -862,6 +862,7 @@
     <string name="confirm_flow_delete">Are you sure you want to delete this flow? All pending submissions will also be deleted.</string>
     <string name="one_moment">One Moment</string>
     <string name="delete_body">Deleting flow and all submissions..</string>
+    <string name="unsupported_version">This flow needs a newer version of the Surveyor application. Would you like to download the latest version?</string>
 
 
 </resources>

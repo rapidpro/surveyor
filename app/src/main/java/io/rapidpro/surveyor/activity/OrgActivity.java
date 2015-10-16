@@ -31,6 +31,7 @@ import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
 import io.rapidpro.surveyor.net.RapidProService;
 import io.rapidpro.surveyor.ui.BlockingProgress;
+import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
 import retrofit.RetrofitError;
 
@@ -72,15 +73,20 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         refresh();
     }
 
-     public void refresh() {
-        FlowListAdapter adapter = (FlowListAdapter)getViewCache().getListViewAdapter(android.R.id.list);
-        if (adapter != null){
+    public void refresh() {
+        FlowListAdapter adapter = (FlowListAdapter) getViewCache().getListViewAdapter(android.R.id.list);
+        if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
 
         int pending = Submission.getPendingSubmissions(getDBOrg().getId()).length;
-        getViewCache().setVisible(R.id.container_pending, pending > 0);
-        getViewCache().setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
+
+        Surveyor.LOG.d("Pending: " + pending);
+
+        ViewCache cache = getViewCache();
+        cache.setVisible(R.id.container_pending, pending > 0);
+        cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
+
     }
 
     @Override
@@ -106,7 +112,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         startActivity(getIntent(this, RapidFlowsActivity.class));
     }
 
-    public void confirmRefreshOrg(MenuItem item){
+    public void confirmRefreshOrg(MenuItem item) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirm_org_refresh))
@@ -230,8 +236,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 realm.close();
                 incrementProgress();
 
-            }
-            catch (RetrofitError e) {
+            } catch (RetrofitError e) {
                 m_error = getRapidProService().getErrorMessage(e);
             }
 
@@ -247,7 +252,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 Toast.makeText(OrgActivity.this, m_error, Toast.LENGTH_SHORT).show();
                 finish();
             } else {
-                if (m_refreshProgress == null){
+                if (m_refreshProgress == null) {
                     finish();
                     startActivity(getIntent());
                 }

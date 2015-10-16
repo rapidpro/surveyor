@@ -3,6 +3,7 @@ package io.rapidpro.surveyor.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.widget.ListView;
 import java.io.File;
 import java.text.NumberFormat;
 
+import io.rapidpro.flows.definition.Flow;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
@@ -156,7 +158,29 @@ public class FlowActivity extends BaseActivity {
     }
 
     public void onStartFlow(View view) {
-        startActivity(getIntent(this, FlowRunActivity.class));
+        if (Flow.SPEC_VERSIONS.contains(getDBFlow().getSpecVersion())) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getString(R.string.unsupported_version))
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            try {
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=io.rapidpro.surveyor")));
+                            } catch (android.content.ActivityNotFoundException e) {
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=io.rapidpro.surveyor")));
+                            }
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
+        } else {
+            startActivity(getIntent(this, FlowRunActivity.class));
+        }
     }
 
 

@@ -142,10 +142,15 @@ public class BaseActivity extends AppCompatActivity {
         return getPreferences().getInt(getString(key), def);
     }
 
-
     public Realm getRealm() {
-        if (m_realm == null){
-            m_realm = Realm.getDefaultInstance();
+        if (m_realm == null) {
+            try {
+                m_realm = Realm.getDefaultInstance();
+            } catch (Throwable t) {
+                Surveyor.LOG.d("Invalid database, reinstall required");
+                Realm.deleteRealm(Surveyor.get().getRealmConfig());
+                m_realm = Realm.getDefaultInstance();
+            }
         }
         return m_realm;
     }

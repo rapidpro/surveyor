@@ -104,6 +104,8 @@ public class ViewCache {
 
     public void setButtonText(int id, String text) {
         Button button = getButton(id);
-        button.setText(text);
+        if (button != null) {
+            button.setText(text);
+        }
     }
 }
