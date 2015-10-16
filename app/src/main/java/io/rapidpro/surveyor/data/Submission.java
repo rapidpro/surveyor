@@ -97,22 +97,23 @@ public class Submission {
     /**
      * The submission directory for the given flow
      */
-    private static File getFlowDir(String flowUuid) {
-        File flowDir = new File(getSubmissionsDir(), flowUuid);
+    private static File getFlowDir(int orgId, String flowUuid) {
+        File flowDir = new File(getOrgDir(orgId), flowUuid);
         flowDir.mkdirs();
         return flowDir;
+    }
+
+    private static File getOrgDir(int orgId) {
+        File orgDir = new File(getSubmissionsDir(), orgId + "");
+        orgDir.mkdirs();
+        return orgDir;
     }
 
     /**
      * Get the number of pending submissions for this flow
      */
     public static int getPendingSubmissionCount(DBFlow flow) {
-
-        long start = System.currentTimeMillis();
-        Surveyor.get().LOG.d("Looking up submission count for " + flow.getName());
-        int submissions = getFlowDir(flow.getUuid()).list(NOT_FLOW_FILE_FILTER).length;
-        Surveyor.get().LOG.d("Done: " + (System.currentTimeMillis() - start) + "ms");
-        return submissions;
+        return Submission.getPendingSubmissions(flow).length;
     }
 
     /**
@@ -121,7 +122,7 @@ public class Submission {
     public static File[] getPendingSubmissions(DBFlow flow) {
         long start = System.currentTimeMillis();
         Surveyor.get().LOG.d("Looking up submissions for " + flow.getName());
-        File[] submissions = getFlowDir(flow.getUuid()).listFiles(NOT_FLOW_FILE_FILTER);
+        File[] submissions = getFlowDir(flow.getOrg().getId(), flow.getUuid()).listFiles(NOT_FLOW_FILE_FILTER);
         Surveyor.get().LOG.d("Done: " + (System.currentTimeMillis() - start) + "ms");
         return submissions;
     }
@@ -129,11 +130,12 @@ public class Submission {
     /**
      * Get all submission files across all flows
      */
-    public static File[] getPendingSubmissions() {
+    public static File[] getPendingSubmissions(int orgId) {
+
         long start = System.currentTimeMillis();
         Surveyor.get().LOG.d("Looking up all submissions..");
         List<File> files = new ArrayList<>();
-        for (File dir : getSubmissionsDir().listFiles()) {
+        for (File dir : getOrgDir(orgId).listFiles()) {
             if (dir.isDirectory()) {
                 for (File submission : dir.listFiles(NOT_FLOW_FILE_FILTER)) {
                     files.add(submission);
@@ -198,7 +200,7 @@ public class Submission {
         String uuid = UUID.randomUUID().toString();
 
         // get a unique filename
-        File flowDir = getFlowDir(flow.getUuid());
+        File flowDir = getFlowDir(flow.getOrg().getId(), flow.getUuid());
         File file =  new File(flowDir, flow.getRevision() + "_" + uuid + "_1.json");
         int count = 2;
         while (file.exists()) {
@@ -282,9 +284,9 @@ public class Submission {
         return m_completed;
     }
 
-    public static void deleteFlowSubmissions(String uuid) {
+    public static void deleteFlowSubmissions(int orgId, String uuid) {
         try {
-            FileUtils.deleteDirectory(getFlowDir(uuid));
+            FileUtils.deleteDirectory(getFlowDir(orgId, uuid));
         } catch (IOException e) {}
     }
 

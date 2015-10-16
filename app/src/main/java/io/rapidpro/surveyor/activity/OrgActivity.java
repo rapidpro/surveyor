@@ -78,7 +78,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
             adapter.notifyDataSetChanged();
         }
 
-        int pending = Submission.getPendingSubmissions().length;
+        int pending = Submission.getPendingSubmissions(getDBOrg().getId()).length;
         getViewCache().setVisible(R.id.container_pending, pending > 0);
         getViewCache().setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
     }
@@ -136,7 +136,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 
-                        final File[] submissions = Submission.getPendingSubmissions();
+                        final File[] submissions = Submission.getPendingSubmissions(getDBOrg().getId());
 
                         final BlockingProgress progress = new BlockingProgress(OrgActivity.this,
                                 R.string.submit_title, R.string.submit_body, submissions.length);

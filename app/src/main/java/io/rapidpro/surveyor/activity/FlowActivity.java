@@ -168,6 +168,7 @@ public class FlowActivity extends BaseActivity {
         realm.beginTransaction();
 
         final String uuid = flow.getUuid();
+        final int orgId = flow.getOrg().getId();
 
         builder.setMessage(getString(R.string.confirm_flow_delete))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -183,7 +184,7 @@ public class FlowActivity extends BaseActivity {
                             protected Void doInBackground(Void... params) {
                                 flow.removeFromRealm();
                                 progress.incrementProgressBy(1);
-                                Submission.deleteFlowSubmissions(uuid);
+                                Submission.deleteFlowSubmissions(orgId, uuid);
                                 progress.incrementProgressBy(1);
                                 return null;
                             }
