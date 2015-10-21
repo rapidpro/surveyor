@@ -185,6 +185,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 // save the org properties to the database
                 DBOrg latest = rapid.getOrg();
                 realm.beginTransaction();
+                org.setName(latest.getName());
                 org.setAnonymous(latest.isAnonymous());
                 org.setCountry(latest.getCountry());
                 org.setDateStyle(latest.getDateStyle());
