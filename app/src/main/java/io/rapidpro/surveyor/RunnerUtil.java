@@ -3,7 +3,6 @@ package io.rapidpro.surveyor;
 import org.json.JSONException;
 import org.threeten.bp.ZoneId;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.rapidpro.expressions.dates.DateStyle;
@@ -14,9 +13,7 @@ import io.rapidpro.flows.runner.FlowRunException;
 import io.rapidpro.flows.runner.Org;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Runner;
-import io.rapidpro.surveyor.data.DBField;
 import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.DBOrg;
 
 

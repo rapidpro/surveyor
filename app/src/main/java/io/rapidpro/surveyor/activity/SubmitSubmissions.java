@@ -6,7 +6,6 @@ import android.widget.Toast;
 import java.io.File;
 
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import retrofit.RetrofitError;

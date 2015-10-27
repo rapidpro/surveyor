@@ -3,6 +3,7 @@ package io.rapidpro.surveyor.net;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,10 +15,8 @@ import java.util.List;
 
 import io.rapidpro.flows.runner.Contact;
 import io.rapidpro.flows.runner.Field;
-import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.data.DBField;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.DBOrg;
@@ -111,14 +110,21 @@ public class RapidProService {
             contact.setLanguage(null);
         }
 
-        Contact result =  m_api.addContact(getToken(), contact);
-        contact.setUuid(result.getUuid());
+        JsonObject result =  m_api.addContact(getToken(), contact.toJson());
+        String uuid = result.get("uuid").getAsString();
+        contact.setUuid(uuid);
         return contact;
     }
 
     public void addResults(final Submission submission) {
         try {
-            m_api.addResults(getToken(), submission);
+            JsonObject obj = submission.toJson().getAsJsonObject();
+
+            // replace contact with uuid
+            JsonObject contact = obj.get("contact").getAsJsonObject();
+            obj.addProperty("contact", contact.get("uuid").getAsString());
+
+            m_api.addResults(getToken(), obj);
             submission.delete();
         } catch (RetrofitError e) {
             Surveyor.LOG.e("Failed submitting results", e);
@@ -153,18 +159,18 @@ public class RapidProService {
         List<Field> fields = new ArrayList<>();
         int pageNumber = 1;
         FieldResultPage page = m_api.getFieldPage(getToken(), pageNumber);
-        fields.addAll(page.results);
+        fields.addAll(page.getRunnerFields());
 
         while (page != null && page.next != null && page.next.trim().length() != 0) {
             page = m_api.getFieldPage(getToken(), ++pageNumber);
-            fields.addAll(page.results);
+            fields.addAll(page.getRunnerFields());
         }
         return fields;
     }
 
     private RapidProAPI getAPIAccessor() {
 
-        Gson gson = JsonUtils.getGsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+        Gson gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(FieldAttributes f) {
                 return f.getDeclaringClass().equals(RealmObject.class);
@@ -174,8 +180,7 @@ public class RapidProService {
             public boolean shouldSkipClass(Class<?> clazz) {
                 return false;
             }
-        }).registerTypeAdapterFactory(new FlowListTypeAdapterFactory())
-                .registerTypeAdapter(Contact.class, new Submission.ContactSerializer()).create();
+        }).registerTypeAdapterFactory(new FlowListTypeAdapterFactory()).create();
 
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(Surveyor.BASE_URL)

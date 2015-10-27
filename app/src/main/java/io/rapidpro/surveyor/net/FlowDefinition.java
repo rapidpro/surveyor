@@ -1,7 +1,6 @@
 package io.rapidpro.surveyor.net;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 public class FlowDefinition {
     public String base_language;

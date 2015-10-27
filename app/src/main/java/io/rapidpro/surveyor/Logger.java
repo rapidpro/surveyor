@@ -18,7 +18,6 @@
 
 package io.rapidpro.surveyor;
 
-import android.text.Html;
 import android.util.Log;
 
 public class Logger {

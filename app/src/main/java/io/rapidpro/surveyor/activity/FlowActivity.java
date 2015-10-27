@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -17,7 +16,6 @@ import java.text.NumberFormat;
 import io.rapidpro.flows.definition.Flow;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.net.FlowDefinition;
