@@ -15,6 +15,7 @@ import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.net.RapidProService;
 import io.rapidpro.surveyor.ui.ViewCache;
@@ -26,9 +27,6 @@ import io.realm.Realm;
  * between activities and the like.
  */
 public class BaseActivity extends AppCompatActivity {
-
-    // our logging tag
-    private static String TAG = "Surveyor";
 
     private DBOrg m_org;
     private DBFlow m_flow;
@@ -86,6 +84,7 @@ public class BaseActivity extends AppCompatActivity {
             PreferenceManager.getDefaultSharedPreferences(this).edit().remove(SurveyorIntent.PREF_LOGGED_IN).commit();
 
             Submission.clear();
+            OrgDetails.clear();
 
             startActivity(new Intent(this, LoginActivity.class));
             return true;
