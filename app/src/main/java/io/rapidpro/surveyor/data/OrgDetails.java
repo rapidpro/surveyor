@@ -1,5 +1,7 @@
 package io.rapidpro.surveyor.data;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
@@ -10,6 +12,7 @@ import java.util.List;
 
 import io.rapidpro.flows.runner.Field;
 import io.rapidpro.flows.utils.JsonUtils;
+import io.rapidpro.flows.utils.Jsonizable;
 import io.rapidpro.surveyor.Surveyor;
 
 /**
@@ -17,7 +20,7 @@ import io.rapidpro.surveyor.Surveyor;
  * found on the server (or any added during submission). This could
  * be extended to hold other org details such as boundary data.
  */
-public class OrgDetails {
+public class OrgDetails implements Jsonizable {
 
     private static final String ORGS_DIR = "orgs";
     private static final String DETAILS_FILE = "details.json";
@@ -28,10 +31,30 @@ public class OrgDetails {
     // The file to read and save to
     private transient File m_file;
 
+    /**
+     * Serializes org details JSON
+     * @return the JSON
+     */
+    @Override
+    public JsonElement toJson() {
+        return JsonUtils.object(
+                "fields", JsonUtils.toJsonArray(m_fields)
+        );
+    }
+
+    /**
+     * Deserializes org details from json
+     */
+    public static OrgDetails fromJson(JsonElement ele) {
+        JsonObject obj = (JsonObject) ele;
+        OrgDetails details = new OrgDetails();
+        details.m_fields = JsonUtils.fromJsonArray(obj.get("fields").getAsJsonArray(), null, Field.class);
+        return details;
+    }
+
     public void save() {
-        String json = JsonUtils.getGson().toJson(this);
         try {
-            FileUtils.write(m_file, json);
+            FileUtils.write(m_file, this.toJson().toString());
         } catch (IOException e) {
             Surveyor.LOG.e("Failure writing submission", e);
         }
@@ -67,21 +90,24 @@ public class OrgDetails {
     public static OrgDetails load(DBOrg org) {
         try {
             File file = new File(getOrgDir(org), DETAILS_FILE);
-
             OrgDetails details = new OrgDetails();
             if (file.exists()) {
                 String json = FileUtils.readFileToString(file);
-                details = JsonUtils.getGson().fromJson(json, OrgDetails.class);
+                JsonElement obj = JsonUtils.getGson().fromJson(json, JsonElement.class);
+                details = JsonUtils.fromJson(obj, null, OrgDetails.class);
+                details.setFile(file);
             }
             details.setFile(file);
             return details;
         } catch (IOException e) {
             // we'll return null
             Surveyor.LOG.e("Failure reading org details", e);
-        } finally {
-            JsonUtils.clearDeserializationContext();
         }
         return null;
+    }
+
+    public static void clear() {
+        FileUtils.deleteQuietly(getOrgsDir());
     }
 
 }

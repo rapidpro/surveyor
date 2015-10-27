@@ -2,6 +2,9 @@ package io.rapidpro.surveyor.net;
 
 import android.location.Location;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import java.util.List;
 
 import io.rapidpro.flows.runner.Contact;
@@ -46,12 +49,12 @@ public interface RapidProAPI {
     @POST("/api/v1/steps.json")
     Void addResults(
             @Header("Authorization") String token,
-            @Body Submission state);
+            @Body JsonElement submissionJson);
 
     @POST("/api/v1/contacts.json")
-    Contact addContact(
+    JsonObject addContact(
             @Header("Authorization") String token,
-            @Body Contact contact);
+            @Body JsonElement contact);
 
     @GET("/api/v1/boundaries.json")
     LocationResultPage getLocationPage(

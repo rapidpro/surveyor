@@ -6,8 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
 import org.apache.commons.io.FileUtils;
 import org.threeten.bp.Instant;
@@ -21,13 +24,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import io.rapidpro.expressions.utils.ExpressionUtils;
 import io.rapidpro.flows.definition.Flow;
 import io.rapidpro.flows.runner.Contact;
 import io.rapidpro.flows.runner.ContactUrn;
 import io.rapidpro.flows.runner.Field;
+import io.rapidpro.flows.runner.Org;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Step;
+import io.rapidpro.flows.runner.Value;
 import io.rapidpro.flows.utils.JsonUtils;
+import io.rapidpro.flows.utils.Jsonizable;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.net.RapidProService;
 
@@ -36,7 +43,7 @@ import io.rapidpro.surveyor.net.RapidProService;
  * submission to the server. Submissions are stored on the file
  * system to be tolerant of database changes in the future.
  */
-public class Submission {
+public class Submission implements Jsonizable {
 
     private transient static final String SUBMISSIONS_DIR = "submissions";
     private transient static final String FLOW_FILE = "flow.json";
@@ -45,30 +52,22 @@ public class Submission {
     private transient File m_file;
 
     // fields created during this submission
-    @SerializedName("fields")
     protected HashMap<String,Field> m_fields = new HashMap<>();
 
-    @SerializedName("steps")
     protected List<Step> m_steps;
 
     // flow uuid
-    @SerializedName("flow")
     private String m_flow;
 
     // our contact participating in the flow
-    @SerializedName("contact")
     private Contact m_contact;
 
     // when the flow run started
-    @SerializedName("started")
-    @JsonAdapter(JsonUtils.InstantAdapter.class)
     private Instant m_started;
 
-    @SerializedName("version")
     private int m_revision;
 
     // if the flow was completed
-    @SerializedName("completed")
     private boolean m_completed;
 
     private static FilenameFilter NOT_FLOW_FILE_FILTER = new FilenameFilter() {
@@ -77,6 +76,8 @@ public class Submission {
             return !filename.endsWith(FLOW_FILE);
         }
     };
+
+    public Submission() {}
 
     /**
      * Clear out all submissions for all flows
@@ -174,19 +175,49 @@ public class Submission {
         try {
 
             Flow.DeserializationContext context = new Flow.DeserializationContext(getFlow(file));
-            JsonUtils.setDeserializationContext(context);
             String json = FileUtils.readFileToString(file);
-            Submission submission = JsonUtils.getGson().fromJson(json, Submission.class);
+
+            Surveyor.LOG.d(" << " + json);
+            JsonElement obj = JsonUtils.getGson().fromJson(json, JsonElement.class);
+            Submission submission = JsonUtils.fromJson(obj, context, Submission.class);
             submission.setFile(file);
             return submission;
         } catch (IOException e) {
             // we'll return null
             Surveyor.LOG.e("Failure reading submission", e);
-        } finally {
-            JsonUtils.clearDeserializationContext();
         }
         return null;
     }
+
+    public static Submission fromJson(JsonElement ele, Flow.DeserializationContext context) {
+        JsonObject obj = (JsonObject) ele;
+        Submission submission = new Submission();
+        submission.m_steps = JsonUtils.fromJsonArray(obj.get("steps").getAsJsonArray(), context, Step.class);
+        submission.m_contact = JsonUtils.fromJson(obj.get("contact"), null, Contact.class);
+        submission.m_started = ExpressionUtils.parseJsonDate(obj.get("started").getAsString());
+        submission.m_revision = obj.get("version").getAsInt();
+        submission.m_completed = obj.get("completed").getAsBoolean();
+        submission.m_flow = obj.get("flow").getAsString();
+        return submission;
+    }
+
+    /**
+     * Serializes this run state to JSON
+     * @return the JSON
+     */
+    @Override
+    public JsonElement toJson() {
+        return JsonUtils.object(
+                "fields", JsonUtils.toJsonArray(m_fields.values()),
+                "steps", JsonUtils.toJsonArray(m_steps),
+                "flow", m_flow,
+                "contact", m_contact.toJson(),
+                "started", ExpressionUtils.formatJsonDate(m_started),
+                "version", m_revision,
+                "completed", m_completed
+        );
+    }
+
 
     /**
      * Create a new submission for a flow
@@ -227,6 +258,8 @@ public class Submission {
 
     public void addSteps(RunState runState) {
 
+        m_contact = runState.getContact();
+
         List<Step> completed = runState.getCompletedSteps();
         if (m_steps == null) {
             m_steps = new ArrayList<>();
@@ -248,9 +281,10 @@ public class Submission {
     }
 
     public void save() {
-        String json = JsonUtils.getGson().toJson(this);
         try {
-            FileUtils.write(m_file, json);
+            String output = toJson().toString();
+            Surveyor.LOG.d(" >> " + output);
+            FileUtils.write(m_file, output);
         } catch (IOException e) {
             Surveyor.LOG.e("Failure writing submission", e);
         }
@@ -288,33 +322,6 @@ public class Submission {
         try {
             FileUtils.deleteDirectory(getFlowDir(orgId, uuid));
         } catch (IOException e) {}
-    }
-
-    public static class ContactSerializer implements JsonSerializer<Contact> {
-        @Override
-        public JsonElement serialize(Contact src, Type typeOfSrc, JsonSerializationContext context) {
-
-            // if we have a uuid, it's been provided from the server, so we can
-            // represent ourselves with the uuid
-            if (src.getUuid() != null) {
-                return new JsonPrimitive(src.getUuid());
-            }
-
-            // if we don't know the uuid yet, create a json object
-            // with all of our known properties
-            else {
-                JsonArray urns = new JsonArray();
-                for (ContactUrn urn : src.getUrns()) {
-                    urns.add(new JsonPrimitive(urn.toString()));
-                }
-
-                JsonObject obj = new JsonObject();
-                obj.addProperty("name", src.getName());
-                obj.addProperty("language", src.getLanguage());
-                obj.add("urns", urns);
-                return obj;
-            }
-        }
     }
 }
 
