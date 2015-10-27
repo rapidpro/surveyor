@@ -19,7 +19,6 @@ import java.util.Date;
 import io.rapidpro.flows.RunnerBuilder;
 import io.rapidpro.flows.definition.actions.Action;
 import io.rapidpro.flows.definition.actions.message.MessageAction;
-import io.rapidpro.flows.runner.Field;
 import io.rapidpro.flows.runner.FlowRunException;
 import io.rapidpro.flows.runner.Input;
 import io.rapidpro.flows.runner.Location;

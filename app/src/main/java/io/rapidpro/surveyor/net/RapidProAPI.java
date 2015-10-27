@@ -1,24 +1,18 @@
 package io.rapidpro.surveyor.net;
 
-import android.location.Location;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.List;
 
-import io.rapidpro.flows.runner.Contact;
-import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.surveyor.data.DBOrg;
-import io.rapidpro.surveyor.data.Submission;
+import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.POST;
-import retrofit.Callback;
-
 import retrofit.http.Query;
 
 public interface RapidProAPI {

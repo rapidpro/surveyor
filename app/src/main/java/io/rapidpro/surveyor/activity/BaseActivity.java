@@ -28,9 +28,6 @@ import io.realm.Realm;
  */
 public class BaseActivity extends AppCompatActivity {
 
-    // our logging tag
-    private static String TAG = "Surveyor";
-
     private DBOrg m_org;
     private DBFlow m_flow;
     private ViewCache m_viewCache;

@@ -15,10 +15,8 @@ import java.util.List;
 
 import io.rapidpro.flows.runner.Contact;
 import io.rapidpro.flows.runner.Field;
-import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.data.DBField;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.DBOrg;

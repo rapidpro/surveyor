@@ -1,16 +1,7 @@
 package io.rapidpro.surveyor.data;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.annotations.SerializedName;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
 import org.apache.commons.io.FileUtils;
 import org.threeten.bp.Instant;
@@ -18,7 +9,6 @@ import org.threeten.bp.Instant;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,12 +17,9 @@ import java.util.UUID;
 import io.rapidpro.expressions.utils.ExpressionUtils;
 import io.rapidpro.flows.definition.Flow;
 import io.rapidpro.flows.runner.Contact;
-import io.rapidpro.flows.runner.ContactUrn;
 import io.rapidpro.flows.runner.Field;
-import io.rapidpro.flows.runner.Org;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Step;
-import io.rapidpro.flows.runner.Value;
 import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.flows.utils.Jsonizable;
 import io.rapidpro.surveyor.Surveyor;
