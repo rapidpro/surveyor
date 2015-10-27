@@ -195,7 +195,13 @@ public class Submission implements Jsonizable {
         submission.m_steps = JsonUtils.fromJsonArray(obj.get("steps").getAsJsonArray(), context, Step.class);
         submission.m_contact = JsonUtils.fromJson(obj.get("contact"), null, Contact.class);
         submission.m_started = ExpressionUtils.parseJsonDate(obj.get("started").getAsString());
-        submission.m_revision = obj.get("version").getAsInt();
+
+        if (obj.has("revision")) {
+            submission.m_revision = obj.get("revision").getAsInt();
+        } else if (obj.has("version")) {
+            submission.m_revision = obj.get("version").getAsInt();
+        }
+
         submission.m_completed = obj.get("completed").getAsBoolean();
         submission.m_flow = obj.get("flow").getAsString();
         return submission;
@@ -213,7 +219,7 @@ public class Submission implements Jsonizable {
                 "flow", m_flow,
                 "contact", m_contact.toJson(),
                 "started", ExpressionUtils.formatJsonDate(m_started),
-                "version", m_revision,
+                "revision", m_revision,
                 "completed", m_completed
         );
     }
