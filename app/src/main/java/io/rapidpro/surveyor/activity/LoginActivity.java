@@ -202,7 +202,9 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                 @Override
                 public void failure(RetrofitError error) {
                     Surveyor.LOG.e("Failure logging in", error);
-                    if (error.getResponse().getStatus() == 404) {
+                    if (error == null|| error.getResponse() == null) {
+                        setErrorMessage(getString(R.string.error_server_not_found));
+                    } else if (error.getResponse().getStatus() == 404) {
                         setErrorMessage(getString(R.string.error_server_not_found));
                     } else if (error.getResponse().getStatus() == 500) {
                         setErrorMessage(getString(R.string.error_server_failure));

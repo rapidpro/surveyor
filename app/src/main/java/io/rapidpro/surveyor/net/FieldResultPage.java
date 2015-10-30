@@ -16,7 +16,11 @@ public class FieldResultPage {
     public List<Field> getRunnerFields() {
         List<Field> runnerFields = new ArrayList<>();
         for (JsonElement ele : results) {
-            runnerFields.add(Field.fromJson(ele));
+            try {
+                runnerFields.add(Field.fromJson(ele));
+            } catch (Throwable t) {
+                // if we fail to create the field, continue
+            }
         }
         return runnerFields;
     }
