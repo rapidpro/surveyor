@@ -192,6 +192,11 @@ public class RapidProService {
     }
 
     public int getErrorMessage(RetrofitError e) {
+
+        if (e == null || e.getResponse() == null) {
+            return R.string.error_server_not_found;
+        }
+
         int status = e.getResponse().getStatus();
         if (status == 404 || status == 502) {
             return R.string.error_server_not_found;
