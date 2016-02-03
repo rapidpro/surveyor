@@ -1,8 +1,11 @@
 package io.rapidpro.surveyor.ui;
 
+import android.content.Context;
 import android.util.SparseArray;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -17,10 +20,12 @@ public class ViewCache {
 
     private SparseArray<View> m_cache;
     private View m_parent;
+    private Context m_context;
 
-    public ViewCache(View parent) {
+    public ViewCache(Context context, View parent) {
         m_cache = new SparseArray<>();
         m_parent = parent;
+        m_context = context;
     }
 
     private View getCachedView(int id) {
@@ -64,7 +69,17 @@ public class ViewCache {
     }
 
     public void hide(int id) {
-        getCachedView(id).setVisibility(View.GONE);
+        hide(id, false);
+    }
+
+    public void hide(int id, boolean hideKeyboard) {
+        View view = getCachedView(id);
+        view.setVisibility(View.GONE);
+
+        if (hideKeyboard) {
+            InputMethodManager imm = (InputMethodManager)m_context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     public void show(int id) {

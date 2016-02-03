@@ -23,35 +23,37 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
 
         List<DBOrg> orgs = getRealm().where(DBOrg.class).findAll();
 
-        // if we don't have any orgs, take us back to the login screen
-        if (orgs.size() == 0) {
-            Intent i = new Intent(OrgListActivity.this, LoginActivity.class);
+        boolean loggedIn = isLoggedIn();
 
-            // if we are logged in, show an error
-            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SurveyorIntent.PREF_LOGGED_IN, false)) {
+        if (loggedIn) {
+            // if we don't have any orgs, take us back to the login screen
+            if (orgs.size() == 0) {
+                Intent i = new Intent(OrgListActivity.this, LoginActivity.class);
+
+                // if we are logged in, show an error
                 i.putExtra(SurveyorIntent.EXTRA_ERROR, getString(R.string.error_no_orgs));
+
+
+                startActivity(i);
+                finish();
+                overridePendingTransition(0, 0);
             }
+            // if it's a single org, skip our activity
+            else if (orgs.size() == 1) {
+                getSurveyor().LOG.d("One org found, shortcutting: " + orgs.get(0).getName());
+                onFragmentInteraction(orgs.get(0));
+                finish();
+                overridePendingTransition(0, 0);
+            } else {
 
+                // this holds our org list fragment which shows all orgs in the db
+                setContentView(R.layout.fragment_container);
 
-            startActivity(i);
-            finish();
-            overridePendingTransition(0, 0);
-        }
-        // if it's a single org, skip our activity
-        else if (orgs.size() == 1) {
-            getSurveyor().LOG.d("One org found, shortcutting: " + orgs.get(0).getName());
-            onFragmentInteraction(orgs.get(0));
-            finish();
-            overridePendingTransition(0, 0);
-        } else {
-
-            // this holds our org list fragment which shows all orgs in the db
-            setContentView(R.layout.fragment_container);
-
-            if (savedInstanceState == null) {
-                Fragment fragment = new OrgListFragment();
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(R.id.fragment_container, fragment).commit();
+                if (savedInstanceState == null) {
+                    Fragment fragment = new OrgListFragment();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.add(R.id.fragment_container, fragment).commit();
+                }
             }
         }
     }

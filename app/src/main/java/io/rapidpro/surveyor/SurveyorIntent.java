@@ -5,5 +5,5 @@ public interface SurveyorIntent {
     String EXTRA_FLOW_ID = "surveyor.extra.flow_id";
     String EXTRA_SUBMISSION_FILE = "surveyor.extra.submission_file";
     String EXTRA_ERROR = "surveyor.extra.error";
-    String PREF_LOGGED_IN = "surveyor.pref.logged_in";
+    String PREF_USERNAME = "surveyor.pref.username";
 }

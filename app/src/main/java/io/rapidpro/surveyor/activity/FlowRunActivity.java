@@ -1,13 +1,16 @@
 package io.rapidpro.surveyor.activity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -119,7 +122,8 @@ public class FlowRunActivity extends BaseActivity {
                 }
             }).build();
 
-            m_submission = new Submission(getDBFlow());
+
+            m_submission = new Submission(getUsername(), getDBFlow());
 
             // create a run state based on our contact
             OrgDetails details = OrgDetails.load(flow.getOrg());
@@ -237,8 +241,9 @@ public class FlowRunActivity extends BaseActivity {
 
         addLogMessage(R.string.log_flow_complete);
         ViewCache cache = getViewCache();
-        cache.hide(R.id.chat_box);
+        cache.hide(R.id.chat_box, true);
         cache.show(R.id.completion_buttons);
+
     }
 
     private void addLogMessage(int message) {

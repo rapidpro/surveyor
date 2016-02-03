@@ -28,7 +28,7 @@ public class CachedLinearLayout extends LinearLayout {
     }
 
     protected void init() {
-        m_cache = new ViewCache(this);
+        m_cache = new ViewCache(getContext(), this);
     }
 
     public TextView getTextView(int id) {

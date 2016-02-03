@@ -30,7 +30,7 @@ class SubmitSubmissions extends AsyncTask<String, Void, Void> {
     protected Void doInBackground(String... params) {
 
         for (File submission : m_submissions) {
-            Submission sub = Submission.load(submission);
+            Submission sub = Submission.load(m_activity.getUsername(), submission);
             if (sub != null) {
                 try {
                     sub.submit();

@@ -57,6 +57,9 @@ public class Submission implements Jsonizable {
     // if the flow was completed
     private boolean m_completed;
 
+    // the username submitting this run
+    private String m_username;
+
     private static FilenameFilter NOT_FLOW_FILE_FILTER = new FilenameFilter() {
         @Override
         public boolean accept(File dir, String filename) {
@@ -158,7 +161,7 @@ public class Submission implements Jsonizable {
      * Loads a submission from a file. Assumes the flow file is present in
      * the parent directory.
      */
-    public static Submission load(File file) {
+    public static Submission load(String username, File file) {
         try {
 
             Flow.DeserializationContext context = new Flow.DeserializationContext(getFlow(file));
@@ -167,6 +170,11 @@ public class Submission implements Jsonizable {
             Surveyor.LOG.d(" << " + json);
             JsonElement obj = JsonUtils.getGson().fromJson(json, JsonElement.class);
             Submission submission = JsonUtils.fromJson(obj, context, Submission.class);
+
+            if (submission.m_username == null) {
+                submission.m_username = username;
+            }
+
             submission.setFile(file);
             return submission;
         } catch (IOException e) {
@@ -182,6 +190,10 @@ public class Submission implements Jsonizable {
         submission.m_steps = JsonUtils.fromJsonArray(obj.get("steps").getAsJsonArray(), context, Step.class);
         submission.m_contact = JsonUtils.fromJson(obj.get("contact"), null, Contact.class);
         submission.m_started = ExpressionUtils.parseJsonDate(obj.get("started").getAsString());
+
+        if (obj.has("submitted_by")) {
+            submission.m_username = obj.get("submitted_by").getAsString();
+        }
 
         if (obj.has("revision")) {
             submission.m_revision = obj.get("revision").getAsInt();
@@ -207,7 +219,8 @@ public class Submission implements Jsonizable {
                 "contact", m_contact.toJson(),
                 "started", ExpressionUtils.formatJsonDate(m_started),
                 "revision", m_revision,
-                "completed", m_completed
+                "completed", m_completed,
+                "submitted_by", m_username
         );
     }
 
@@ -215,8 +228,9 @@ public class Submission implements Jsonizable {
     /**
      * Create a new submission for a flow
      */
-    public Submission(DBFlow flow) {
+    public Submission(String username, DBFlow flow) {
 
+        m_username = username;
         m_flow = flow.getUuid();
         m_contact = new Contact();
         m_revision = flow.getRevision();

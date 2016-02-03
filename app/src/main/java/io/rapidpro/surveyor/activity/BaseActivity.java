@@ -38,10 +38,56 @@ public class BaseActivity extends AppCompatActivity {
         return (Surveyor)getApplication();
     }
 
+    public boolean validateLogin() {
+        return true;
+    }
+
+    public void logout() {
+        logout(-1);
+    }
+
+    /**
+     * Logs the user out and returns them to the login page
+     */
+    public void logout(int error) {
+
+        Realm realm = getRealm();
+        realm.beginTransaction();
+        realm.clear(DBFlow.class);
+        realm.clear(DBOrg.class);
+        realm.commitTransaction();
+        finish();
+
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.remove(SurveyorIntent.PREF_USERNAME);
+        editor.apply();
+
+        Submission.clear();
+        OrgDetails.clear();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        if (error != -1) {
+            intent.putExtra(SurveyorIntent.EXTRA_ERROR, getString(error));
+        }
+        startActivity(intent);
+    }
+
+    public String getUsername() {
+        return PreferenceManager.getDefaultSharedPreferences(this).getString(SurveyorIntent.PREF_USERNAME, null);
+    }
+
+    public boolean isLoggedIn() {
+        return getUsername() != null;
+    }
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
+
+        // check if they are properly logged in
+        if (validateLogin() && !isLoggedIn()) {
+            logout(R.string.please_login_again);
+        }
     }
 
     public void finish() {
@@ -53,7 +99,6 @@ public class BaseActivity extends AppCompatActivity {
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
     }
-
 
     @Override
     protected void onDestroy() {
@@ -74,19 +119,7 @@ public class BaseActivity extends AppCompatActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         } else if (id == R.id.action_logout) {
-            Realm realm = getRealm();
-            realm.beginTransaction();
-            realm.clear(DBFlow.class);
-            realm.clear(DBOrg.class);
-            realm.commitTransaction();
-            finish();
-
-            PreferenceManager.getDefaultSharedPreferences(this).edit().remove(SurveyorIntent.PREF_LOGGED_IN).commit();
-
-            Submission.clear();
-            OrgDetails.clear();
-
-            startActivity(new Intent(this, LoginActivity.class));
+            logout();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -108,7 +141,7 @@ public class BaseActivity extends AppCompatActivity {
 
     public ViewCache getViewCache() {
         if (m_viewCache == null) {
-            m_viewCache = new ViewCache(findViewById(android.R.id.content));
+            m_viewCache = new ViewCache(this, findViewById(android.R.id.content));
         }
         return m_viewCache;
     }

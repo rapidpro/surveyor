@@ -91,6 +91,10 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
     }
 
+    public boolean validateLogin() {
+        return false;
+    }
+
     private void setErrorMessage(String message) {
 
         TextView errorBox  = (TextView) findViewById(R.id.text_error_message);
@@ -141,7 +145,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         m_passwordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = m_emailView.getText().toString();
+        final String email = m_emailView.getText().toString();
         String password = m_passwordView.getText().toString();
 
         boolean cancel = false;
@@ -194,7 +198,9 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                     finish();
 
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                    prefs.edit().putBoolean(SurveyorIntent.PREF_LOGGED_IN, true).commit();
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString(SurveyorIntent.PREF_USERNAME, email);
+                    editor.commit();
 
                     startActivity(new Intent(LoginActivity.this, OrgListActivity.class));
                 }
