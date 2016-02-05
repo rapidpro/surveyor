@@ -2,14 +2,24 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
+
+import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
@@ -121,8 +131,56 @@ public class BaseActivity extends AppCompatActivity {
         } else if (id == R.id.action_logout) {
             logout();
             return true;
+        } else if (id == R.id.action_debug) {
+            sendBugReport();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void sendBugReport(){
+
+        // Log our build and device details
+        StringBuilder info = new StringBuilder();
+        info.append("Version: " + BuildConfig.VERSION_NAME + "; " + BuildConfig.VERSION_CODE);
+        info.append("\n  OS: " + System.getProperty("os.version") + " (API " + Build.VERSION.SDK_INT + ")");
+        info.append("\n  Model: " + android.os.Build.MODEL  + " (" + android.os.Build.DEVICE + ")");
+        Surveyor.LOG.d(info.toString());
+
+        // Generate a logcat file
+        File outputFile = new File(Environment.getExternalStorageDirectory(), "surveyor-debug.txt");
+
+        try {
+            Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E Surveyor:*\" ");
+        } catch (Throwable t) {
+            Surveyor.LOG.e("Failed to generate report", t);
+        }
+
+        ShareCompat.IntentBuilder.from(this)
+                .setType("message/rfc822")
+                .addEmailTo("support@rapidpro.io")
+                .setSubject("Surveyor Bug Report")
+                .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
+                .setStream(Uri.fromFile(outputFile))
+                .setChooserTitle("Send Email")
+                .startChooser();
+    }
+
+    public void showSendBugReport() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.confirm_bug_report))
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        sendBugReport();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
     }
 
     protected void onResume() {

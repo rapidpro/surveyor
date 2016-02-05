@@ -22,6 +22,7 @@ import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Step;
 import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.flows.utils.Jsonizable;
+import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.net.RapidProService;
 
@@ -59,6 +60,9 @@ public class Submission implements Jsonizable {
 
     // the username submitting this run
     private String m_username;
+
+    // the app version when this submission started
+    private String m_appVersion;
 
     private static FilenameFilter NOT_FLOW_FILE_FILTER = new FilenameFilter() {
         @Override
@@ -111,11 +115,7 @@ public class Submission implements Jsonizable {
      * Get all the submission files for the given flow
      */
     public static File[] getPendingSubmissions(DBFlow flow) {
-        long start = System.currentTimeMillis();
-        Surveyor.get().LOG.d("Looking up submissions for " + flow.getName());
-        File[] submissions = getFlowDir(flow.getOrg().getId(), flow.getUuid()).listFiles(NOT_FLOW_FILE_FILTER);
-        Surveyor.get().LOG.d("Done: " + (System.currentTimeMillis() - start) + "ms");
-        return submissions;
+        return getFlowDir(flow.getOrg().getId(), flow.getUuid()).listFiles(NOT_FLOW_FILE_FILTER);
     }
 
     /**
@@ -124,7 +124,6 @@ public class Submission implements Jsonizable {
     public static File[] getPendingSubmissions(int orgId) {
 
         long start = System.currentTimeMillis();
-        Surveyor.get().LOG.d("Looking up all submissions..");
         List<File> files = new ArrayList<>();
         for (File dir : getOrgDir(orgId).listFiles()) {
             if (dir.isDirectory()) {
@@ -136,7 +135,7 @@ public class Submission implements Jsonizable {
 
         File[] results = new File[files.size()];
         results = files.toArray(results);
-        Surveyor.get().LOG.d("Done: " + (System.currentTimeMillis() - start) + "ms");
+        Surveyor.get().LOG.d("Fetched all submissions. Took: " + (System.currentTimeMillis() - start) + "ms");
         return results;
     }
 
@@ -153,7 +152,6 @@ public class Submission implements Jsonizable {
         } catch (IOException e) {
             Surveyor.LOG.e("Error loading flow", e);
         }
-        Surveyor.LOG.d("From file: " + flow);
         return Flow.fromJson(flow);
     }
 
@@ -201,6 +199,13 @@ public class Submission implements Jsonizable {
             submission.m_revision = obj.get("version").getAsInt();
         }
 
+        if (obj.has("app_version")) {
+            JsonElement version = obj.get("app_version");
+            if (!version.isJsonNull()) {
+                submission.m_appVersion = version.getAsString();
+            }
+        }
+
         submission.m_completed = obj.get("completed").getAsBoolean();
         submission.m_flow = obj.get("flow").getAsString();
         return submission;
@@ -220,6 +225,7 @@ public class Submission implements Jsonizable {
                 "started", ExpressionUtils.formatJsonDate(m_started),
                 "revision", m_revision,
                 "completed", m_completed,
+                "app_version", m_appVersion,
                 "submitted_by", m_username
         );
     }
@@ -234,6 +240,7 @@ public class Submission implements Jsonizable {
         m_flow = flow.getUuid();
         m_contact = new Contact();
         m_revision = flow.getRevision();
+        m_appVersion = BuildConfig.VERSION_NAME;
 
         String uuid = UUID.randomUUID().toString();
 

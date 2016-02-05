@@ -193,6 +193,7 @@ public class FlowRunActivity extends BaseActivity {
                 // addMessage(t.getMessage().toString(), true);
                 Toast.makeText(this, "Couldn't handle message", Toast.LENGTH_SHORT).show();
                 Surveyor.LOG.e("Error running flow", t);
+                showSendBugReport();
             }
 
             // scroll us to the bottom

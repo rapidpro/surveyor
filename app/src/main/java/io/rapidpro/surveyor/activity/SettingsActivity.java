@@ -8,6 +8,10 @@ import io.rapidpro.surveyor.fragment.SettingsFragment;
 
 public class SettingsActivity extends BaseActivity {
 
+    public boolean validateLogin() {
+        return false;
+    }
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FragmentTransaction ft = getFragmentManager().beginTransaction();

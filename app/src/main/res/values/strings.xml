@@ -864,6 +864,8 @@
     <string name="delete_body">Deleting flow and all submissions..</string>
     <string name="unsupported_version">This flow needs a newer version of the Surveyor application. Would you like to download the latest version?</string>
     <string name="please_login_again">Please login to your account again.</string>
+    <string name="action_send_debug">Bug Report</string>
+    <string name="confirm_bug_report">Oops, it looks like Surveyor is having difficulty with this flow. Would you like to send a bug report so we can look into it?</string>
 
 
 </resources>
