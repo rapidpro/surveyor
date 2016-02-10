@@ -45,8 +45,8 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
 
         final DBOrg org = getDBOrg();
 
-        // if we don't know our country yet, fetch it
-        if (org.getCountry() == null || org.getCountry().trim().length() == 0) {
+        // if we don't know our timezone yet, fetch it
+        if (org.getTimezone() == null || org.getTimezone().trim().length() == 0) {
             setContentView(R.layout.activity_pending);
             new FetchOrgData().execute();
         } else {
@@ -186,8 +186,11 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 realm.beginTransaction();
                 org.setName(latest.getName());
                 org.setAnonymous(latest.isAnonymous());
-                org.setCountry(latest.getCountry());
                 org.setDateStyle(latest.getDateStyle());
+
+                if (latest.getCountry() != null) {
+                    org.setCountry(latest.getCountry());
+                }
 
                 if (latest.getPrimaryLanguage() == null) {
                     org.setPrimaryLanguage("base");

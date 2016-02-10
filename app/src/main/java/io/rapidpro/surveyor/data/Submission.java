@@ -17,6 +17,7 @@ import java.util.UUID;
 import io.rapidpro.expressions.utils.ExpressionUtils;
 import io.rapidpro.flows.definition.Flow;
 import io.rapidpro.flows.runner.Contact;
+import io.rapidpro.flows.runner.ContactUrn;
 import io.rapidpro.flows.runner.Field;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Step;

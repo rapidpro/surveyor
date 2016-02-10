@@ -14,10 +14,10 @@ import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+
 
 import java.io.File;
-import java.io.IOException;
+
 
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;

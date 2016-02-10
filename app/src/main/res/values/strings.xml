@@ -866,6 +866,7 @@
     <string name="please_login_again">Please login to your account again.</string>
     <string name="action_send_debug">Bug Report</string>
     <string name="confirm_bug_report">Oops, it looks like Surveyor is having difficulty with this flow. Would you like to send a bug report so we can look into it?</string>
+    <string name="transition_chat">transition_chat</string>
 
 
 </resources>

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -17,11 +18,14 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
+
 import java.util.Date;
 
 import io.rapidpro.flows.RunnerBuilder;
 import io.rapidpro.flows.definition.actions.Action;
 import io.rapidpro.flows.definition.actions.message.MessageAction;
+import io.rapidpro.flows.runner.ContactUrn;
 import io.rapidpro.flows.runner.FlowRunException;
 import io.rapidpro.flows.runner.Input;
 import io.rapidpro.flows.runner.Location;
@@ -128,6 +132,14 @@ public class FlowRunActivity extends BaseActivity {
             // create a run state based on our contact
             OrgDetails details = OrgDetails.load(flow.getOrg());
             m_runState = RunnerUtil.getRunState(m_runner, getDBFlow(), details.getFields());
+
+            // if our contact creation is per login, add their urn
+            JsonObject metadata = m_runState.getFlow().getMetadata();
+            if (metadata.has("contact_creation")) {
+                if ("login".equals(metadata.get("contact_creation").getAsString())) {
+                    m_runState.getContact().getUrns().add(ContactUrn.fromString("mailto:" + getUsername()));
+                }
+            }
 
             // show any initial messages
             addMessages(m_runState);
@@ -256,6 +268,11 @@ public class FlowRunActivity extends BaseActivity {
     private void addMessage(String message, boolean inbound) {
         getLayoutInflater().inflate(R.layout.item_chat_bubble, m_chats);
         ChatBubbleView bubble = (ChatBubbleView) m_chats.getChildAt(m_chats.getChildCount() - 1);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            bubble.setTransitionName(getString(R.string.transition_chat));
+        }
+
         bubble.setMessage(message, inbound);
     }
 

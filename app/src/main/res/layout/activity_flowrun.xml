@@ -76,7 +76,9 @@
                 android:layout_marginBottom="4dp"
                 android:background="@drawable/white_rounded"
                 android:id="@+id/text_chat"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:transitionName="@string/transition_chat"
+                />
 
         </RelativeLayout>
 
