@@ -58,10 +58,12 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="10dp"
                 android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:text="@string/icon_send"
                 android:textColor="@color/light_gray"
+                android:clickable="true"
                 android:onClick="sendMessage"
-                android:textSize="32sp"/>
+                android:textSize="36sp"/>
 
             <EditText
                 android:layout_width="match_parent"

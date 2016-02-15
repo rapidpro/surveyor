@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +42,7 @@ import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
+import io.rapidpro.surveyor.ui.IconTextView;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
 import io.realm.Realm;
@@ -50,6 +53,7 @@ import io.realm.Realm;
 public class FlowRunActivity extends BaseActivity {
 
     private LinearLayout m_chats;
+    private IconTextView m_sendButton;
     private EditText m_chatbox;
     private ScrollView m_scrollView;
 
@@ -71,6 +75,7 @@ public class FlowRunActivity extends BaseActivity {
 
             m_chats = (LinearLayout) findViewById(R.id.chats);
             m_chatbox = (EditText) findViewById(R.id.text_chat);
+            m_sendButton = (IconTextView) findViewById(R.id.button_send);
             m_scrollView = (ScrollView) findViewById(R.id.scroll);
 
             ((TextView)findViewById(R.id.text_flow_name)).setText(flow.getName());
@@ -84,6 +89,27 @@ public class FlowRunActivity extends BaseActivity {
                         return true;
                     }
                     return false;
+                }
+            });
+
+            m_chatbox.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() > 0) {
+                        m_sendButton.setIconColor(R.color.tertiary_light);
+                    } else {
+                        m_sendButton.setIconColor(R.color.light_gray);
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
                 }
             });
 
