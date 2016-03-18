@@ -119,11 +119,9 @@ public class RapidProService {
     public void addResults(final Submission submission) {
         try {
             JsonObject obj = submission.toJson().getAsJsonObject();
-
             // replace contact with uuid
             JsonObject contact = obj.get("contact").getAsJsonObject();
             obj.addProperty("contact", contact.get("uuid").getAsString());
-
             m_api.addResults(getToken(), obj);
             submission.delete();
         } catch (RetrofitError e) {
@@ -184,7 +182,7 @@ public class RapidProService {
 
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(Surveyor.BASE_URL)
-                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setLogLevel(RestAdapter.LogLevel.BASIC)
                 .setConverter(new GsonConverter(gson))
                 .build();
 

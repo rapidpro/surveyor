@@ -867,6 +867,17 @@
     <string name="action_send_debug">Bug Report</string>
     <string name="confirm_bug_report">Oops, it looks like Surveyor is having difficulty with this flow. Would you like to send a bug report so we can look into it?</string>
     <string name="transition_chat">transition_chat</string>
+    <string name="title_activity_video">Capture Video</string>
+    <string name="intro_message">Intro message</string>
+    <string name="stop">Stop Recording</string>
+    <string name="record">Record</string>
+    <string name="camera_error">Camera Error</string>
+    <string name="description_info">Description info</string>
+    <string name="tag_url">tag_url</string>
+    <string name="tag_handler">tag_handler</string>
+    <string name="tag_media_type">tag_media_type</string>
+    <string name="media_image">media_image</string>
+    <string name="media_video">media_video</string>
 
 
 </resources>

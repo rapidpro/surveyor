@@ -1,9 +1,12 @@
 package io.rapidpro.surveyor.widget;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
@@ -45,12 +48,33 @@ public class ChatBubbleView extends CachedLinearLayout {
     public void setMessage(String text, boolean inbound) {
         TextView tv = getTextView(R.id.text_message);
         tv.setText(text);
+        tv.setMovementMethod(LinkMovementMethod.getInstance());
 
         if (!inbound) {
             tv.setBackground(getResources().getDrawable(R.drawable.chat_bubble_out));
         }
 
         addView(getSpacer(), inbound ? 1 : 0);
+    }
+
+    public void setThumbnail(Bitmap image, String url, int type){
+        ImageView imageView = getImageView(R.id.thumbnail);
+        imageView.setImageBitmap(image);
+
+        View mediaView = getView(R.id.media_view);
+        mediaView.setVisibility(VISIBLE);
+        mediaView.setTag(R.string.tag_url, url);
+        mediaView.setTag(R.string.tag_media_type, type);
+
+        if (type == R.string.media_image) {
+            getTextView(R.id.media_icon).setText(R.string.icon_photo);
+        } else if (type == R.string.media_video) {
+            getTextView(R.id.media_icon).setText(R.string.icon_play_arrow);
+        }
+
+        show(R.id.media_view);
+        hide(R.id.text_message);
+        hide(R.id.spacer);
     }
 
     /**

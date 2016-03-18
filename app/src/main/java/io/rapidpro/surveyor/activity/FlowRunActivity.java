@@ -1,11 +1,16 @@
 package io.rapidpro.surveyor.activity;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -13,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -22,6 +26,12 @@ import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.rapidpro.flows.RunnerBuilder;
@@ -37,6 +47,7 @@ import io.rapidpro.flows.runner.Step;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.RunnerUtil;
 import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBAlias;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
@@ -61,6 +72,13 @@ public class FlowRunActivity extends BaseActivity {
     private RunState m_runState;
 
     private Submission m_submission;
+
+    private File m_lastMediaFile;
+
+    private static final int ACTION_TEXT = 1;
+    private static final int ACTION_PHOTO = 2;
+    private static final int ACTION_VIDEO = 3;
+    private static final int ACTION_GPS = 4;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -213,6 +231,16 @@ public class FlowRunActivity extends BaseActivity {
             return;
         }
 
+        if (sendButton != null && sendButton.getTag() == ACTION_PHOTO) {
+            requestPhoto();
+            return;
+        }
+
+        if (sendButton != null && sendButton.getTag() == ACTION_VIDEO) {
+            requestVideo();
+            return;
+        }
+
         EditText chatBox = (EditText) findViewById(R.id.text_chat);
         String message = chatBox.getText().toString();
 
@@ -270,11 +298,154 @@ public class FlowRunActivity extends BaseActivity {
                 }
             }
 
+            ViewCache vc = getViewCache();
+            TextView sendButton = vc.getTextView(R.id.button_send);
+
+            if (run.getState() == RunState.State.WAIT_PHOTO) {
+                sendButton.setText(getString(R.string.icon_photo_camera));
+                sendButton.setTag(ACTION_PHOTO);
+                vc.hide(R.id.text_chat);
+            } else if (run.getState() == RunState.State.WAIT_VIDEO) {
+                sendButton.setText(getString(R.string.icon_videocam));
+                sendButton.setTag(ACTION_VIDEO);
+            } else {
+                sendButton.setText(getString(R.string.icon_send));
+                sendButton.setTag(ACTION_TEXT);
+                vc.show(R.id.text_chat);
+            }
+
             if (run.getState() == RunState.State.COMPLETED) {
                 markFlowComplete();
             }
         }
     }
+
+    static final int IMAGE_RESULT = 1;
+    static final int VIDEO_RESULT = 2;
+
+    private void requestMedia(Intent intent, int resultType) {
+        m_lastMediaFile = m_submission.createMediaFile("jpg");
+
+        // Continue only if the File was successfully created
+        if (m_lastMediaFile != null) {
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(m_lastMediaFile));
+            startActivityForResult(intent, resultType);
+        }
+
+    }
+
+    private void requestPhoto() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            requestMedia(takePictureIntent, IMAGE_RESULT);
+        }
+    }
+
+    private void requestVideo() {
+        Intent intent = new Intent(this, VideoCaptureActivity.class);
+        intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, m_submission.createMediaFile("mp4").getAbsolutePath());
+        startActivityForResult(intent, VIDEO_RESULT);
+    }
+
+
+    protected Bitmap scaleToWidth(Bitmap bitmap, int width) {
+        double ratio = (double)width / (double)bitmap.getWidth();
+        return Bitmap.createScaledBitmap(bitmap, width, (int)((double)bitmap.getHeight() * ratio), false);
+    }
+
+    /**
+     * Scales a bitmap so that it's longest dimension is provided value
+     */
+    protected Bitmap scaleToMax(Bitmap bitmap, int max) {
+
+        // landscape photos
+        if (bitmap.getWidth() > bitmap.getHeight()) {
+            double ratio = (double)max / (double)bitmap.getWidth();
+            return Bitmap.createScaledBitmap(bitmap, max, (int)((double)bitmap.getHeight() * ratio), false);
+
+        } else {
+            double ratio = (double)max / (double)bitmap.getHeight();
+            return Bitmap.createScaledBitmap(bitmap, (int)((double)bitmap.getWidth() * ratio), max, false);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == IMAGE_RESULT && resultCode == RESULT_OK) {
+
+            if(m_lastMediaFile != null && m_lastMediaFile.exists()){
+
+                Bitmap full = BitmapFactory.decodeFile(m_lastMediaFile.getAbsolutePath());
+                Bitmap scaled = scaleToMax(full, 1024);
+                Bitmap thumb = scaleToMax(scaled, 600);
+
+                byte[] bytes = convertToJPEG(scaled);
+
+                try {
+                    FileUtils.writeByteArrayToFile(m_lastMediaFile, bytes);
+                    String url = "file:" + m_lastMediaFile.getAbsolutePath();
+                    m_runner.resume(m_runState, Input.of("image", url));
+                    addMedia(thumb, url, R.string.media_image);
+                    addMessages(m_runState);
+                    saveSteps();
+                } catch (Exception e) {
+                    Toast.makeText(this, "Couldn't handle message", Toast.LENGTH_SHORT).show();
+                    Surveyor.LOG.e("Error running flow", e);
+                    showSendBugReport();
+                }
+            }
+        }
+
+        if (requestCode == VIDEO_RESULT && resultCode == RESULT_OK) {
+
+            String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
+            if(file != null) {
+
+                Bitmap thumb = ThumbnailUtils.createVideoThumbnail(file, MediaStore.Images.Thumbnails.MINI_KIND);
+
+                try {
+                    String url = "file:" + file;
+                    m_runner.resume(m_runState, Input.of("video", url));
+                    addMedia(thumb, url, R.string.media_video);
+                    addMessages(m_runState);
+                    saveSteps();
+                } catch (Exception e) {
+                    Toast.makeText(this, "Couldn't handle message", Toast.LENGTH_SHORT).show();
+                    Surveyor.LOG.e("Error running flow", e);
+                    showSendBugReport();
+                }
+            }
+
+        }
+    }
+
+    private void createMediaFile() throws IOException {
+
+        m_lastMediaFile = null;
+
+        // Create a unique file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "MEDIA_" + timeStamp + "_";
+
+        // create a hidden temprorary directory if we don't have one
+        File temp = Environment.getExternalStorageDirectory();
+        temp = new File(temp.getAbsolutePath()+"/.temp/");
+        if(!temp.exists()) {
+            temp.mkdir();
+        }
+
+        m_lastMediaFile = File.createTempFile(imageFileName, ".media", temp);
+    }
+
+    public static byte[] convertToJPEG(Bitmap bm) {
+        // int iBytes = bm.getWidth() * bm.getHeight() * 4;
+        // ByteBuffer buffer = ByteBuffer.allocate(iBytes);
+        // bm.copyPixelsToBuffer(buffer);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+        return baos.toByteArray();
+    }
+
 
     private void markFlowComplete() {
 
@@ -300,6 +471,13 @@ public class FlowRunActivity extends BaseActivity {
         }
 
         bubble.setMessage(message, inbound);
+    }
+
+
+    private void addMedia(Bitmap image, String url, int type) {
+        getLayoutInflater().inflate(R.layout.item_chat_bubble, m_chats);
+        ChatBubbleView bubble = (ChatBubbleView) m_chats.getChildAt(m_chats.getChildCount() - 1);
+        bubble.setThumbnail(image, url, type);
     }
 
     private void confirmDiscardRun() {
@@ -337,5 +515,22 @@ public class FlowRunActivity extends BaseActivity {
 
     public void discardRunButton(View view) {
         confirmDiscardRun();
+    }
+
+    public void onClickMedia(View view) {
+
+        String url = (String) view.getTag(R.string.tag_url);
+        int mediaType = (int) view.getTag(R.string.tag_media_type);
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+
+        if (mediaType == R.string.media_image) {
+            intent.setDataAndType(Uri.parse(url), "image/*");
+        } else if (mediaType == R.string.media_video) {
+            intent.setDataAndType(Uri.parse(url), "video/*");
+        }
+
+        startActivity(intent);
     }
 }

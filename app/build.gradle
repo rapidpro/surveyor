@@ -8,8 +8,8 @@ android {
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 17
         targetSdkVersion 22
-        versionCode 13
-        versionName "1.0.13"
+        versionCode 14
+        versionName "1.0.14"
         multiDexEnabled = true
     }
     buildTypes {
@@ -37,6 +37,7 @@ dependencies {
 
     // google services
     compile 'com.android.support:appcompat-v7:22.2.1'
+    compile "com.android.support:support-v13:22.2.1"
 
     // compile 'com.google.android.gms:play-services:8.4.0'
     // compile 'com.android.support:cardview-v7:22.2.1'
@@ -54,7 +55,7 @@ dependencies {
     compile 'com.neovisionaries:nv-i18n:1.11'
 
     // our flow engine
-    compile ('io.rapidpro:flows:1.2.8-SNAPSHOT') {
+    compile ('io.rapidpro:flows:1.2.10-SNAPSHOT') {
         // exclude threeten since it is inefficient in android land
         exclude group: 'org.threeten'
     }
