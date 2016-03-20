@@ -1,5 +1,6 @@
 package io.rapidpro.surveyor.activity;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -26,6 +27,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.greysonparrelli.permiso.Permiso;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -61,7 +64,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
         // Set up the login form.
         m_emailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
+
 
         m_passwordView = (EditText) findViewById(R.id.password);
         m_passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -89,6 +92,26 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         // set our error message if we have one
         setErrorMessage(getIntent().getStringExtra(SurveyorIntent.EXTRA_ERROR));
 
+        Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
+            @Override
+            public void onPermissionResult(Permiso.ResultSet resultSet) {
+                if (resultSet.areAllPermissionsGranted()) {
+                    populateAutoComplete();
+                } else {
+                    // they didn't grant us permission, but that's okay
+                }
+            }
+
+            @Override
+            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
+                LoginActivity.this.showRationaleDialog(R.string.permission_contacts, callback);
+            }
+        }, Manifest.permission.READ_CONTACTS);
+
+    }
+
+    public void onResume() {
+        super.onResume();
     }
 
     public boolean validateLogin() {

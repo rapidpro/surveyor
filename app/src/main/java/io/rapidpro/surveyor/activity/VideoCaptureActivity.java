@@ -1,6 +1,9 @@
 package io.rapidpro.surveyor.activity;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,11 +18,15 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.greysonparrelli.permiso.Permiso;
+
 import java.io.IOException;
 
+import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.fragment.OrgListFragment;
 import io.rapidpro.surveyor.ui.CameraPreview;
 import io.rapidpro.surveyor.ui.CameraUtil;
 import io.rapidpro.surveyor.ui.IconTextView;
@@ -27,7 +34,7 @@ import io.rapidpro.surveyor.ui.IconTextView;
 /**
  * Activity for capturing videos
  */
-public class VideoCaptureActivity extends Activity {
+public class VideoCaptureActivity extends BaseActivity {
 
     // camera settings
     public static final int CAMERA_QUALITY = CamcorderProfile.QUALITY_480P;
@@ -48,8 +55,6 @@ public class VideoCaptureActivity extends Activity {
     protected void onRestoreInstanceState(Bundle bundle) {
         super.onRestoreInstanceState(bundle);
         m_cameraDirection = bundle.getInt(SurveyorIntent.EXTRA_CAMERA_DIRECTION, -1);
-
-        Surveyor.LOG.d("Restored camera direciton: " + m_cameraDirection);
     }
 
     @Override
@@ -61,7 +66,7 @@ public class VideoCaptureActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        // requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_video);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -70,6 +75,8 @@ public class VideoCaptureActivity extends Activity {
         m_toggleCameraButton = (IconTextView) findViewById(R.id.button_switch);
         m_preview = new CameraPreview(this);
         ((LinearLayout) findViewById(R.id.camera_preview)).addView(m_preview);
+
+
     }
 
     public void onResume() {
@@ -80,37 +87,62 @@ public class VideoCaptureActivity extends Activity {
             finish();
         }
 
-        if (m_camera == null) {
+        Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
+            @Override
+            public void onPermissionResult(Permiso.ResultSet resultSet) {
+                if (resultSet.areAllPermissionsGranted()) {
+                    if (m_camera == null) {
 
-            m_preview.init();
+                        m_preview.init();
 
-            // if the front facing camera does not exist
-            if (getFrontCamera() < 0) {
-                Toast.makeText(this, "No front facing camera found.", Toast.LENGTH_LONG).show();
-                m_toggleCameraButton.setVisibility(View.GONE);
-            } else if (m_cameraDirection == CameraInfo.CAMERA_FACING_FRONT) {
-                m_cameraId = getFrontCamera();
-            }
+                        // if the front facing camera does not exist
+                        if (getFrontCamera() < 0) {
+                            Toast.makeText(VideoCaptureActivity.this, "No front facing camera found.", Toast.LENGTH_LONG).show();
+                            m_toggleCameraButton.setVisibility(View.GONE);
+                        } else if (m_cameraDirection == CameraInfo.CAMERA_FACING_FRONT) {
+                            m_cameraId = getFrontCamera();
+                        }
 
-            // default to the back camera if one isn't set
-            if (m_cameraId == -1) {
-                m_cameraId = getBackCamera();
-                m_cameraDirection = CameraInfo.CAMERA_FACING_BACK;
-            }
+                        // default to the back camera if one isn't set
+                        if (m_cameraId == -1) {
+                            m_cameraId = getBackCamera();
+                            m_cameraDirection = CameraInfo.CAMERA_FACING_BACK;
+                        }
 
-            Surveyor.LOG.d("Opening camera: " + m_cameraId);
-            m_camera = Camera.open(m_cameraId);
-            m_preview.refreshCamera(m_camera, m_cameraId);
+                        try {
+                            Surveyor.LOG.d("Opening camera: " + m_cameraId);
+                            m_camera = Camera.open(m_cameraId);
+                            m_preview.refreshCamera(m_camera, m_cameraId);
 
-            if (m_camera != null) {
-                Camera.Parameters params = m_camera.getParameters();
-                if (params.getSupportedFocusModes().contains(
-                        Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
-                    params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+                            if (m_camera != null) {
+                                Camera.Parameters params = m_camera.getParameters();
+                                if (params.getSupportedFocusModes().contains(
+                                        Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+                                    params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+                                }
+                                m_camera.setParameters(params);
+                            }
+                        } catch (Exception e) {
+                            Surveyor.LOG.e("Failed to open camera", e);
+                            finish();
+                        }
+                    }
+                } else {
+                    // didn't grant us permission
+                    finish();
                 }
-                m_camera.setParameters(params);
             }
-        }
+
+            @Override
+            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
+                VideoCaptureActivity.this.showRationaleDialog(R.string.permission_camera, callback);
+            }
+        }, Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.MODIFY_AUDIO_SETTINGS,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                "android.permission.READ_PROFILE");
+
     }
 
     /**
@@ -169,7 +201,14 @@ public class VideoCaptureActivity extends Activity {
 
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mediaRecorder.setProfile(CamcorderProfile.get(CAMERA_QUALITY));
+
+        try {
+            if (BuildConfig.DEBUG) {
+                mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
+            } else {
+                mediaRecorder.setProfile(CamcorderProfile.get(CAMERA_QUALITY));
+            }
+        } catch (Exception e) {}
 
         // set our recorder to use the output file provided by our caller
         String filename = getIntent().getExtras().getString(SurveyorIntent.EXTRA_MEDIA_FILE);
@@ -250,7 +289,8 @@ public class VideoCaptureActivity extends Activity {
                 try {
                     // and go!
                     m_mediaRecorder.start();
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
         });
 
@@ -263,7 +303,12 @@ public class VideoCaptureActivity extends Activity {
     private void stopRecording() {
 
         if (m_mediaRecorder != null) {
-            m_mediaRecorder.stop();
+            try {
+                m_mediaRecorder.stop();
+            } catch (Exception e) {
+                setResult(Activity.RESULT_CANCELED);
+                finish();
+            }
         }
         releaseMediaRecorder();
         m_recording = false;

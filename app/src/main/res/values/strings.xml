@@ -878,6 +878,16 @@
     <string name="tag_media_type">tag_media_type</string>
     <string name="media_image">media_image</string>
     <string name="media_video">media_video</string>
+    <string name="media_audio">media_audio</string>
+    <string name="tap_to_record">Tap to Record</string>
+    <string name="tap_to_stop">recording..</string>
+    <string name="title_audio_activity">Record Audio</string>
+    <string name="quit">Quit</string>
+    <string name="settings">Settings</string>
+    <string name="permission_storage">We need access to your storage in order to save your surveys that are in progress.</string>
+    <string name="title_permissions">Permission</string>
+    <string name="permission_camera">We need permission to access to the camera in order for you to record videos for your surveys.</string>
+    <string name="permission_contacts">Surveyor can access your contacts to help you fill out the login form. This permission is not required.</string>
 
 
 </resources>

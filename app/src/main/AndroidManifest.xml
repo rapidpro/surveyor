@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="io.rapidpro.surveyor">
 
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
@@ -11,8 +10,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <uses-feature android:name="android.hardware.camera" android:required="true" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -22,6 +22,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/RapidTheme" >
+
         <activity
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login"
@@ -63,10 +64,13 @@
             android:label="@string/title_activity_flow">
         </activity>
         <activity
+            android:name=".activity.AudioCaptureActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_audio_activity">
+        </activity>
+        <activity
             android:name=".activity.VideoCaptureActivity"
-
             android:label="@string/title_activity_video">
         </activity>
-
     </application>
 </manifest>

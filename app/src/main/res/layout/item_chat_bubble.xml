@@ -36,7 +36,7 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             />
-
+        
         <io.rapidpro.surveyor.ui.IconTextView
             android:id="@+id/media_icon"
             android:layout_alignBottom="@+id/thumbnail"
@@ -48,6 +48,8 @@
             android:textSize="40sp"
             android:textColor="@color/white"
             android:text="@string/icon_photo"/>
+        
+        
 
     </RelativeLayout>
 

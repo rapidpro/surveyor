@@ -1,20 +1,27 @@
 package io.rapidpro.surveyor.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+
+import com.greysonparrelli.permiso.Permiso;
+import com.greysonparrelli.permiso.PermisoActivity;
 
 import java.io.File;
 
@@ -36,7 +43,7 @@ import io.realm.Realm;
  * which provides convenience methods for transferring state
  * between activities and the like.
  */
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends PermisoActivity {
 
     private DBOrg m_org;
     private DBFlow m_flow;
@@ -98,6 +105,7 @@ public class BaseActivity extends AppCompatActivity {
         if (validateLogin() && !isLoggedIn()) {
             logout(R.string.please_login_again);
         }
+
     }
 
     public void finish() {
@@ -119,6 +127,12 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+
+        // show the settings menu always in debug mode
+        if (BuildConfig.DEBUG) {
+            menu.findItem(R.id.action_settings).setVisible(true);
+        }
+
         return true;
     }
 
@@ -186,6 +200,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Surveyor.LOG.d(getClass().getSimpleName() + ".onResume()");
+
     }
 
     protected void onPause() {
@@ -290,6 +305,9 @@ public class BaseActivity extends AppCompatActivity {
 
         dialog.show();
         return dialog;
+    }
 
+    public void showRationaleDialog(int body, Permiso.IOnRationaleProvided callback) {
+        Permiso.getInstance().showRationaleInDialog(getString(R.string.title_permissions), getString(body), null, callback);
     }
 }

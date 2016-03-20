@@ -20,7 +20,6 @@ import io.rapidpro.expressions.utils.ExpressionUtils;
 import io.rapidpro.flows.definition.Flow;
 import io.rapidpro.flows.definition.RuleSet;
 import io.rapidpro.flows.runner.Contact;
-import io.rapidpro.flows.runner.ContactUrn;
 import io.rapidpro.flows.runner.Field;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Step;
@@ -132,6 +131,7 @@ public class Submission implements Jsonizable {
 
         long start = System.currentTimeMillis();
         List<File> files = new ArrayList<>();
+
         for (File dir : getOrgDir(orgId).listFiles()) {
             if (dir.isDirectory()) {
                 for (File submission : dir.listFiles(SUBMISSION_FILTER)) {

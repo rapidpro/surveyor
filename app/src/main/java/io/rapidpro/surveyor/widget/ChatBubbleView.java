@@ -9,6 +9,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.ui.CachedLinearLayout;
 
@@ -57,9 +62,12 @@ public class ChatBubbleView extends CachedLinearLayout {
         addView(getSpacer(), inbound ? 1 : 0);
     }
 
-    public void setThumbnail(Bitmap image, String url, int type){
+    public void setThumbnail(Bitmap image, String url, int type) {
         ImageView imageView = getImageView(R.id.thumbnail);
-        imageView.setImageBitmap(image);
+
+        if (image != null) {
+            imageView.setImageBitmap(image);
+        }
 
         View mediaView = getView(R.id.media_view);
         mediaView.setVisibility(VISIBLE);
@@ -70,6 +78,14 @@ public class ChatBubbleView extends CachedLinearLayout {
             getTextView(R.id.media_icon).setText(R.string.icon_photo);
         } else if (type == R.string.media_video) {
             getTextView(R.id.media_icon).setText(R.string.icon_play_arrow);
+        } else if (type == R.string.media_audio) {
+            getTextView(R.id.media_icon).setText(R.string.icon_mic);
+
+            final float scale = getContext().getResources().getDisplayMetrics().density;
+            int pixels = (int) (70 * scale + 0.5f);
+            ViewGroup.LayoutParams params = mediaView.getLayoutParams();
+            params.height = pixels;
+            mediaView.setLayoutParams(params);
         }
 
         show(R.id.media_view);

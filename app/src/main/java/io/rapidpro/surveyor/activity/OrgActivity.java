@@ -1,5 +1,6 @@
 package io.rapidpro.surveyor.activity;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;

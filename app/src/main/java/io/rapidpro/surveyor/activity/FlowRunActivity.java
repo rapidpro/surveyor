@@ -77,8 +77,14 @@ public class FlowRunActivity extends BaseActivity {
 
     private static final int ACTION_TEXT = 1;
     private static final int ACTION_PHOTO = 2;
-    private static final int ACTION_VIDEO = 3;
-    private static final int ACTION_GPS = 4;
+    private static final int ACTION_AUDIO = 3;
+    private static final int ACTION_VIDEO = 4;
+    private static final int ACTION_GPS = 5;
+
+    private static final int RESULT_IMAGE = 1;
+    private static final int RESULT_VIDEO = 2;
+    private static final int RESULT_AUDIO = 3;
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -241,6 +247,11 @@ public class FlowRunActivity extends BaseActivity {
             return;
         }
 
+        if (sendButton != null && sendButton.getTag() == ACTION_AUDIO) {
+            requestAudio();
+            return;
+        }
+
         EditText chatBox = (EditText) findViewById(R.id.text_chat);
         String message = chatBox.getText().toString();
 
@@ -308,6 +319,11 @@ public class FlowRunActivity extends BaseActivity {
             } else if (run.getState() == RunState.State.WAIT_VIDEO) {
                 sendButton.setText(getString(R.string.icon_videocam));
                 sendButton.setTag(ACTION_VIDEO);
+                vc.hide(R.id.text_chat);
+            } else if (run.getState() == RunState.State.WAIT_AUDIO) {
+                sendButton.setText(getString(R.string.icon_mic));
+                sendButton.setTag(ACTION_AUDIO);
+                vc.hide(R.id.text_chat);
             } else {
                 sendButton.setText(getString(R.string.icon_send));
                 sendButton.setTag(ACTION_TEXT);
@@ -320,8 +336,6 @@ public class FlowRunActivity extends BaseActivity {
         }
     }
 
-    static final int IMAGE_RESULT = 1;
-    static final int VIDEO_RESULT = 2;
 
     private void requestMedia(Intent intent, int resultType) {
         m_lastMediaFile = m_submission.createMediaFile("jpg");
@@ -337,16 +351,21 @@ public class FlowRunActivity extends BaseActivity {
     private void requestPhoto() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            requestMedia(takePictureIntent, IMAGE_RESULT);
+            requestMedia(takePictureIntent, RESULT_IMAGE);
         }
     }
 
     private void requestVideo() {
         Intent intent = new Intent(this, VideoCaptureActivity.class);
         intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, m_submission.createMediaFile("mp4").getAbsolutePath());
-        startActivityForResult(intent, VIDEO_RESULT);
+        startActivityForResult(intent, RESULT_VIDEO);
     }
 
+    private void requestAudio() {
+        Intent intent = new Intent(this, AudioCaptureActivity.class);
+        intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, m_submission.createMediaFile("m4a").getAbsolutePath());
+        startActivityForResult(intent, RESULT_AUDIO);
+    }
 
     protected Bitmap scaleToWidth(Bitmap bitmap, int width) {
         double ratio = (double)width / (double)bitmap.getWidth();
@@ -371,7 +390,7 @@ public class FlowRunActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == IMAGE_RESULT && resultCode == RESULT_OK) {
+        if (requestCode == RESULT_IMAGE && resultCode == RESULT_OK) {
 
             if(m_lastMediaFile != null && m_lastMediaFile.exists()){
 
@@ -396,7 +415,7 @@ public class FlowRunActivity extends BaseActivity {
             }
         }
 
-        if (requestCode == VIDEO_RESULT && resultCode == RESULT_OK) {
+        if (requestCode == RESULT_VIDEO && resultCode == RESULT_OK) {
 
             String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
             if(file != null) {
@@ -416,6 +435,24 @@ public class FlowRunActivity extends BaseActivity {
                 }
             }
 
+        }
+
+        if (requestCode == RESULT_AUDIO && resultCode == RESULT_OK) {
+            Surveyor.LOG.d("AUDIO RESULT");
+            String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
+            if(file != null) {
+                try {
+                    String url = "file:" + file;
+                    m_runner.resume(m_runState, Input.of("audio", url));
+                    addMedia(null, url, R.string.media_audio);
+                    addMessages(m_runState);
+                    saveSteps();
+                } catch (Exception e) {
+                    Toast.makeText(this, "Couldn't handle message", Toast.LENGTH_SHORT).show();
+                    Surveyor.LOG.e("Error running flow", e);
+                    showSendBugReport();
+                }
+            }
         }
     }
 
@@ -529,6 +566,8 @@ public class FlowRunActivity extends BaseActivity {
             intent.setDataAndType(Uri.parse(url), "image/*");
         } else if (mediaType == R.string.media_video) {
             intent.setDataAndType(Uri.parse(url), "video/*");
+        } else if (mediaType == R.string.media_audio) {
+            intent.setDataAndType(Uri.parse(url), "audio/*");
         }
 
         startActivity(intent);
