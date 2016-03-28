@@ -1,5 +1,6 @@
 package io.rapidpro.surveyor.data;
 
+import android.net.Uri;
 import android.os.Environment;
 
 import com.google.gson.JsonElement;
@@ -303,14 +304,28 @@ public class Submission implements Jsonizable {
     }
 
     /**
-     * Converts all media urls into Base64 encoded data submittable for the server
+     * Submits all local media and updates to remove urls
      */
     private void resolveMedia() {
+
+        final RapidProService rapid = Surveyor.get().getRapidProService();
+
         // resolve the media for all of our steps
         for (Step step : m_steps) {
             RuleSet.Result result = step.getRuleResult();
             if (result != null) {
-                result.resolveMedia();
+
+                String media = result.getMedia();
+                if (media != null) {
+                    int split = media.indexOf(":");
+                    String type = media.substring(0, split);
+                    String fileUrl = media.substring(split + 1, media.length());
+                    String newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), m_flow);
+
+                    result.setMedia(type + ":" + newUrl);
+
+                    Surveyor.LOG.d(type + ":" + newUrl);
+                }
             }
         }
     }

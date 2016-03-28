@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
+import retrofit.mime.TypedFile;
 
 public class RapidProService {
 
@@ -58,7 +60,7 @@ public class RapidProService {
     }
 
     public void getFlows(final Callback<FlowList> callback) {
-        m_api.getFlows(getToken(), "S", new Callback<FlowList>() {
+        m_api.getFlows(getToken(), "S", false, new Callback<FlowList>() {
             @Override
             public void success(FlowList flowList, Response response) {
                 m_flowList = flowList;
@@ -114,6 +116,18 @@ public class RapidProService {
         String uuid = result.get("uuid").getAsString();
         contact.setUuid(uuid);
         return contact;
+    }
+
+    /**
+     * Uploads a media file and returns the remove URL
+     * @param file the local file to upload
+     * @param flowUuid the flow this media file is associated with
+     * @return the relative path to media
+     */
+    public String uploadMedia(File file, String flowUuid) {
+        TypedFile typedFile = new TypedFile("multipart/form-data", file);
+        JsonObject result = m_api.uploadMedia(getToken(), typedFile, flowUuid);
+        return result.get("location").getAsString();
     }
 
     public void addResults(final Submission submission) {

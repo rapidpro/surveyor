@@ -203,7 +203,7 @@ public class VideoCaptureActivity extends BaseActivity {
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
         try {
-            if (BuildConfig.DEBUG) {
+            if (false && BuildConfig.DEBUG) {
                 mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
             } else {
                 mediaRecorder.setProfile(CamcorderProfile.get(CAMERA_QUALITY));

@@ -315,15 +315,15 @@ public class FlowRunActivity extends BaseActivity {
             if (run.getState() == RunState.State.WAIT_PHOTO) {
                 sendButton.setText(getString(R.string.icon_photo_camera));
                 sendButton.setTag(ACTION_PHOTO);
-                vc.hide(R.id.text_chat);
+                vc.hide(R.id.text_chat, true);
             } else if (run.getState() == RunState.State.WAIT_VIDEO) {
                 sendButton.setText(getString(R.string.icon_videocam));
                 sendButton.setTag(ACTION_VIDEO);
-                vc.hide(R.id.text_chat);
+                vc.hide(R.id.text_chat, true);
             } else if (run.getState() == RunState.State.WAIT_AUDIO) {
                 sendButton.setText(getString(R.string.icon_mic));
                 sendButton.setTag(ACTION_AUDIO);
-                vc.hide(R.id.text_chat);
+                vc.hide(R.id.text_chat, true);
             } else {
                 sendButton.setText(getString(R.string.icon_send));
                 sendButton.setTag(ACTION_TEXT);
