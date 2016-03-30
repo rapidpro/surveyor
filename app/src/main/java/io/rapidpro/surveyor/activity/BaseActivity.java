@@ -1,21 +1,16 @@
 package io.rapidpro.surveyor.activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ShareCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -34,7 +29,7 @@ import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
-import io.rapidpro.surveyor.net.RapidProService;
+import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
 
@@ -260,7 +255,7 @@ public class BaseActivity extends PermisoActivity {
         return m_realm;
     }
 
-    public RapidProService getRapidProService() {
+    public TembaService getRapidProService() {
         return getSurveyor().getRapidProService();
     }
 

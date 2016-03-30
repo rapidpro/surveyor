@@ -28,7 +28,7 @@ import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.flows.utils.Jsonizable;
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.net.RapidProService;
+import io.rapidpro.surveyor.net.TembaService;
 
 /**
  * Represents a single flow run. Manages saving run progress and
@@ -308,7 +308,7 @@ public class Submission implements Jsonizable {
      */
     private void resolveMedia() {
 
-        final RapidProService rapid = Surveyor.get().getRapidProService();
+        final TembaService rapid = Surveyor.get().getRapidProService();
 
         // resolve the media for all of our steps
         for (Step step : m_steps) {
@@ -320,10 +320,9 @@ public class Submission implements Jsonizable {
                     int split = media.indexOf(":");
                     String type = media.substring(0, split);
                     String fileUrl = media.substring(split + 1, media.length());
-                    String newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), m_flow);
-
+                    String newUrl = null;
+                    newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), m_flow);
                     result.setMedia(type + ":" + newUrl);
-
                     Surveyor.LOG.d(type + ":" + newUrl);
                 }
             }
@@ -340,8 +339,8 @@ public class Submission implements Jsonizable {
         }
     }
 
-    public void submit() {
-        final RapidProService rapid = Surveyor.get().getRapidProService();
+    public void submit() throws IOException {
+        final TembaService rapid = Surveyor.get().getRapidProService();
         final Submission submission = this;
 
         // submit any created fields

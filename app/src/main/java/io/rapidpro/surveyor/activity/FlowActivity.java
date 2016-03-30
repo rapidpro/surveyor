@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
 
 import io.rapidpro.flows.definition.Flow;
@@ -22,10 +23,10 @@ import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class FlowActivity extends BaseActivity {
 
@@ -94,10 +95,12 @@ public class FlowActivity extends BaseActivity {
                         // go fetch our DBFlow definition async
                         getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
                             @Override
-                            public void success(FlowDefinition definition, Response response) {
+                            public void onResponse(Call<FlowDefinition> call, Response<FlowDefinition> response) {
                                 Realm realm = getRealm();
                                 realm.beginTransaction();
-                                flow.setDefinition(new String(((TypedByteArray) response.getBody()).getBytes()));
+
+                                FlowDefinition definition = response.body();
+                                flow.setDefinition(definition.toString());
                                 flow.setRevision(definition.metadata.revision);
                                 flow.setName(definition.metadata.name);
                                 flow.setQuestionCount(definition.rule_sets.size());
@@ -109,11 +112,12 @@ public class FlowActivity extends BaseActivity {
                                 m_refreshProgress.incrementProgressBy(1);
                                 m_refreshProgress.hide();
                                 m_refreshProgress = null;
+
                             }
 
                             @Override
-                            public void failure(RetrofitError error) {
-                                Surveyor.LOG.e("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error.getCause());
+                            public void onFailure(Call<FlowDefinition> call, Throwable t) {
+                                Surveyor.LOG.e("Failure fetching flow", t);
                             }
                         });
                     }

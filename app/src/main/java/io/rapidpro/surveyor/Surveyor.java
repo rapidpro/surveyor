@@ -1,18 +1,12 @@
 package io.rapidpro.surveyor;
 
 import android.app.Application;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
-import java.io.File;
-import java.io.IOException;
-
-import io.rapidpro.surveyor.net.RapidProService;
+import io.rapidpro.surveyor.net.TembaService;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -23,7 +17,7 @@ public class Surveyor extends Application {
     private static Surveyor s_this;
 
     private SharedPreferences m_prefs = null;
-    private RapidProService m_rapidProService = null;
+    private TembaService m_tembaService = null;
     private RealmConfiguration m_realmConfig;
 
     @Override
@@ -60,13 +54,13 @@ public class Surveyor extends Application {
 
     public void updatePrefs() {
         BASE_URL = getPreferences().getString("pref_key_host", getString(R.string.pref_default_host));
-        m_rapidProService = null;
+        m_tembaService = null;
     }
 
-    public RapidProService getRapidProService() {
-        if (m_rapidProService == null) {
-            m_rapidProService = new RapidProService();
+    public TembaService getRapidProService() {
+        if (m_tembaService == null) {
+            m_tembaService = new TembaService();
         }
-        return m_rapidProService;
+        return m_tembaService;
     }
 }

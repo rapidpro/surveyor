@@ -5,6 +5,8 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.DBFlow;
@@ -13,10 +15,9 @@ import io.rapidpro.surveyor.fragment.RapidFlowsFragment;
 import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.net.FlowList;
 import io.realm.Realm;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragment.RapidFlowListener {
 
@@ -31,7 +32,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
 
         getRapidProService().getFlows(new Callback<FlowList>() {
             @Override
-            public void success(FlowList flows, Response response) {
+            public void onResponse(Call<FlowList> call, Response<FlowList> response) {
                 if (!RapidFlowsActivity.this.isDestroyed()) {
                     setContentView(R.layout.fragment_container);
                     if (savedInstanceState == null) {
@@ -43,9 +44,10 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                Surveyor.LOG.e(error.getMessage(), error.getCause());
-                int message = getRapidProService().getErrorMessage(error);
+            public void onFailure(Call<FlowList> call, Throwable t) {
+                Surveyor.LOG.e("Failed fetching flows", t);
+
+                int message = getRapidProService().getErrorMessage(t);
                 Toast.makeText(RapidFlowsActivity.this, message, Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -69,9 +71,10 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         // go fetch our DBFlow definition async
         getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
             @Override
-            public void success(FlowDefinition definition, Response response) {
+            public void onResponse(Call<FlowDefinition> call, Response<FlowDefinition> response) {
+                FlowDefinition definition = response.body();
                 realm.beginTransaction();
-                flow.setDefinition(new String(((TypedByteArray) response.getBody()).getBytes()));
+                flow.setDefinition(definition.toString());
                 flow.setRevision(definition.metadata.revision);
                 flow.setName(definition.metadata.name);
                 realm.copyToRealmOrUpdate(flow);
@@ -79,9 +82,10 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                Surveyor.LOG.e("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error.getCause());
+            public void onFailure(Call<FlowDefinition> call, Throwable t) {
+                Surveyor.LOG.e("Failure fetching: " + t.getMessage(), t);
             }
+
         });
 
     }

@@ -53,7 +53,9 @@ dependencies {
     compile 'io.realm:realm-android:0.82.1'
 
     // rest api
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.squareup.retrofit2:retrofit:2.0.0'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0'
 
     // internationalization, language iso codes
     compile 'com.neovisionaries:nv-i18n:1.11'
@@ -71,6 +73,8 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
 
     compile 'com.greysonparrelli.permiso:permiso:0.1.3'
+
+
 
 }
 

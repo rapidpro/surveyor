@@ -1,6 +1,5 @@
 package io.rapidpro.surveyor.activity;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -14,6 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.List;
 
@@ -29,11 +29,11 @@ import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
-import io.rapidpro.surveyor.net.RapidProService;
+import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
-import retrofit.RetrofitError;
+
 
 public class OrgActivity extends BaseActivity implements FlowListFragment.OnFragmentInteractionListener {
 
@@ -174,7 +174,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         protected Void doInBackground(String... params) {
 
             try {
-                RapidProService rapid = getRapidProService();
+                TembaService rapid = getRapidProService();
 
                 // get our database
                 Realm realm = Realm.getDefaultInstance();
@@ -205,6 +205,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
 
                 // now go fetch the locations
                 List<DBLocation> results = rapid.getLocations();
+
                 for (DBLocation location : results) {
                     location.setOrg(org);
 
@@ -227,7 +228,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 incrementProgress();
 
                 // finally the fields for our org
-                List<Field> fields = rapid.getFields();
+                List<Field> fields  = rapid.getFields();
                 OrgDetails details = OrgDetails.load(org);
 
                 if (details != null) {
@@ -240,8 +241,8 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 realm.close();
                 incrementProgress();
 
-            } catch (RetrofitError e) {
-                m_error = getRapidProService().getErrorMessage(e);
+            } catch (Throwable t) {
+                m_error = getRapidProService().getErrorMessage(t);
             }
 
             return null;
