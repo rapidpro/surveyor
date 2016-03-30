@@ -67,9 +67,9 @@ public class AudioCaptureActivity extends BaseActivity {
 
     public void toggleRecording(View view) {
         if (!m_isRecording) {
-            m_recordButton.setText(getString(R.string.icon_stop));
             m_recordButton.setTextColor(getResources().getColor(R.color.recording));
             m_instructions.setText(getString(R.string.tap_to_stop));
+            getViewCache().getView(R.id.content_view).setBackgroundColor(getColor(R.color.warning));
             recordAudio();
         } else {
             stopRecording();

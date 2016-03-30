@@ -880,7 +880,7 @@
     <string name="media_video">media_video</string>
     <string name="media_audio">media_audio</string>
     <string name="tap_to_record">Tap to Record</string>
-    <string name="tap_to_stop">recording..</string>
+    <string name="tap_to_stop">Recording. Tap to stop.</string>
     <string name="title_audio_activity">Record Audio</string>
     <string name="quit">Quit</string>
     <string name="settings">Settings</string>

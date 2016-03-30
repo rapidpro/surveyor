@@ -204,6 +204,11 @@ public class FlowRunActivity extends BaseActivity {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public void onBackPressed() {
         confirmDiscardRun();
     }
@@ -508,6 +513,7 @@ public class FlowRunActivity extends BaseActivity {
         }
 
         bubble.setMessage(message, inbound);
+        scrollToBottom();
     }
 
 
@@ -515,6 +521,16 @@ public class FlowRunActivity extends BaseActivity {
         getLayoutInflater().inflate(R.layout.item_chat_bubble, m_chats);
         ChatBubbleView bubble = (ChatBubbleView) m_chats.getChildAt(m_chats.getChildCount() - 1);
         bubble.setThumbnail(image, url, type);
+        scrollToBottom();
+    }
+
+    private void scrollToBottom() {
+        m_scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                m_scrollView.fullScroll(View.FOCUS_DOWN);
+            }
+        });
     }
 
     private void confirmDiscardRun() {

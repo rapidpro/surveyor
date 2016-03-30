@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.ui.CachedLinearLayout;
+import io.rapidpro.surveyor.ui.IconTextView;
 
 /**
  * Represents a chat bubble for either inbound or
@@ -67,6 +68,8 @@ public class ChatBubbleView extends CachedLinearLayout {
 
         if (image != null) {
             imageView.setImageBitmap(image);
+        } else {
+
         }
 
         View mediaView = getView(R.id.media_view);
@@ -79,7 +82,11 @@ public class ChatBubbleView extends CachedLinearLayout {
         } else if (type == R.string.media_video) {
             getTextView(R.id.media_icon).setText(R.string.icon_play_arrow);
         } else if (type == R.string.media_audio) {
-            getTextView(R.id.media_icon).setText(R.string.icon_mic);
+            IconTextView iconView = (IconTextView) getTextView(R.id.media_icon);
+            iconView.setText(R.string.icon_volume_up);
+            iconView.setIconColor(R.color.primary_lightest);
+
+            getView(R.id.media_view).setBackground(null);
 
             final float scale = getContext().getResources().getDisplayMetrics().density;
             int pixels = (int) (70 * scale + 0.5f);
