@@ -28,6 +28,7 @@ import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.flows.utils.Jsonizable;
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.activity.FlowRunActivity;
 import io.rapidpro.surveyor.net.TembaService;
 
 /**
@@ -320,8 +321,15 @@ public class Submission implements Jsonizable {
                     int split = media.indexOf(":");
                     String type = media.substring(0, split);
                     String fileUrl = media.substring(split + 1, media.length());
-                    String newUrl = null;
-                    newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), m_flow);
+
+                    // don't attempt resolved types
+                    for (String msgType : FlowRunActivity.MSG_RESOLVED) {
+                        if (msgType.equals(type)) {
+                            return;
+                        }
+                    }
+
+                    String newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), m_flow);
                     result.setMedia(type + ":" + newUrl);
                     Surveyor.LOG.d(type + ":" + newUrl);
                 }

@@ -888,6 +888,10 @@
     <string name="title_permissions">Permission</string>
     <string name="permission_camera">We need permission to access to the camera in order for you to record videos for your surveys.</string>
     <string name="permission_contacts">Surveyor can access your contacts to help you fill out the login form. This permission is not required.</string>
+    <string name="permission_location">This survey requires access to your location to continue.</string>
+    <string name="location_unavailable">Your location is not currently available. Please try again.</string>
+    <string name="media_location">media_location</string>
+    <string name="made_recording">Made Recording</string>
 
 
 </resources>

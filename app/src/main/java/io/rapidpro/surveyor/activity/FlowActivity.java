@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,6 +119,10 @@ public class FlowActivity extends BaseActivity {
                             @Override
                             public void onFailure(Call<FlowDefinition> call, Throwable t) {
                                 Surveyor.LOG.e("Failure fetching flow", t);
+                                m_refreshProgress.hide();
+                                m_refreshProgress = null;
+                                Toast.makeText(FlowActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+
                             }
                         });
                     }

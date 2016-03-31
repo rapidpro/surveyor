@@ -1,16 +1,20 @@
 package io.rapidpro.surveyor.activity;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.LocationManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -24,7 +28,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.gson.JsonObject;
+import com.greysonparrelli.permiso.Permiso;
 
 import org.apache.commons.io.FileUtils;
 
@@ -48,6 +58,7 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.RunnerUtil;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.TembaException;
 import io.rapidpro.surveyor.data.DBAlias;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
@@ -56,12 +67,26 @@ import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.ui.IconTextView;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
+import io.rapidpro.surveyor.widget.IconLinkView;
 import io.realm.Realm;
 
 /**
  * Starts and runs a given flow
  */
-public class FlowRunActivity extends BaseActivity {
+public class FlowRunActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    public static final String MSG_TEXT = "text";
+    public static final String MSG_PHOTO = "photo";
+    public static final String MSG_AUDIO = "audio";
+    public static final String MSG_VIDEO = "video";
+    public static final String MSG_GPS = "geo";
+
+    public static final String[] MSG_RESOLVED = new String[] { MSG_TEXT, MSG_GPS };
+
+    private static final int RESULT_IMAGE = 1;
+    private static final int RESULT_VIDEO = 2;
+    private static final int RESULT_AUDIO = 3;
+
 
     private LinearLayout m_chats;
     private IconTextView m_sendButton;
@@ -70,25 +95,30 @@ public class FlowRunActivity extends BaseActivity {
 
     private Runner m_runner;
     private RunState m_runState;
-
     private Submission m_submission;
-
     private File m_lastMediaFile;
+    private GoogleApiClient m_googleApi;
 
-    private static final int ACTION_TEXT = 1;
-    private static final int ACTION_PHOTO = 2;
-    private static final int ACTION_AUDIO = 3;
-    private static final int ACTION_VIDEO = 4;
-    private static final int ACTION_GPS = 5;
-
-    private static final int RESULT_IMAGE = 1;
-    private static final int RESULT_VIDEO = 2;
-    private static final int RESULT_AUDIO = 3;
+    private android.location.Location m_lastLocation;
+    private boolean m_connected;
+    private LocationRequest m_locationRequest;
 
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (m_googleApi == null) {
+            m_googleApi = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+
+            m_googleApi.connect();
+        }
+
+
         setContentView(R.layout.activity_flowrun);
 
         DBFlow flow = getDBFlow();
@@ -102,7 +132,7 @@ public class FlowRunActivity extends BaseActivity {
             m_sendButton = (IconTextView) findViewById(R.id.button_send);
             m_scrollView = (ScrollView) findViewById(R.id.scroll);
 
-            ((TextView)findViewById(R.id.text_flow_name)).setText(flow.getName());
+            ((TextView) findViewById(R.id.text_flow_name)).setText(flow.getName());
 
             // allow messages to be sent with the enter key
             m_chatbox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -203,6 +233,7 @@ public class FlowRunActivity extends BaseActivity {
         }
     }
 
+
     @Override
     public void onResume() {
         super.onResume();
@@ -231,10 +262,11 @@ public class FlowRunActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void refreshRun(MenuItem item) {
-
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopLocationUpdates();
     }
-
 
     public void sendMessage(View sendButton) {
 
@@ -242,18 +274,23 @@ public class FlowRunActivity extends BaseActivity {
             return;
         }
 
-        if (sendButton != null && sendButton.getTag() == ACTION_PHOTO) {
+        if (sendButton != null && MSG_PHOTO.equals(sendButton.getTag())) {
             requestPhoto();
             return;
         }
 
-        if (sendButton != null && sendButton.getTag() == ACTION_VIDEO) {
+        if (sendButton != null && MSG_VIDEO.equals(sendButton.getTag())) {
             requestVideo();
             return;
         }
 
-        if (sendButton != null && sendButton.getTag() == ACTION_AUDIO) {
+        if (sendButton != null && MSG_AUDIO.equals(sendButton.getTag())) {
             requestAudio();
+            return;
+        }
+
+        if (sendButton != null && MSG_GPS.equals(sendButton.getTag())) {
+            requestLocation();
             return;
         }
 
@@ -319,19 +356,24 @@ public class FlowRunActivity extends BaseActivity {
 
             if (run.getState() == RunState.State.WAIT_PHOTO) {
                 sendButton.setText(getString(R.string.icon_photo_camera));
-                sendButton.setTag(ACTION_PHOTO);
+                sendButton.setTag(MSG_PHOTO);
                 vc.hide(R.id.text_chat, true);
             } else if (run.getState() == RunState.State.WAIT_VIDEO) {
                 sendButton.setText(getString(R.string.icon_videocam));
-                sendButton.setTag(ACTION_VIDEO);
+                sendButton.setTag(MSG_VIDEO);
                 vc.hide(R.id.text_chat, true);
             } else if (run.getState() == RunState.State.WAIT_AUDIO) {
                 sendButton.setText(getString(R.string.icon_mic));
-                sendButton.setTag(ACTION_AUDIO);
+                sendButton.setTag(MSG_AUDIO);
                 vc.hide(R.id.text_chat, true);
-            } else {
+            } else if (run.getState() == RunState.State.WAIT_GPS) {
+                sendButton.setText(getString(R.string.icon_place));
+                sendButton.setTag(MSG_GPS);
+                vc.hide(R.id.text_chat, true);
+            }
+            else {
                 sendButton.setText(getString(R.string.icon_send));
-                sendButton.setTag(ACTION_TEXT);
+                sendButton.setTag(MSG_TEXT);
                 vc.show(R.id.text_chat);
             }
 
@@ -372,9 +414,97 @@ public class FlowRunActivity extends BaseActivity {
         startActivityForResult(intent, RESULT_AUDIO);
     }
 
+
+    /**
+     * Get the current location
+     */
+    private void requestLocation() {
+        Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
+            @Override
+            @SuppressWarnings("ResourceType")
+            public void onPermissionResult(Permiso.ResultSet resultSet) {
+
+                if (resultSet.areAllPermissionsGranted()) {
+
+                    if (m_connected) {
+                        m_lastLocation = LocationServices.FusedLocationApi.getLastLocation(m_googleApi);
+                        startLocationUpdates();
+                        if (m_lastLocation != null) {
+                            try {
+
+                                double latitude = m_lastLocation.getLatitude();
+                                double longitude = m_lastLocation.getLongitude();
+
+                                String location = latitude + "," + longitude;
+                                m_runner.resume(m_runState, Input.of("geo", location));
+
+                                String url = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude + "(Location)";
+                                addMediaLink(latitude +"," + longitude, url, R.string.media_location);
+                                addMessages(m_runState);
+                                saveSteps();
+
+                            } catch (FlowRunException e) {
+                                throw new TembaException(e);
+                            }
+                        } else {
+                            Toast.makeText(FlowRunActivity.this,
+                                    R.string.location_unavailable,
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(FlowRunActivity.this,
+                                R.string.location_unavailable,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
+                FlowRunActivity.this.showRationaleDialog(R.string.permission_location, callback);
+            }
+        }, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
+    }
+
+    protected LocationRequest getLocationRequest() {
+        if (m_locationRequest == null) {
+            m_locationRequest = new LocationRequest();
+            m_locationRequest.setInterval(10000);
+            m_locationRequest.setFastestInterval(5000);
+            m_locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        }
+        return m_locationRequest;
+    }
+
+
+    /**
+     * Start updating location until they exit this run
+     */
+    @SuppressWarnings("ResourceType")
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(m_googleApi, getLocationRequest(), new LocationListener() {
+            @Override
+            public void onLocationChanged(android.location.Location location) {
+                m_lastLocation = location;
+            }
+        });
+    }
+
+    /**
+     * Stop getting location updates
+     */
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(m_googleApi, new LocationListener() {
+            @Override
+            public void onLocationChanged(android.location.Location location) {
+
+            }
+        });
+    }
+
     protected Bitmap scaleToWidth(Bitmap bitmap, int width) {
-        double ratio = (double)width / (double)bitmap.getWidth();
-        return Bitmap.createScaledBitmap(bitmap, width, (int)((double)bitmap.getHeight() * ratio), false);
+        double ratio = (double) width / (double) bitmap.getWidth();
+        return Bitmap.createScaledBitmap(bitmap, width, (int) ((double) bitmap.getHeight() * ratio), false);
     }
 
     /**
@@ -384,12 +514,12 @@ public class FlowRunActivity extends BaseActivity {
 
         // landscape photos
         if (bitmap.getWidth() > bitmap.getHeight()) {
-            double ratio = (double)max / (double)bitmap.getWidth();
-            return Bitmap.createScaledBitmap(bitmap, max, (int)((double)bitmap.getHeight() * ratio), false);
+            double ratio = (double) max / (double) bitmap.getWidth();
+            return Bitmap.createScaledBitmap(bitmap, max, (int) ((double) bitmap.getHeight() * ratio), false);
 
         } else {
-            double ratio = (double)max / (double)bitmap.getHeight();
-            return Bitmap.createScaledBitmap(bitmap, (int)((double)bitmap.getWidth() * ratio), max, false);
+            double ratio = (double) max / (double) bitmap.getHeight();
+            return Bitmap.createScaledBitmap(bitmap, (int) ((double) bitmap.getWidth() * ratio), max, false);
         }
     }
 
@@ -397,7 +527,7 @@ public class FlowRunActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RESULT_IMAGE && resultCode == RESULT_OK) {
 
-            if(m_lastMediaFile != null && m_lastMediaFile.exists()){
+            if (m_lastMediaFile != null && m_lastMediaFile.exists()) {
 
                 Bitmap full = BitmapFactory.decodeFile(m_lastMediaFile.getAbsolutePath());
                 Bitmap scaled = scaleToMax(full, 1024);
@@ -423,7 +553,7 @@ public class FlowRunActivity extends BaseActivity {
         if (requestCode == RESULT_VIDEO && resultCode == RESULT_OK) {
 
             String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
-            if(file != null) {
+            if (file != null) {
 
                 Bitmap thumb = ThumbnailUtils.createVideoThumbnail(file, MediaStore.Images.Thumbnails.MINI_KIND);
 
@@ -445,13 +575,16 @@ public class FlowRunActivity extends BaseActivity {
         if (requestCode == RESULT_AUDIO && resultCode == RESULT_OK) {
             Surveyor.LOG.d("AUDIO RESULT");
             String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
-            if(file != null) {
+            if (file != null) {
                 try {
+
                     String url = "file:" + file;
                     m_runner.resume(m_runState, Input.of("audio", url));
-                    addMedia(null, url, R.string.media_audio);
+
+                    addMediaLink(getString(R.string.made_recording), url, R.string.media_audio);
                     addMessages(m_runState);
                     saveSteps();
+
                 } catch (Exception e) {
                     Toast.makeText(this, "Couldn't handle message", Toast.LENGTH_SHORT).show();
                     Surveyor.LOG.e("Error running flow", e);
@@ -469,10 +602,10 @@ public class FlowRunActivity extends BaseActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "MEDIA_" + timeStamp + "_";
 
-        // create a hidden temprorary directory if we don't have one
+        // create a hidden temporary directory if we don't have one
         File temp = Environment.getExternalStorageDirectory();
-        temp = new File(temp.getAbsolutePath()+"/.temp/");
-        if(!temp.exists()) {
+        temp = new File(temp.getAbsolutePath() + "/.temp/");
+        if (!temp.exists()) {
             temp.mkdir();
         }
 
@@ -521,6 +654,13 @@ public class FlowRunActivity extends BaseActivity {
         getLayoutInflater().inflate(R.layout.item_chat_bubble, m_chats);
         ChatBubbleView bubble = (ChatBubbleView) m_chats.getChildAt(m_chats.getChildCount() - 1);
         bubble.setThumbnail(image, url, type);
+        scrollToBottom();
+    }
+
+    private void addMediaLink(String title, String url, int type) {
+        getLayoutInflater().inflate(R.layout.item_icon_link, m_chats);
+        IconLinkView icon = (IconLinkView) m_chats.getChildAt(m_chats.getChildCount() - 1);
+        icon.initialize(title, type, url);
         scrollToBottom();
     }
 
@@ -584,8 +724,26 @@ public class FlowRunActivity extends BaseActivity {
             intent.setDataAndType(Uri.parse(url), "video/*");
         } else if (mediaType == R.string.media_audio) {
             intent.setDataAndType(Uri.parse(url), "audio/*");
+        } else if (mediaType == R.string.media_location) {
+            intent.setDataAndType(Uri.parse(url), null);
         }
 
         startActivity(intent);
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Surveyor.LOG.d("GoogleAPI client connected");
+        m_connected = true;
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Surveyor.LOG.d("GoogleAPI client suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Surveyor.LOG.d("GoogleAPI client failed");
     }
 }
