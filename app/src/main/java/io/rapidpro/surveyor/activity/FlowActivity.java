@@ -20,6 +20,7 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.Submission;
+import io.rapidpro.surveyor.net.APIError;
 import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.rapidpro.surveyor.ui.ViewCache;
@@ -97,22 +98,30 @@ public class FlowActivity extends BaseActivity {
                         getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
                             @Override
                             public void onResponse(Call<FlowDefinition> call, Response<FlowDefinition> response) {
-                                Realm realm = getRealm();
-                                realm.beginTransaction();
 
-                                FlowDefinition definition = response.body();
-                                flow.setDefinition(definition.toString());
-                                flow.setRevision(definition.metadata.revision);
-                                flow.setName(definition.metadata.name);
-                                flow.setQuestionCount(definition.rule_sets.size());
-                                realm.copyToRealmOrUpdate(flow);
-                                realm.commitTransaction();
+                                if (response.isSuccessful()) {
+                                    Realm realm = getRealm();
+                                    realm.beginTransaction();
 
-                                refresh();
+                                    FlowDefinition definition = response.body();
+                                    flow.setDefinition(definition.toString());
+                                    flow.setRevision(definition.metadata.revision);
+                                    flow.setName(definition.metadata.name);
+                                    flow.setQuestionCount(definition.rule_sets.size());
+                                    realm.copyToRealmOrUpdate(flow);
+                                    realm.commitTransaction();
 
-                                m_refreshProgress.incrementProgressBy(1);
-                                m_refreshProgress.hide();
-                                m_refreshProgress = null;
+                                    refresh();
+
+                                    m_refreshProgress.incrementProgressBy(1);
+                                    m_refreshProgress.hide();
+                                    m_refreshProgress = null;
+                                } else {
+                                    APIError error = getRapidProService().parseError(response);
+                                    m_refreshProgress.hide();
+                                    m_refreshProgress = null;
+                                    Toast.makeText(FlowActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
 
                             }
 

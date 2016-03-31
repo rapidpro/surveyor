@@ -8,8 +8,9 @@ public class APIError {
     public APIError() {
     }
 
-    public APIError(int status) {
-        statusCode = status;
+    public APIError(int status, String message) {
+        this.statusCode = status;
+        this.message = message;
     }
 
     public int getStatus() {
@@ -17,6 +18,10 @@ public class APIError {
     }
 
     public String getMessage() {
-        return message;
+        if (message != null) {
+            return message;
+        } else {
+            return "Server error, please try again.";
+        }
     }
 }

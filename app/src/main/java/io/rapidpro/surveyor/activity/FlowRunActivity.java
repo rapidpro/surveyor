@@ -439,7 +439,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
                                 m_runner.resume(m_runState, Input.of("geo", location));
 
                                 String url = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude + "(Location)";
-                                addMediaLink(latitude +"," + longitude, url, R.string.media_location);
+                                addMediaLink(latitude + "," + longitude, url, R.string.media_location);
                                 addMessages(m_runState);
                                 saveSteps();
 

@@ -19,6 +19,7 @@ public class FlowDefinition {
     public static class Metadata {
         public int revision;
         public String name;
+        public String contact_creation;
     }
 
     public String toString() {
@@ -31,11 +32,9 @@ public class FlowDefinition {
                 "entry", entry,
                 "metadata", JsonUtils.object(
                         "revision", metadata.revision,
-                        "name", metadata.name)
+                        "name", metadata.name,
+                        "contact_creation", metadata.contact_creation)
         ).toString();
 
     }
-
-
-
 }

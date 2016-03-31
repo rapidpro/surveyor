@@ -253,11 +253,14 @@ public class TembaService {
     public APIError parseError(Response<?> response){
         Converter<ResponseBody, APIError> converter =
                 m_retrofit.responseBodyConverter(APIError.class, new Annotation[0]);
-        APIError error;
+
+        APIError error = new APIError(response.code(), null);
         try {
             error = converter.convert(response.errorBody());
         } catch (IOException e) {
-            error = new APIError(response.code());
+            try {
+                error = new APIError(response.code(), response.errorBody().string());
+            } catch (IOException last) {}
         }
 
         return error;
