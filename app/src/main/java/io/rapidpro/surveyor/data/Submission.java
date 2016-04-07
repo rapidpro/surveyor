@@ -305,33 +305,50 @@ public class Submission implements Jsonizable {
     }
 
     /**
-     * Submits all local media and updates to remove urls
+     * Get all the results which contain an pointer to a local file
      */
-    private void resolveMedia() {
-
-        final TembaService rapid = Surveyor.get().getRapidProService();
-
+    private List<RuleSet.Result> getLocalFileResults() {
+        List<RuleSet.Result> localResults = new ArrayList<RuleSet.Result>();
         // resolve the media for all of our steps
         for (Step step : m_steps) {
             RuleSet.Result result = step.getRuleResult();
             if (result != null) {
-
                 String media = result.getMedia();
                 if (media != null) {
                     int split = media.indexOf(":");
                     String type = media.substring(0, split);
                     String fileUrl = media.substring(split + 1, media.length());
-
                     // don't attempt resolved types
-                    for (String msgType : FlowRunActivity.MSG_RESOLVED) {
-                        if (msgType.equals(type)) {
-                            return;
-                        }
+                    if (!FlowRunActivity.MSG_RESOLVED.contains(type) && fileUrl.startsWith("file:")) {
+                        localResults.add(result);
                     }
+                }
+            }
+        }
+        return localResults;
+    }
 
-                    String newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), m_flow);
+
+    /**
+     * Submits all local media and updates with remote urls
+     */
+    private void resolveMedia() {
+
+        final TembaService rapid = Surveyor.get().getRapidProService();
+
+        List<RuleSet.Result> results = getLocalFileResults();
+
+        // if we have local files to upload, determine our flow run
+        if (results.size() > 0) {
+            int flowRun = rapid.getFlowRun(this);
+            for (RuleSet.Result result : results) {
+                String media = result.getMedia();
+                if (media != null) {
+                    int split = media.indexOf(":");
+                    String type = media.substring(0, split);
+                    String fileUrl = media.substring(split + 1, media.length());
+                    String newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), m_flow, flowRun);
                     result.setMedia(type + ":" + newUrl);
-                    Surveyor.LOG.d(type + ":" + newUrl);
                 }
             }
         }

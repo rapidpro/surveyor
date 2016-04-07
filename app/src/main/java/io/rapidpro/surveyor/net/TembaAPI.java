@@ -46,7 +46,7 @@ public interface TembaAPI {
             @Query("uuid") String uuid);
 
     @POST("/api/v1/steps.json")
-    Call<Void> addResults(
+    Call<JsonObject> addResults(
             @Header("Authorization") String token,
             @Body JsonElement submissionJson);
 

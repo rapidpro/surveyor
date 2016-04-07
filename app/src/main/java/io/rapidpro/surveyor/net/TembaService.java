@@ -9,6 +9,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -140,31 +142,55 @@ public class TembaService {
      * @param flowUuid the flow this media file is associated with
      * @return the relative path to media
      */
-    public String uploadMedia(File file, String flowUuid) {
+    public String uploadMedia(File file, String flowUuid, int flowRun) {
 
         Map<String, RequestBody> map = new HashMap<>();
         map.put("flow", RequestBody.create(MediaType.parse("text/plain"), flowUuid));
+        map.put("run", RequestBody.create(MediaType.parse("text/plain"), "" + flowRun));
 
         RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         map.put("media_file\"; filename=\"" + file.getName(), fileBody);
 
+
+
         try {
             JsonObject result = m_api.uploadMedia(getToken(), map).execute().body();
-
             return result.get("location").getAsString();
         } catch (IOException e) {
             throw new TembaException(e);
         }
     }
 
-    public void addResults(final Submission submission) {
+    public JsonObject prepareSubmission(Submission submission, boolean includeSteps) {
         JsonObject obj = submission.toJson().getAsJsonObject();
+
+        if (!includeSteps) {
+            obj.add("steps", new JsonArray());
+        }
 
         // replace contact with uuid
         JsonObject contact = obj.get("contact").getAsJsonObject();
         obj.addProperty("contact", contact.get("uuid").getAsString());
+        return obj;
+    }
 
+    public int getFlowRun(final Submission submission) {
         try {
+            JsonObject obj = prepareSubmission(submission, false);
+            JsonObject response = m_api.addResults(getToken(), obj).execute().body();
+
+            if (response != null && response.has("run")) {
+                return response.get("run").getAsInt();
+            }
+            throw new TembaException("Failed to fetch new run id");
+        } catch (IOException e) {
+            throw new TembaException(e);
+        }
+    }
+
+    public void addResults(final Submission submission) {
+        try {
+            JsonObject obj = prepareSubmission(submission, true);
             m_api.addResults(getToken(), obj).execute();
             submission.delete();
         } catch (IOException e) {

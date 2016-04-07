@@ -42,7 +42,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import io.rapidpro.flows.RunnerBuilder;
 import io.rapidpro.flows.definition.actions.Action;
@@ -81,7 +83,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
     public static final String MSG_VIDEO = "video";
     public static final String MSG_GPS = "geo";
 
-    public static final String[] MSG_RESOLVED = new String[] { MSG_TEXT, MSG_GPS };
+    public static final List<String> MSG_RESOLVED = Arrays.asList(MSG_TEXT, MSG_GPS);
 
     private static final int RESULT_IMAGE = 1;
     private static final int RESULT_VIDEO = 2;
