@@ -892,6 +892,7 @@
     <string name="location_unavailable">Your location is not currently available. Please try again.</string>
     <string name="media_location">media_location</string>
     <string name="made_recording">Made Recording</string>
+    <string name="error_invalid_host">Sorry, that is not a valid host. Try again.</string>
 
 
 </resources>

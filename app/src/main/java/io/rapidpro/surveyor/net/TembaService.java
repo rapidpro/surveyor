@@ -49,8 +49,8 @@ public class TembaService {
     private String m_token;
     private FlowList m_flowList;
 
-    public TembaService() {
-        m_api = getAPIAccessor();
+    public TembaService(String host) {
+        m_api = getAPIAccessor(host);
     }
 
     public FlowList getLastFlows() { return m_flowList; }
@@ -139,19 +139,17 @@ public class TembaService {
     /**
      * Uploads a media file and returns the remove URL
      * @param file the local file to upload
-     * @param flowUuid the flow this media file is associated with
      * @return the relative path to media
      */
-    public String uploadMedia(File file, String flowUuid, int flowRun) {
+    public String uploadMedia(File file, String extension) {
 
         Map<String, RequestBody> map = new HashMap<>();
-        map.put("flow", RequestBody.create(MediaType.parse("text/plain"), flowUuid));
-        map.put("run", RequestBody.create(MediaType.parse("text/plain"), "" + flowRun));
 
         RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         map.put("media_file\"; filename=\"" + file.getName(), fileBody);
 
-
+        RequestBody extBody = RequestBody.create(MediaType.parse("text/plain"), extension);
+        map.put("extension", extBody);
 
         try {
             JsonObject result = m_api.uploadMedia(getToken(), map).execute().body();
@@ -191,8 +189,12 @@ public class TembaService {
     public void addResults(final Submission submission) {
         try {
             JsonObject obj = prepareSubmission(submission, true);
-            m_api.addResults(getToken(), obj).execute();
-            submission.delete();
+            Response response = m_api.addResults(getToken(), obj).execute();
+            if (response.isSuccessful()) {
+                submission.delete();
+            } else {
+                throw new TembaException("Error submitting results");
+            }
         } catch (IOException e) {
             throw new TembaException(e);
         }
@@ -244,7 +246,7 @@ public class TembaService {
         }
     }
 
-    private TembaAPI getAPIAccessor() {
+    private TembaAPI getAPIAccessor(String host) {
 
         Gson gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
             @Override
@@ -263,16 +265,17 @@ public class TembaService {
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .build();
 
-        m_retrofit = new Retrofit.Builder()
-                .baseUrl(Surveyor.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .client(okHttpClient)
-                .build();
-
-
+        try {
+            m_retrofit = new Retrofit.Builder()
+                    .baseUrl(host)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .client(okHttpClient)
+                    .build();
+        } catch (IllegalArgumentException e) {
+            throw new TembaException(e);
+        }
 
         // .setLogLevel(RestAdapter.LogLevel.FULL)
-
         return m_retrofit.create(TembaAPI.class);
     }
 

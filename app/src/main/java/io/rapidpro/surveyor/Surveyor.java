@@ -24,7 +24,12 @@ public class Surveyor extends Application {
     public void onCreate() {
         super.onCreate();
         s_this = this;
-        updatePrefs();
+
+        try {
+            updatePrefs();
+        } catch (TembaException e) {
+            resetPrefs();
+        }
 
         m_realmConfig = new RealmConfiguration.Builder(this).build();
 
@@ -52,14 +57,25 @@ public class Surveyor extends Application {
         return m_prefs;
     }
 
+    public void resetPrefs() {
+        getPreferences().edit().clear().commit();
+        updatePrefs();
+    }
     public void updatePrefs() {
         BASE_URL = getPreferences().getString("pref_key_host", getString(R.string.pref_default_host));
         m_tembaService = null;
+
+        // try to create our accessor
+        getRapidProService();
+    }
+
+    public TembaService getRapidProService(String host) {
+        return new TembaService(host);
     }
 
     public TembaService getRapidProService() {
         if (m_tembaService == null) {
-            m_tembaService = new TembaService();
+            m_tembaService = getRapidProService(Surveyor.BASE_URL);
         }
         return m_tembaService;
     }

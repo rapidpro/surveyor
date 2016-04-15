@@ -36,7 +36,6 @@ class SubmitSubmissions extends AsyncTask<String, Void, Void> {
                 } catch (Throwable t) {
                     Surveyor.LOG.e("Failed to submit flow run", t);
                     m_error = m_activity.getRapidProService().getErrorMessage(t);
-                    return null;
                 }
             }
 

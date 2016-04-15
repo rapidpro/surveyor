@@ -88,8 +88,6 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
 
     @Override
     public void onFragmentInteraction(DBOrg org) {
-
-
         getRapidProService().setToken(org.getToken());
         Intent intent = new Intent(OrgListActivity.this, OrgActivity.class);
         intent.putExtra(SurveyorIntent.EXTRA_ORG_ID, org.getId());

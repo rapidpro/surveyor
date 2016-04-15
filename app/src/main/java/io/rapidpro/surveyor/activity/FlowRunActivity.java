@@ -82,13 +82,11 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
     public static final String MSG_AUDIO = "audio";
     public static final String MSG_VIDEO = "video";
     public static final String MSG_GPS = "geo";
-
     public static final List<String> MSG_RESOLVED = Arrays.asList(MSG_TEXT, MSG_GPS);
 
     private static final int RESULT_IMAGE = 1;
     private static final int RESULT_VIDEO = 2;
     private static final int RESULT_AUDIO = 3;
-
 
     private LinearLayout m_chats;
     private IconTextView m_sendButton;
@@ -218,8 +216,10 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
             // if our contact creation is per login, add their urn
             JsonObject metadata = m_runState.getFlow().getMetadata();
             if (metadata.has("contact_creation")) {
-                if ("login".equals(metadata.get("contact_creation").getAsString())) {
-                    m_runState.getContact().getUrns().add(ContactUrn.fromString("mailto:" + getUsername()));
+                if (metadata.get("contact_creation").toString() != null) {
+                    if ("login".equals(metadata.get("contact_creation").getAsString())) {
+                        m_runState.getContact().getUrns().add(ContactUrn.fromString("mailto:" + getUsername()));
+                    }
                 }
             }
 
@@ -540,7 +540,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
                 try {
                     FileUtils.writeByteArrayToFile(m_lastMediaFile, bytes);
                     String url = "file:" + m_lastMediaFile.getAbsolutePath();
-                    m_runner.resume(m_runState, Input.of("image", url));
+                    m_runner.resume(m_runState, Input.of("image/jpeg", url));
                     addMedia(thumb, url, R.string.media_image);
                     addMessages(m_runState);
                     saveSteps();
@@ -561,7 +561,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
 
                 try {
                     String url = "file:" + file;
-                    m_runner.resume(m_runState, Input.of("video", url));
+                    m_runner.resume(m_runState, Input.of("video/mp4", url));
                     addMedia(thumb, url, R.string.media_video);
                     addMessages(m_runState);
                     saveSteps();
@@ -571,18 +571,14 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
                     showSendBugReport();
                 }
             }
-
         }
 
         if (requestCode == RESULT_AUDIO && resultCode == RESULT_OK) {
-            Surveyor.LOG.d("AUDIO RESULT");
             String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
             if (file != null) {
                 try {
-
                     String url = "file:" + file;
-                    m_runner.resume(m_runState, Input.of("audio", url));
-
+                    m_runner.resume(m_runState, Input.of("audio/mp4", url));
                     addMediaLink(getString(R.string.made_recording), url, R.string.media_audio);
                     addMessages(m_runState);
                     saveSteps();

@@ -340,14 +340,16 @@ public class Submission implements Jsonizable {
 
         // if we have local files to upload, determine our flow run
         if (results.size() > 0) {
-            int flowRun = rapid.getFlowRun(this);
             for (RuleSet.Result result : results) {
                 String media = result.getMedia();
                 if (media != null) {
                     int split = media.indexOf(":");
+
                     String type = media.substring(0, split);
                     String fileUrl = media.substring(split + 1, media.length());
-                    String newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), m_flow, flowRun);
+
+                    String extension = fileUrl.substring(fileUrl.lastIndexOf("."));
+                    String newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), extension);
                     result.setMedia(type + ":" + newUrl);
                 }
             }
@@ -372,6 +374,7 @@ public class Submission implements Jsonizable {
         rapid.addCreatedFields(m_fields);
 
         // first we need to create our contact
+        Surveyor.LOG.d(m_contact.toJson().toString());
         rapid.addContact(m_contact);
 
         // then post the results
