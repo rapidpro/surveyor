@@ -24,15 +24,13 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final List<DBOrg> orgs = getRealm().where(DBOrg.class).findAll();
-        final boolean loggedIn = isLoggedIn();
-
         Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
             @Override
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.areAllPermissionsGranted()) {
-                    if (loggedIn) {
+                    if (isLoggedIn()) {
                         // if we don't have any orgs, take us back to the login screen
+                        List<DBOrg> orgs = getRealm().where(DBOrg.class).findAll();
                         if (orgs.size() == 0) {
                             Intent i = new Intent(OrgListActivity.this, LoginActivity.class);
 

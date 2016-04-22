@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.greysonparrelli.permiso.Permiso;
+import com.greysonparrelli.permiso.PermisoActivity;
 
 import java.io.IOException;
 
@@ -34,7 +35,7 @@ import io.rapidpro.surveyor.ui.IconTextView;
 /**
  * Activity for capturing videos
  */
-public class VideoCaptureActivity extends BaseActivity {
+public class VideoCaptureActivity extends PermisoActivity {
 
     // camera settings
     public static final int CAMERA_QUALITY = CamcorderProfile.QUALITY_480P;
@@ -66,7 +67,9 @@ public class VideoCaptureActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // requestWindowFeature(Window.FEATURE_NO_TITLE);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_video);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -337,5 +340,9 @@ public class VideoCaptureActivity extends BaseActivity {
                 toast.show();
             }
         }
+    }
+
+    public void showRationaleDialog(int body, Permiso.IOnRationaleProvided callback) {
+        Permiso.getInstance().showRationaleInDialog(getString(R.string.title_permissions), getString(body), null, callback);
     }
 }

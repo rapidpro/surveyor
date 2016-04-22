@@ -74,7 +74,7 @@
                 android:textColor="@color/pending_text"
                 android:textSize="22sp"
                 android:paddingEnd="5dp"
-                android:paddingStart="5dp"
+                android:paddingStart="14dp"
                 android:layout_marginStart="8dp"
                 android:text="Take a photo"/>
 

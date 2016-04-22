@@ -400,10 +400,25 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
     }
 
     private void requestPhoto() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            requestMedia(takePictureIntent, RESULT_IMAGE);
-        }
+
+        Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
+            @Override
+            @SuppressWarnings("ResourceType")
+            public void onPermissionResult(Permiso.ResultSet resultSet) {
+                if (resultSet.areAllPermissionsGranted()) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                        requestMedia(takePictureIntent, RESULT_IMAGE);
+                    }
+                }
+            }
+
+            @Override
+            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
+                FlowRunActivity.this.showRationaleDialog(R.string.permission_camera, callback);
+            }
+
+        }, Manifest.permission.CAMERA);
     }
 
     private void requestVideo() {
@@ -413,9 +428,23 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
     }
 
     private void requestAudio() {
-        Intent intent = new Intent(this, AudioCaptureActivity.class);
-        intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, m_submission.createMediaFile("m4a").getAbsolutePath());
-        startActivityForResult(intent, RESULT_AUDIO);
+        Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
+            @Override
+            @SuppressWarnings("ResourceType")
+            public void onPermissionResult(Permiso.ResultSet resultSet) {
+                if (resultSet.areAllPermissionsGranted()) {
+                    Intent intent = new Intent(FlowRunActivity.this, AudioCaptureActivity.class);
+                    intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, m_submission.createMediaFile("m4a").getAbsolutePath());
+                    startActivityForResult(intent, RESULT_AUDIO);
+                }
+            }
+
+            @Override
+            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
+                FlowRunActivity.this.showRationaleDialog(R.string.permission_camera, callback);
+            }
+
+        }, Manifest.permission.RECORD_AUDIO);
     }
 
 
