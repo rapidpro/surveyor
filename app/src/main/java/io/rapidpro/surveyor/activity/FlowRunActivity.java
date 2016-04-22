@@ -270,29 +270,24 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
         stopLocationUpdates();
     }
 
+    public void onRequestMedia(View view) {
+        View media = getViewCache().getView(R.id.media_icon);
+        if (m_runState.getState() != RunState.State.COMPLETED) {
+            if (media != null && MSG_PHOTO.equals(media.getTag())) {
+                requestPhoto();
+            } else if (media != null && MSG_VIDEO.equals(media.getTag())) {
+                requestVideo();
+            } else if (media != null && MSG_AUDIO.equals(media.getTag())) {
+                requestAudio();
+            } else if (media != null && MSG_GPS.equals(media.getTag())) {
+                requestLocation();
+            }
+        }
+    }
+
     public void sendMessage(View sendButton) {
 
         if (m_runState.getState() == RunState.State.COMPLETED) {
-            return;
-        }
-
-        if (sendButton != null && MSG_PHOTO.equals(sendButton.getTag())) {
-            requestPhoto();
-            return;
-        }
-
-        if (sendButton != null && MSG_VIDEO.equals(sendButton.getTag())) {
-            requestVideo();
-            return;
-        }
-
-        if (sendButton != null && MSG_AUDIO.equals(sendButton.getTag())) {
-            requestAudio();
-            return;
-        }
-
-        if (sendButton != null && MSG_GPS.equals(sendButton.getTag())) {
-            requestLocation();
             return;
         }
 
@@ -311,7 +306,6 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
                 addMessages(m_runState);
 
             } catch (Throwable t) {
-                // addMessage(t.getMessage().toString(), true);
                 Toast.makeText(this, "Couldn't handle message", Toast.LENGTH_SHORT).show();
                 Surveyor.LOG.e("Error running flow", t);
                 showSendBugReport();
@@ -354,29 +348,37 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
             }
 
             ViewCache vc = getViewCache();
-            TextView sendButton = vc.getTextView(R.id.button_send);
+            TextView mediaButton = vc.getTextView(R.id.media_icon);
+            TextView mediaText = vc.getTextView(R.id.media_text);
 
             if (run.getState() == RunState.State.WAIT_PHOTO) {
-                sendButton.setText(getString(R.string.icon_photo_camera));
-                sendButton.setTag(MSG_PHOTO);
-                vc.hide(R.id.text_chat, true);
+                mediaButton.setText(getString(R.string.icon_photo_camera));
+                mediaButton.setTag(MSG_PHOTO);
+                mediaText.setText(getString(R.string.request_photo));
+                vc.hide(R.id.chat_box, true);
+                vc.show(R.id.container_request_media);
             } else if (run.getState() == RunState.State.WAIT_VIDEO) {
-                sendButton.setText(getString(R.string.icon_videocam));
-                sendButton.setTag(MSG_VIDEO);
-                vc.hide(R.id.text_chat, true);
+                mediaButton.setText(getString(R.string.icon_videocam));
+                mediaButton.setTag(MSG_VIDEO);
+                mediaText.setText(getString(R.string.request_video));
+                vc.hide(R.id.chat_box, true);
+                vc.show(R.id.container_request_media);
             } else if (run.getState() == RunState.State.WAIT_AUDIO) {
-                sendButton.setText(getString(R.string.icon_mic));
-                sendButton.setTag(MSG_AUDIO);
-                vc.hide(R.id.text_chat, true);
+                mediaButton.setText(getString(R.string.icon_mic));
+                mediaButton.setTag(MSG_AUDIO);
+                mediaText.setText(getString(R.string.request_audio));
+                vc.hide(R.id.chat_box, true);
+                vc.show(R.id.container_request_media);
             } else if (run.getState() == RunState.State.WAIT_GPS) {
-                sendButton.setText(getString(R.string.icon_place));
-                sendButton.setTag(MSG_GPS);
-                vc.hide(R.id.text_chat, true);
+                mediaButton.setText(getString(R.string.icon_place));
+                mediaButton.setTag(MSG_GPS);
+                mediaText.setText(getString(R.string.request_location));
+                vc.hide(R.id.chat_box, true);
+                vc.show(R.id.container_request_media);
             }
             else {
-                sendButton.setText(getString(R.string.icon_send));
-                sendButton.setTag(MSG_TEXT);
-                vc.show(R.id.text_chat);
+                vc.show(R.id.chat_box);
+                vc.hide(R.id.container_request_media);
             }
 
             if (run.getState() == RunState.State.COMPLETED) {
@@ -744,4 +746,5 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Surveyor.LOG.d("GoogleAPI client failed");
     }
+
 }

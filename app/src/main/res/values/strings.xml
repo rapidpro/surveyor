@@ -893,6 +893,10 @@
     <string name="media_location">media_location</string>
     <string name="made_recording">Made Recording</string>
     <string name="error_invalid_host">Sorry, that is not a valid host. Try again.</string>
+    <string name="request_photo">Take a Photo</string>
+    <string name="request_video">Record a Video</string>
+    <string name="request_audio">Make a Recording</string>
+    <string name="request_location">Share Location</string>
 
 
 </resources>

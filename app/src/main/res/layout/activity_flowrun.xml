@@ -41,6 +41,45 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:visibility="visible"
+            android:background="@color/pending_background"
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:id="@+id/container_request_media"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:clickable="true"
+            android:onClick="onRequestMedia"
+            android:layout_height="wrap_content" android:orientation="horizontal">
+
+            <io.rapidpro.surveyor.ui.IconTextView style="?android:textAppearanceSmall"
+                android:id="@+id/media_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/tertiary_button"
+                android:textColor="@color/pending_button_text"
+                android:textSize="22sp"
+                android:padding="6dp"
+                android:minHeight="0dp"
+                android:fontFamily=""
+                android:text="@string/icon_photo_camera"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/media_text"
+                android:layout_marginTop="-3dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/pending_text"
+                android:textSize="22sp"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"
+                android:layout_marginStart="8dp"
+                android:text="Take a photo"/>
+
+        </LinearLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
