@@ -216,8 +216,9 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
             // if our contact creation is per login, add their urn
             JsonObject metadata = m_runState.getFlow().getMetadata();
             if (metadata.has("contact_creation")) {
-                if (metadata.get("contact_creation").toString() != null) {
-                    if ("login".equals(metadata.get("contact_creation").getAsString())) {
+                String contactCreation = metadata.get("contact_creation").toString();
+                if (contactCreation != null) {
+                    if ("login".equals(contactCreation)) {
                         m_runState.getContact().getUrns().add(ContactUrn.fromString("mailto:" + getUsername()));
                     }
                 }

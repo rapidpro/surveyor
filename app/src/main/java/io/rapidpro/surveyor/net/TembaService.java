@@ -320,7 +320,8 @@ public class TembaService {
                 JsonObject flow = flows.get(i).getAsJsonObject();
                 JsonArray rulesets = flow.get("rulesets").getAsJsonArray();
                 for (int j=0; j<rulesets.size(); j++) {
-                    if ("wait_message".equals(rulesets.get(j).getAsJsonObject().get("ruleset_type").getAsString())) {
+                    String rulesetType = rulesets.get(j).getAsJsonObject().get("ruleset_type").getAsString();
+                    if (rulesetType != null && rulesetType.startsWith("wait_")) {
                         questionCount++;
                     }
                 }
