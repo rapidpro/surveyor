@@ -72,7 +72,7 @@
         </activity>
         <activity
             android:name=".activity.VideoCaptureActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:theme="@style/RapidTheme.FullScreen"
             android:label="@string/title_activity_video">
         </activity>
     </application>

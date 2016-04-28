@@ -2,8 +2,10 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
@@ -67,9 +69,10 @@ public class AudioCaptureActivity extends BaseActivity {
 
     public void toggleRecording(View view) {
         if (!m_isRecording) {
-            m_recordButton.setTextColor(getResources().getColor(R.color.recording));
+            Resources res = getResources();
+            m_recordButton.setTextColor(res.getColor(R.color.recording));
             m_instructions.setText(getString(R.string.tap_to_stop));
-            getViewCache().getView(R.id.content_view).setBackgroundColor(getColor(R.color.warning));
+            getViewCache().getView(R.id.content_view).setBackgroundColor(res.getColor(R.color.warning));
             recordAudio();
         } else {
             stopRecording();

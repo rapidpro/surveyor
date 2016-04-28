@@ -78,8 +78,6 @@ public class VideoCaptureActivity extends PermisoActivity {
         m_toggleCameraButton = (IconTextView) findViewById(R.id.button_switch);
         m_preview = new CameraPreview(this);
         ((LinearLayout) findViewById(R.id.camera_preview)).addView(m_preview);
-
-
     }
 
     public void onResume() {
@@ -184,13 +182,8 @@ public class VideoCaptureActivity extends PermisoActivity {
     }
 
     private boolean hasCamera(Context context) {
-
         // check if the device has camera
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-            return true;
-        } else {
-            return false;
-        }
+        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
     /**
@@ -206,7 +199,7 @@ public class VideoCaptureActivity extends PermisoActivity {
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
         try {
-            if (false && BuildConfig.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
             } else {
                 mediaRecorder.setProfile(CamcorderProfile.get(CAMERA_QUALITY));
@@ -226,9 +219,7 @@ public class VideoCaptureActivity extends PermisoActivity {
 
         try {
             mediaRecorder.prepare();
-        } catch (IllegalStateException e) {
-            releaseMediaRecorder();
-        } catch (IOException e) {
+        } catch (IllegalStateException | IOException e) {
             releaseMediaRecorder();
         }
         return mediaRecorder;
@@ -292,7 +283,7 @@ public class VideoCaptureActivity extends PermisoActivity {
                 try {
                     // and go!
                     m_mediaRecorder.start();
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
             }
         });

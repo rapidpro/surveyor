@@ -132,7 +132,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
             m_sendButton = (IconTextView) findViewById(R.id.button_send);
             m_scrollView = (ScrollView) findViewById(R.id.scroll);
 
-            ((TextView) findViewById(R.id.text_flow_name)).setText(flow.getName());
+            setTitle(flow.getName());
 
             // allow messages to be sent with the enter key
             m_chatbox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
