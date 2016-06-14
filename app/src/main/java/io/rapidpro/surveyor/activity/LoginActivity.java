@@ -1,5 +1,6 @@
 package io.rapidpro.surveyor.activity;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -27,6 +28,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.greysonparrelli.permiso.Permiso;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,10 +39,12 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.net.APIError;
 import io.realm.Realm;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 /**
  * A login screen that offers login via email/password.
@@ -61,7 +67,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
         // Set up the login form.
         m_emailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
+
 
         m_passwordView = (EditText) findViewById(R.id.password);
         m_passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -89,6 +95,26 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         // set our error message if we have one
         setErrorMessage(getIntent().getStringExtra(SurveyorIntent.EXTRA_ERROR));
 
+        Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
+            @Override
+            public void onPermissionResult(Permiso.ResultSet resultSet) {
+                if (resultSet.areAllPermissionsGranted()) {
+                    populateAutoComplete();
+                } else {
+                    // they didn't grant us permission, but that's okay
+                }
+            }
+
+            @Override
+            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
+                LoginActivity.this.showRationaleDialog(R.string.permission_contacts, callback);
+            }
+        }, Manifest.permission.READ_CONTACTS);
+
+    }
+
+    public void onResume() {
+        super.onResume();
     }
 
     public boolean validateLogin() {
@@ -180,47 +206,54 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
             getRapidProService().getOrgs(email, password, new Callback<List<DBOrg>>() {
                 @Override
-                public void success(List<DBOrg> orgs, Response response) {
+                public void onResponse(Call<List<DBOrg>> call, Response<List<DBOrg>> response) {
 
-                    Realm realm = getRealm();
-                    realm.beginTransaction();
-                    realm.where(DBOrg.class).findAll().clear();
+                    if (response.isSuccessful()) {
 
-                    // add our orgs, make sure we don't consider duplicates
-                    HashSet<Integer> added = new HashSet<>();
-                    for (DBOrg org : orgs) {
-                        if (added.add(org.getId())) {
-                            realm.copyToRealm(org);
+                        List<DBOrg> orgs = response.body();
+
+                        Realm realm = getRealm();
+                        realm.beginTransaction();
+                        realm.where(DBOrg.class).findAll().clear();
+
+                        // add our orgs, make sure we don't consider duplicates
+                        HashSet<Integer> added = new HashSet<>();
+                        for (DBOrg org : orgs) {
+                            if (added.add(org.getId())) {
+                                realm.copyToRealm(org);
+                            }
                         }
+
+                        realm.commitTransaction();
+                        finish();
+
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString(SurveyorIntent.PREF_USERNAME, email);
+                        editor.commit();
+
+                        startActivity(new Intent(LoginActivity.this, OrgListActivity.class));
+                    } else {
+                        APIError error = getRapidProService().parseError(response);
+                        int status = error.getStatus();
+                        if (status == 404) {
+                            setErrorMessage(getString(R.string.error_server_not_found));
+                        } else if (status == 500) {
+                            setErrorMessage(getString(R.string.error_server_failure));
+                        } else if (status == 403) {
+                            setErrorMessage(getString(R.string.error_invalid_login));
+                        } else {
+                            setErrorMessage(getString(R.string.error_server_failure));
+                        }
+                        showProgress(false);
                     }
-
-                    realm.commitTransaction();
-                    finish();
-
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString(SurveyorIntent.PREF_USERNAME, email);
-                    editor.commit();
-
-                    startActivity(new Intent(LoginActivity.this, OrgListActivity.class));
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    Surveyor.LOG.e("Failure logging in", error);
-                    if (error == null|| error.getResponse() == null) {
-                        setErrorMessage(getString(R.string.error_server_not_found));
-                    } else if (error.getResponse().getStatus() == 404) {
-                        setErrorMessage(getString(R.string.error_server_not_found));
-                    } else if (error.getResponse().getStatus() == 500) {
-                        setErrorMessage(getString(R.string.error_server_failure));
-                    } else if (error.getResponse().getStatus() == 403) {
-                        setErrorMessage(getString(R.string.error_invalid_login));
-                    } else {
-                        setErrorMessage(getString(R.string.error_server_failure));
-                    }
+                public void onFailure(Call<List<DBOrg>> call, Throwable t) {
+                    Surveyor.LOG.e("Failure logging in", t);
+                    setErrorMessage(getString(R.string.error_server_failure));
                     showProgress(false);
-
                 }
             });
         }

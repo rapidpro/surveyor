@@ -41,6 +41,50 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:visibility="visible"
+            android:background="@drawable/primary_button"
+            android:layout_width="wrap_content"
+            android:id="@+id/container_request_media"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:clickable="true"
+            android:onClick="onRequestMedia"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="12dp"
+            android:layout_height="wrap_content" android:orientation="horizontal"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp">
+
+
+            <io.rapidpro.surveyor.ui.IconTextView
+                style="?android:textAppearanceSmall"
+                android:id="@+id/media_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:minHeight="0dp"
+                android:fontFamily=""
+                android:text="@string/icon_photo_camera"
+                android:textStyle="bold"
+                android:padding="4dp" />
+
+            <TextView
+                android:id="@+id/media_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:text="Take a photo"
+                android:layout_marginTop="-3dp"
+                android:padding="6dp" />
+
+
+        </LinearLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,7 +134,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_options"
-        android:id="@+id/scroll">
+        android:id="@+id/scroll"
+        android:fillViewport="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -111,6 +156,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/icon_forum"
+                    android:visibility="gone"
                     android:textColor="@color/light_gray"
                     android:textSize="22sp"/>
 
@@ -122,6 +168,7 @@
                     android:textColor="@color/light_gray"
                     android:textSize="16sp"
                     android:textStyle="italic"
+                    android:visibility="gone"
                     android:paddingTop="0dp"
                     android:layout_marginTop="-1dp"
                     android:layout_marginStart="14dp"

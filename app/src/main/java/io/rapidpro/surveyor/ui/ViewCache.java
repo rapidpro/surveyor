@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -40,6 +41,10 @@ public class ViewCache {
 
     public TextView getTextView(int id) {
         return (TextView) getCachedView(id);
+    }
+
+    public ImageView getImageView(int id) {
+        return (ImageView) getCachedView(id);
     }
 
     public Object getSelectedItem(int id) {
@@ -122,5 +127,9 @@ public class ViewCache {
         if (button != null) {
             button.setText(text);
         }
+    }
+
+    public View getView(int id) {
+        return getCachedView(id);
     }
 }

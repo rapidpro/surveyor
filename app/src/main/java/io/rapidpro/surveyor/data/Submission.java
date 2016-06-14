@@ -1,5 +1,8 @@
 package io.rapidpro.surveyor.data;
 
+import android.net.Uri;
+import android.os.Environment;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -16,8 +19,8 @@ import java.util.UUID;
 
 import io.rapidpro.expressions.utils.ExpressionUtils;
 import io.rapidpro.flows.definition.Flow;
+import io.rapidpro.flows.definition.RuleSet;
 import io.rapidpro.flows.runner.Contact;
-import io.rapidpro.flows.runner.ContactUrn;
 import io.rapidpro.flows.runner.Field;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Step;
@@ -25,7 +28,8 @@ import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.flows.utils.Jsonizable;
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.net.RapidProService;
+import io.rapidpro.surveyor.activity.FlowRunActivity;
+import io.rapidpro.surveyor.net.TembaService;
 
 /**
  * Represents a single flow run. Manages saving run progress and
@@ -36,6 +40,7 @@ public class Submission implements Jsonizable {
 
     private transient static final String SUBMISSIONS_DIR = "submissions";
     private transient static final String FLOW_FILE = "flow.json";
+    private transient static final String MEDIA_DIR = "media";
 
     // the file we will be persisted in
     private transient File m_file;
@@ -65,10 +70,10 @@ public class Submission implements Jsonizable {
     // the app version when this submission started
     private String m_appVersion;
 
-    private static FilenameFilter NOT_FLOW_FILE_FILTER = new FilenameFilter() {
+    private static FilenameFilter SUBMISSION_FILTER = new FilenameFilter() {
         @Override
         public boolean accept(File dir, String filename) {
-            return !filename.endsWith(FLOW_FILE);
+            return !filename.endsWith(FLOW_FILE) && !filename.equals(MEDIA_DIR);
         }
     };
 
@@ -85,7 +90,9 @@ public class Submission implements Jsonizable {
      * The root submission directory
      */
     private static File getSubmissionsDir() {
-        File runsDir = new File(Surveyor.get().getFilesDir(), SUBMISSIONS_DIR);
+        //File runsDir = new File(Surveyor.get().getFilesDir(), SUBMISSIONS_DIR);
+        File runsDir = new File(Environment.getExternalStorageDirectory(), "Surveyor");
+        runsDir = new File(runsDir, SUBMISSIONS_DIR);
         runsDir.mkdirs();
         return runsDir;
     }
@@ -116,7 +123,7 @@ public class Submission implements Jsonizable {
      * Get all the submission files for the given flow
      */
     public static File[] getPendingSubmissions(DBFlow flow) {
-        return getFlowDir(flow.getOrg().getId(), flow.getUuid()).listFiles(NOT_FLOW_FILE_FILTER);
+        return getFlowDir(flow.getOrg().getId(), flow.getUuid()).listFiles(SUBMISSION_FILTER);
     }
 
     /**
@@ -126,9 +133,10 @@ public class Submission implements Jsonizable {
 
         long start = System.currentTimeMillis();
         List<File> files = new ArrayList<>();
+
         for (File dir : getOrgDir(orgId).listFiles()) {
             if (dir.isDirectory()) {
-                for (File submission : dir.listFiles(NOT_FLOW_FILE_FILTER)) {
+                for (File submission : dir.listFiles(SUBMISSION_FILTER)) {
                     files.add(submission);
                 }
             }
@@ -231,6 +239,15 @@ public class Submission implements Jsonizable {
         );
     }
 
+    private File getUniqueFile(File dir, String name, String ext) {
+        File file =  new File(dir, name + "." + ext);
+        int count = 2;
+        while (file.exists()) {
+            file =  new File(dir, name + "_" + count + "." + ext);
+            count++;
+        }
+        return file;
+    }
 
     /**
      * Create a new submission for a flow
@@ -243,17 +260,11 @@ public class Submission implements Jsonizable {
         m_revision = flow.getRevision();
         m_appVersion = BuildConfig.VERSION_NAME;
 
-        String uuid = UUID.randomUUID().toString();
-
-        // get a unique filename
+        // get a unique filename for our submission
         File flowDir = getFlowDir(flow.getOrg().getId(), flow.getUuid());
-        File file =  new File(flowDir, flow.getRevision() + "_" + uuid + "_1.json");
-        int count = 2;
-        while (file.exists()) {
-            file =  new File(flowDir, flow.getRevision() + "_" + uuid + "_" + count + ".json");
-            count++;
-        }
+        m_file = getUniqueFile(flowDir, flow.getRevision() + "_" + UUID.randomUUID().toString(), "json");
 
+        // write our flow definition if it isn't there yet
         File flowFile = new File(flowDir, flow.getRevision() + "_" + FLOW_FILE);
         if (!flowFile.exists()) {
             try {
@@ -263,8 +274,6 @@ public class Submission implements Jsonizable {
                 // TODO: this should probably fail hard
             }
         }
-
-        m_file = file;
     }
 
     public String getFilename() {
@@ -295,6 +304,58 @@ public class Submission implements Jsonizable {
         }
     }
 
+    /**
+     * Get all the results which contain an pointer to a local file
+     */
+    private List<RuleSet.Result> getLocalFileResults() {
+        List<RuleSet.Result> localResults = new ArrayList<RuleSet.Result>();
+        // resolve the media for all of our steps
+        for (Step step : m_steps) {
+            RuleSet.Result result = step.getRuleResult();
+            if (result != null) {
+                String media = result.getMedia();
+                if (media != null) {
+                    int split = media.indexOf(":");
+                    String type = media.substring(0, split);
+                    String fileUrl = media.substring(split + 1, media.length());
+                    // don't attempt resolved types
+                    if (!FlowRunActivity.MSG_RESOLVED.contains(type) && fileUrl.startsWith("file:")) {
+                        localResults.add(result);
+                    }
+                }
+            }
+        }
+        return localResults;
+    }
+
+
+    /**
+     * Submits all local media and updates with remote urls
+     */
+    private void resolveMedia() {
+
+        final TembaService rapid = Surveyor.get().getRapidProService();
+
+        List<RuleSet.Result> results = getLocalFileResults();
+
+        // if we have local files to upload, determine our flow run
+        if (results.size() > 0) {
+            for (RuleSet.Result result : results) {
+                String media = result.getMedia();
+                if (media != null) {
+                    int split = media.indexOf(":");
+
+                    String type = media.substring(0, split);
+                    String fileUrl = media.substring(split + 1, media.length());
+
+                    String extension = fileUrl.substring(fileUrl.lastIndexOf("."));
+                    String newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), extension);
+                    result.setMedia(type + ":" + newUrl);
+                }
+            }
+        }
+    }
+
     public void save() {
         try {
             String output = toJson().toString();
@@ -305,23 +366,30 @@ public class Submission implements Jsonizable {
         }
     }
 
-    public void submit() {
-        final RapidProService rapid = Surveyor.get().getRapidProService();
+    public void submit() throws IOException {
+        final TembaService rapid = Surveyor.get().getRapidProService();
         final Submission submission = this;
 
         // submit any created fields
         rapid.addCreatedFields(m_fields);
 
         // first we need to create our contact
+        Surveyor.LOG.d(m_contact.toJson().toString());
         rapid.addContact(m_contact);
 
         // then post the results
+        submission.resolveMedia();
         rapid.addResults(submission);
     }
 
     public void delete() {
         if (m_file != null) {
+
+            // delete ourselves
             FileUtils.deleteQuietly(m_file);
+
+            // and our associated media files
+            deleteMediaFiles();
         }
     }
 
@@ -338,5 +406,45 @@ public class Submission implements Jsonizable {
             FileUtils.deleteDirectory(getFlowDir(orgId, uuid));
         } catch (IOException e) {}
     }
+
+    public File getMediaDir() {
+        File submissionDir = m_file.getParentFile();
+        File mediaDir = new File(submissionDir, "media");
+        mediaDir.mkdirs();
+        return mediaDir;
+
+    }
+
+    /**
+     * Get the prefix associated with this submission
+     * @return
+     */
+    public String getPrefix() {
+        // our prefix should be the filename up to the '.json' extension
+        String filename = m_file.getName();
+        return filename.substring(0, filename.length() - 5);
+    }
+
+    /**
+     * Gets a unique file in the media directory keyed for this submission
+     */
+    public File createMediaFile(String extension) {
+        return getUniqueFile(getMediaDir(), getPrefix(), extension);
+    }
+
+    private void deleteMediaFiles() {
+        final String prefix = getPrefix();
+        File[] mediaFiles = getMediaDir().listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String filename) {
+                return filename.startsWith(prefix);
+            }
+        });
+
+        for (File mediaFile : mediaFiles) {
+            FileUtils.deleteQuietly(mediaFile);
+        }
+    }
+
 }
 

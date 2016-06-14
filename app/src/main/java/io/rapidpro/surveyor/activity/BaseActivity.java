@@ -11,10 +11,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ShareCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+
+import com.greysonparrelli.permiso.Permiso;
+import com.greysonparrelli.permiso.PermisoActivity;
 
 import java.io.File;
 
@@ -27,7 +29,7 @@ import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
-import io.rapidpro.surveyor.net.RapidProService;
+import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
 
@@ -36,7 +38,7 @@ import io.realm.Realm;
  * which provides convenience methods for transferring state
  * between activities and the like.
  */
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends PermisoActivity {
 
     private DBOrg m_org;
     private DBFlow m_flow;
@@ -98,6 +100,7 @@ public class BaseActivity extends AppCompatActivity {
         if (validateLogin() && !isLoggedIn()) {
             logout(R.string.please_login_again);
         }
+
     }
 
     public void finish() {
@@ -119,6 +122,12 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+
+        // show the settings menu always in debug mode
+        if (BuildConfig.DEBUG) {
+            menu.findItem(R.id.action_settings).setVisible(true);
+        }
+
         return true;
     }
 
@@ -186,6 +195,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Surveyor.LOG.d(getClass().getSimpleName() + ".onResume()");
+
     }
 
     protected void onPause() {
@@ -245,7 +255,7 @@ public class BaseActivity extends AppCompatActivity {
         return m_realm;
     }
 
-    public RapidProService getRapidProService() {
+    public TembaService getRapidProService() {
         return getSurveyor().getRapidProService();
     }
 
@@ -290,6 +300,9 @@ public class BaseActivity extends AppCompatActivity {
 
         dialog.show();
         return dialog;
+    }
 
+    public void showRationaleDialog(int body, Permiso.IOnRationaleProvided callback) {
+        Permiso.getInstance().showRationaleInDialog(getString(R.string.title_permissions), getString(body), null, callback);
     }
 }

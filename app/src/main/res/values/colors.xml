@@ -41,5 +41,7 @@
     <color name="pending_button_text">#ebf2ea</color>
     <color name="pending_text">#2c4b27</color>
 
+    <color name="recording">#f4f4f4</color>
+
 
 </resources>
