@@ -4,7 +4,7 @@
               android:layout_height="match_parent"
               android:gravity="center_horizontal"
               android:orientation="vertical"
-              tools:context="io.rapidpro.surveyorLoginActivity">
+              tools:context="io.rapidpro.surveyor.LoginActivity">
 
     <!-- Login progress -->
     <ProgressBar
@@ -106,6 +106,17 @@
                     android:textStyle="bold"/>
             </LinearLayout>
 
+            <TextView 
+                android:id="@+id/create_account_link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_account"
+                android:onClick="onCreateAccount"
+                android:padding="10dp"
+                android:textSize="18sp"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/primary_lightest"
+                android:gravity="center_horizontal"/>
 
         </LinearLayout>
 

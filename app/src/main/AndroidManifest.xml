@@ -75,5 +75,8 @@
             android:theme="@style/RapidTheme.FullScreen"
             android:label="@string/title_activity_video">
         </activity>
+        <activity android:name=".activity.CreateAccountActivity"
+                  android:label="@string/title_activity_create_account">
+        </activity>
     </application>
 </manifest>

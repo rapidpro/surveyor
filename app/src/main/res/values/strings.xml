@@ -22,6 +22,7 @@
     <string name="title_activity_org">Organization</string>
     <string name="title_activity_flow_list">Download Flow</string>
     <string name="title_activity_flowrun">Flow Run</string>
+    <string name="title_activity_create_account">Create Account</string>
     <string name="error_org_missing">Org couldn\'t be found</string>
 
     <string name="icon_error">\ue000</string>
@@ -897,6 +898,6 @@
     <string name="request_video">Record a Video</string>
     <string name="request_audio">Make a Recording</string>
     <string name="request_location">Share Location</string>
-
+    <string name="web_load_failure">Check your network connection and try again.</string>
 
 </resources>

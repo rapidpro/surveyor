@@ -19,6 +19,8 @@ import com.greysonparrelli.permiso.Permiso;
 import com.greysonparrelli.permiso.PermisoActivity;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.List;
 
 
 import io.rapidpro.surveyor.BuildConfig;
@@ -54,9 +56,37 @@ public class BaseActivity extends PermisoActivity {
         return true;
     }
 
+    /**
+     * Logs in a user for the given orgs
+     */
+    public void login(String email, List<DBOrg> orgs) {
+        Realm realm = getRealm();
+        realm.beginTransaction();
+        realm.where(DBOrg.class).findAll().clear();
+
+        // add our orgs, make sure we don't consider duplicates
+        HashSet<Integer> added = new HashSet<>();
+        for (DBOrg org : orgs) {
+            if (added.add(org.getId())) {
+                realm.copyToRealm(org);
+            }
+        }
+
+        realm.commitTransaction();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(SurveyorIntent.PREF_USERNAME, email);
+        editor.apply();
+
+        startActivity(new Intent(this, OrgListActivity.class));
+        finish();
+    }
+
     public void logout() {
         logout(-1);
     }
+
 
     /**
      * Logs the user out and returns them to the login page
@@ -69,10 +99,6 @@ public class BaseActivity extends PermisoActivity {
         realm.clear(DBOrg.class);
         realm.commitTransaction();
         finish();
-
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.remove(SurveyorIntent.PREF_USERNAME);
-        editor.apply();
 
         Submission.clear();
         OrgDetails.clear();
@@ -244,13 +270,7 @@ public class BaseActivity extends PermisoActivity {
 
     public Realm getRealm() {
         if (m_realm == null) {
-            try {
-                m_realm = Realm.getDefaultInstance();
-            } catch (Throwable t) {
-                Surveyor.LOG.d("Invalid database, reinstall required");
-                Realm.deleteRealm(Surveyor.get().getRealmConfig());
-                m_realm = Realm.getDefaultInstance();
-            }
+            m_realm = Surveyor.get().getRealm();
         }
         return m_realm;
     }

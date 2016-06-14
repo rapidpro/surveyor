@@ -68,6 +68,12 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         // Set up the login form.
         m_emailView = (AutoCompleteTextView) findViewById(R.id.email);
 
+        // prepoulate with our previous username if we have one
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String username = prefs.getString(SurveyorIntent.PREF_USERNAME, "");
+        m_emailView.setText(username);
+
+        populateAutoComplete();
 
         m_passwordView = (EditText) findViewById(R.id.password);
         m_passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -209,30 +215,8 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                 public void onResponse(Call<List<DBOrg>> call, Response<List<DBOrg>> response) {
 
                     if (response.isSuccessful()) {
-
                         List<DBOrg> orgs = response.body();
-
-                        Realm realm = getRealm();
-                        realm.beginTransaction();
-                        realm.where(DBOrg.class).findAll().clear();
-
-                        // add our orgs, make sure we don't consider duplicates
-                        HashSet<Integer> added = new HashSet<>();
-                        for (DBOrg org : orgs) {
-                            if (added.add(org.getId())) {
-                                realm.copyToRealm(org);
-                            }
-                        }
-
-                        realm.commitTransaction();
-                        finish();
-
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString(SurveyorIntent.PREF_USERNAME, email);
-                        editor.commit();
-
-                        startActivity(new Intent(LoginActivity.this, OrgListActivity.class));
+                        login(email, orgs);
                     } else {
                         APIError error = getRapidProService().parseError(response);
                         int status = error.getStatus();
@@ -335,6 +319,16 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
 
+    }
+
+
+    /**
+     * The user clicked on the link to create a new account,
+     * launch our CreateAccountActivity
+     **/
+    public void onCreateAccount(View view) {
+        Surveyor.LOG.d("onCreateAccount: " + this + " " + CreateAccountActivity.class);
+        startActivity(new Intent(this, CreateAccountActivity.class));
     }
 
     private interface ProfileQuery {
