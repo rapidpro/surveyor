@@ -327,7 +327,6 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
      * launch our CreateAccountActivity
      **/
     public void onCreateAccount(View view) {
-        Surveyor.LOG.d("onCreateAccount: " + this + " " + CreateAccountActivity.class);
         startActivity(new Intent(this, CreateAccountActivity.class));
     }
 
