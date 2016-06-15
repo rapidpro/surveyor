@@ -98,7 +98,6 @@ public class BaseActivity extends PermisoActivity {
         realm.clear(DBFlow.class);
         realm.clear(DBOrg.class);
         realm.commitTransaction();
-        finish();
 
         Submission.clear();
         OrgDetails.clear();
@@ -108,6 +107,8 @@ public class BaseActivity extends PermisoActivity {
             intent.putExtra(SurveyorIntent.EXTRA_ERROR, getString(error));
         }
         startActivity(intent);
+
+        finish();
     }
 
     public String getUsername() {
@@ -124,9 +125,8 @@ public class BaseActivity extends PermisoActivity {
 
         // check if they are properly logged in
         if (validateLogin() && !isLoggedIn()) {
-            logout(R.string.please_login_again);
+            logout();
         }
-
     }
 
     public void finish() {

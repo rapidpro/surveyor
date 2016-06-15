@@ -4,19 +4,12 @@ import android.app.Activity;
 import android.net.UrlQuerySanitizer;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.Window;
-import android.view.WindowManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import java.io.BufferedInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;

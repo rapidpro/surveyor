@@ -8,8 +8,8 @@ android {
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 19
-        versionName "1.1.4"
+        versionCode 20
+        versionName "1.2"
         multiDexEnabled = true
     }
     buildTypes {
@@ -37,8 +37,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // google services
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:support-v4:23.3.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:support-v4:23.4.0'
 
     // database ORM
     compile 'io.realm:realm-android:0.82.1'
@@ -49,8 +49,8 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.0.0'
 
     // for location services
-    compile 'com.google.android.gms:play-services-gcm:8.4.0'
-    compile 'com.google.android.gms:play-services-location:8.4.0'
+    compile 'com.google.android.gms:play-services-gcm:9.0.1'
+    compile 'com.google.android.gms:play-services-location:9.0.1'
 
     // internationalization, language iso codes
     compile 'com.neovisionaries:nv-i18n:1.11'
