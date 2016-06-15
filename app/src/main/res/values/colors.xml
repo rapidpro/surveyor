@@ -7,12 +7,12 @@
     -->
     <color name="background">#eeeeee</color>
 
-    <color name="primary_background">#a9c6f2</color>
-    <color name="primary_lightest">#587391</color>
-    <color name="primary_light">#345274</color>
-    <color name="primary">#1E3C5D</color>
-    <color name="primary_dark">#0C2642</color>
-    <color name="primary_darkest">#031529</color>
+    <color name="primary_background">#bad7e7</color>
+    <color name="primary_lightest">#6d9bb4</color>
+    <color name="primary_light">#FF107DB9</color>
+    <color name="primary">#0c6596</color>
+    <color name="primary_dark">#FF094A6E</color>
+    <color name="primary_darkest">#FF05283B</color>
 
     <color name="secondary_lightest">#68609A</color>
     <color name="secondary_light">#443B7B</color>
