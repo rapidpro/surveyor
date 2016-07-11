@@ -1,9 +1,12 @@
 package io.rapidpro.surveyor.net;
 
 import com.google.gson.JsonArray;
-import io.rapidpro.flows.utils.JsonUtils;
+import com.google.gson.JsonElement;
 
-public class FlowDefinition {
+import io.rapidpro.flows.utils.JsonUtils;
+import io.rapidpro.flows.utils.Jsonizable;
+
+public class FlowDefinition implements Jsonizable {
     public String base_language;
     public JsonArray action_sets;
     public JsonArray rule_sets;
@@ -20,7 +23,8 @@ public class FlowDefinition {
         public String uuid;
     }
 
-    public String toString() {
+    @Override
+    public JsonElement toJson() {
         return JsonUtils.object(
                 "base_language", base_language,
                 "action_sets", action_sets,
@@ -33,7 +37,10 @@ public class FlowDefinition {
                         "revision", metadata.revision,
                         "name", metadata.name,
                         "contact_creation", metadata.contact_creation)
-        ).toString();
+        );
+    }
 
+    public String toString() {
+        return toJson().toString();
     }
 }

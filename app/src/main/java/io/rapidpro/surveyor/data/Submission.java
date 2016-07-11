@@ -242,7 +242,8 @@ public class Submission implements Jsonizable {
                 submission.m_username = username;
             }
 
-            submission.setFile(file);
+            submission.m_currentFile = file;
+            submission.m_completedFile = file;
             return submission;
         } catch (IOException e) {
             // we'll return null
@@ -312,7 +313,7 @@ public class Submission implements Jsonizable {
     /**
      * Create a new submission for a flow
      */
-    public Submission(String username, DBFlow flow) {
+    public Submission(String username, DBFlow flow, String revision) {
 
         m_username = username;
         m_flow = flow.getUuid();
@@ -322,7 +323,7 @@ public class Submission implements Jsonizable {
 
         // get a unique filename for our submission
         File flowDir = getFlowDir(flow.getOrg().getId(), flow.getUuid());
-        m_completedFile = getUniqueFile(flowDir, flow.getRevision() + "_" + UUID.randomUUID().toString(), "json");
+        m_completedFile = getUniqueFile(flowDir, revision + "_" + UUID.randomUUID().toString(), "json");
 
         // start with an empty submission file
         m_currentFile = new File(flowDir, CURRENT_FILE);
@@ -331,7 +332,7 @@ public class Submission implements Jsonizable {
         }
 
         // write our flow definition if it isn't there yet
-        File flowFile = new File(flowDir, flow.getRevision() + "_" + FLOW_FILE);
+        File flowFile = new File(flowDir, revision + "_" + FLOW_FILE);
         if (!flowFile.exists()) {
             try {
                 FileUtils.writeStringToFile(flowFile, flow.getDefinition());
@@ -463,10 +464,6 @@ public class Submission implements Jsonizable {
         }
     }
 
-    public void setFile(File file) {
-        m_currentFile = file;
-    }
-
     public boolean isCompleted() {
         return m_completed;
     }
@@ -491,7 +488,7 @@ public class Submission implements Jsonizable {
      */
     public String getPrefix() {
         // our prefix should be the filename up to the '.json' extension
-        String filename = m_currentFile.getName();
+        String filename = m_completedFile.getName();
         return filename.substring(0, filename.length() - 5);
     }
 

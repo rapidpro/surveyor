@@ -4,17 +4,14 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.LocationManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -42,11 +39,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import io.rapidpro.flows.RunnerBuilder;
+import io.rapidpro.flows.definition.Flow;
 import io.rapidpro.flows.definition.actions.Action;
 import io.rapidpro.flows.definition.actions.message.MessageAction;
 import io.rapidpro.flows.runner.ContactUrn;
@@ -56,6 +55,7 @@ import io.rapidpro.flows.runner.Location;
 import io.rapidpro.flows.runner.RunState;
 import io.rapidpro.flows.runner.Runner;
 import io.rapidpro.flows.runner.Step;
+import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.RunnerUtil;
 import io.rapidpro.surveyor.Surveyor;
@@ -66,6 +66,8 @@ import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
+import io.rapidpro.surveyor.net.Definitions;
+import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.ui.IconTextView;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
@@ -178,7 +180,23 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
                 }
             });
 
-            m_runner = new RunnerBuilder().withLocationResolver(new Location.Resolver() {
+
+            // read our individual flow definitions
+            Definitions definitions = JsonUtils.getGson().fromJson(getDBFlow().getDefinition(), Definitions.class);
+
+            StringBuilder sb = new StringBuilder();
+            List<Flow> flows = new ArrayList<>();
+            for (FlowDefinition def : definitions.flows) {
+                sb.append(def.metadata.revision).append('-');
+                flows.add(Flow.fromJson(def.toString()));
+            }
+
+            String revision = "0";
+            if (sb.length() > 0) {
+                revision = sb.substring(0, sb.length() - 1);
+            }
+
+            m_runner = new RunnerBuilder(flows).withLocationResolver(new Location.Resolver() {
 
                 @Override
                 public Location resolve(String input, String country, Location.Level levelEnum, Location parent) {
@@ -207,7 +225,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
             }).build();
 
 
-            m_submission = new Submission(getUsername(), getDBFlow());
+            m_submission = new Submission(getUsername(), getDBFlow(), revision);
 
             // create a run state based on our contact
             OrgDetails details = OrgDetails.load(flow.getOrg());

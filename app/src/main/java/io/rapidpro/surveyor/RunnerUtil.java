@@ -53,10 +53,9 @@ public class RunnerUtil {
         } else {
             return Field.ValueType.TEXT;
         }
-
     }
 
     public static RunState getRunState(Runner runner, DBFlow flow, List<Field> fields) throws FlowRunException, JSONException {
-        return runner.start(createOrg(flow.getOrg()), fields, new Contact(), createFlow(flow));
+        return runner.start(createOrg(flow.getOrg()), fields, new Contact(), flow.getUuid());
     }
 }

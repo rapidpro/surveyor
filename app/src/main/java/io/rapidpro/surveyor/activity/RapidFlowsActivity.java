@@ -12,6 +12,7 @@ import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.fragment.RapidFlowsFragment;
+import io.rapidpro.surveyor.net.Definitions;
 import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.net.FlowList;
 import io.realm.Realm;
@@ -69,20 +70,31 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         finish();
 
         // go fetch our DBFlow definition async
-        getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
+        getRapidProService().getFlowDefinition(flow, new Callback<Definitions>() {
             @Override
-            public void onResponse(Call<FlowDefinition> call, Response<FlowDefinition> response) {
-                FlowDefinition definition = response.body();
+            public void onResponse(Call<Definitions> call, Response<Definitions> response) {
+                Definitions definition = response.body();
                 realm.beginTransaction();
                 flow.setDefinition(definition.toString());
-                flow.setRevision(definition.metadata.revision);
-                flow.setName(definition.metadata.name);
+
+                Definitions definitions = response.body();
+
+                for (FlowDefinition def : definitions.flows) {
+                    if (def.metadata.uuid.equals(flow.getUuid())) {
+                        flow.setRevision(def.metadata.revision);
+                        flow.setName(def.metadata.name);
+                        flow.setQuestionCount(def.rule_sets.size());
+                    }
+                }
+
+                flow.setDefinition(definitions.toString());
+
                 realm.copyToRealmOrUpdate(flow);
                 realm.commitTransaction();
             }
 
             @Override
-            public void onFailure(Call<FlowDefinition> call, Throwable t) {
+            public void onFailure(Call<Definitions> call, Throwable t) {
                 Surveyor.LOG.e("Failure fetching: " + t.getMessage(), t);
             }
 

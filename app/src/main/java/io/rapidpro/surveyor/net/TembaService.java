@@ -90,16 +90,16 @@ public class TembaService {
         });
     }
 
-    public void getFlowDefinition(final DBFlow flow, final Callback<FlowDefinition> callback) {
+    public void getFlowDefinition(final DBFlow flow, final Callback<Definitions> callback) {
 
         final Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         flow.setFetching(true);
         realm.commitTransaction();
 
-        m_api.getFlowDefinition(getToken(), flow.getUuid()).enqueue(new Callback<FlowDefinition>() {
+        m_api.getFlowDefinition(getToken(), flow.getUuid()).enqueue(new Callback<Definitions>() {
             @Override
-            public void onResponse(Call<FlowDefinition> call, Response<FlowDefinition> response) {
+            public void onResponse(Call<Definitions> call, Response<Definitions> response) {
 
                 realm.beginTransaction();
                 flow.setFetching(false);
@@ -110,7 +110,7 @@ public class TembaService {
             }
 
             @Override
-            public void onFailure(Call<FlowDefinition> call, Throwable t) {
+            public void onFailure(Call<Definitions> call, Throwable t) {
                 realm.beginTransaction();
                 flow.setFetching(false);
                 realm.commitTransaction();

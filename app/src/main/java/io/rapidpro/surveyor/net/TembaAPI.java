@@ -40,10 +40,10 @@ public interface TembaAPI {
             @Query("type") String type,
             @Query("archived") boolean archived);
 
-    @GET("/api/v1/flow_definition.json")
-    Call<FlowDefinition> getFlowDefinition(
+    @GET("/api/v2/definitions.json")
+    Call<Definitions> getFlowDefinition(
             @Header("Authorization") String token,
-            @Query("uuid") String uuid);
+            @Query("flow_uuid") String uuid);
 
     @POST("/api/v1/steps.json")
     Call<JsonObject> addResults(
