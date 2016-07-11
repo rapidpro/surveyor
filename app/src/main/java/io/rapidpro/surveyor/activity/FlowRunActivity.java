@@ -528,12 +528,14 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
      * Stop getting location updates
      */
     protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(m_googleApi, new LocationListener() {
-            @Override
-            public void onLocationChanged(android.location.Location location) {
+        if (m_googleApi.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(m_googleApi, new LocationListener() {
+                @Override
+                public void onLocationChanged(android.location.Location location) {
 
-            }
-        });
+                }
+            });
+        }
     }
 
     protected Bitmap scaleToWidth(Bitmap bitmap, int width) {
@@ -732,6 +734,8 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
         flow.setLastRunDate(new Date());
         realm.copyToRealmOrUpdate(flow);
         realm.commitTransaction();
+
+        m_submission.complete();
 
         finish();
     }

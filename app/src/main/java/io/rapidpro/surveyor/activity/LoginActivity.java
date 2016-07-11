@@ -190,7 +190,7 @@ public class LoginActivity extends BaseActivity {
                         } else if (status == 403) {
                             setErrorMessage(getString(R.string.error_invalid_login));
                         } else {
-                            setErrorMessage(getString(R.string.error_server_failure));
+                            setErrorMessage(getString(R.string.error_network));
                         }
                         showProgress(false);
                     }
@@ -199,7 +199,7 @@ public class LoginActivity extends BaseActivity {
                 @Override
                 public void onFailure(Call<List<DBOrg>> call, Throwable t) {
                     Surveyor.LOG.e("Failure logging in", t);
-                    setErrorMessage(getString(R.string.error_server_failure));
+                    setErrorMessage(getString(R.string.error_network));
                     showProgress(false);
                 }
             });

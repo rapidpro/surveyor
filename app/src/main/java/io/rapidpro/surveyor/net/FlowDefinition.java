@@ -1,9 +1,6 @@
 package io.rapidpro.surveyor.net;
 
 import com.google.gson.JsonArray;
-
-import org.json.JSONObject;
-
 import io.rapidpro.flows.utils.JsonUtils;
 
 public class FlowDefinition {
@@ -20,6 +17,7 @@ public class FlowDefinition {
         public int revision;
         public String name;
         public String contact_creation;
+        public String uuid;
     }
 
     public String toString() {
@@ -31,6 +29,7 @@ public class FlowDefinition {
                 "flow_type", flow_type,
                 "entry", entry,
                 "metadata", JsonUtils.object(
+                        "uuid", metadata.uuid,
                         "revision", metadata.revision,
                         "name", metadata.name,
                         "contact_creation", metadata.contact_creation)

@@ -899,5 +899,6 @@
     <string name="request_audio">Make a Recording</string>
     <string name="request_location">Share Location</string>
     <string name="web_load_failure">Check your network connection and try again.</string>
+    <string name="error_network">Could not contact server. Check your network connection and try again.</string>
 
 </resources>

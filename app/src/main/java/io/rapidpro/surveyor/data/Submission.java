@@ -3,8 +3,10 @@ package io.rapidpro.surveyor.data;
 import android.net.Uri;
 import android.os.Environment;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.apache.commons.io.FileUtils;
 import org.threeten.bp.Instant;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import io.rapidpro.expressions.utils.ExpressionUtils;
@@ -41,9 +44,11 @@ public class Submission implements Jsonizable {
     private transient static final String SUBMISSIONS_DIR = "submissions";
     private transient static final String FLOW_FILE = "flow.json";
     private transient static final String MEDIA_DIR = "media";
+    private transient static final String CURRENT_FILE = "current.json";
 
-    // the file we will be persisted in
-    private transient File m_file;
+    // the files we will be persisted in
+    private transient File m_currentFile;
+    private transient File m_completedFile;
 
     // fields created during this submission
     protected HashMap<String,Field> m_fields = new HashMap<>();
@@ -73,7 +78,9 @@ public class Submission implements Jsonizable {
     private static FilenameFilter SUBMISSION_FILTER = new FilenameFilter() {
         @Override
         public boolean accept(File dir, String filename) {
-            return !filename.endsWith(FLOW_FILE) && !filename.equals(MEDIA_DIR);
+            return !filename.endsWith(FLOW_FILE)
+                    && !filename.equals(MEDIA_DIR)
+                    && !filename.endsWith(CURRENT_FILE);
         }
     };
 
@@ -90,7 +97,6 @@ public class Submission implements Jsonizable {
      * The root submission directory
      */
     private static File getSubmissionsDir() {
-        //File runsDir = new File(Surveyor.get().getFilesDir(), SUBMISSIONS_DIR);
         File runsDir = new File(Environment.getExternalStorageDirectory(), "Surveyor");
         runsDir = new File(runsDir, SUBMISSIONS_DIR);
         runsDir.mkdirs();
@@ -148,20 +154,73 @@ public class Submission implements Jsonizable {
         return results;
     }
 
+    private static JsonObject migrateFlowToVersion9(String flowUUID, JsonObject root) {
+
+        if (root.has("flows")) {
+            return root;
+        }
+
+        root.get("metadata").getAsJsonObject().addProperty("uuid", flowUUID);
+        JsonArray flowArray = new JsonArray();
+        flowArray.add(root);
+        JsonObject newRoot = new JsonObject();
+        newRoot.add("flows", flowArray);
+
+        return newRoot;
+    }
+
     /**
      * Read the flow definition from disk
      */
-    private static Flow getFlow(File file) {
+    private static Map<String,Flow> getFlows(File file) {
         String revision = file.getName().split("_")[0];
         File flowFile = new File(file.getParent(), revision + "_" + FLOW_FILE);
         Surveyor.LOG.d("Reading flow: " + flowFile.getName());
-        String flow = null;
+        String flowString = null;
         try {
-            flow = FileUtils.readFileToString(flowFile);
+            flowString = FileUtils.readFileToString(flowFile);
         } catch (IOException e) {
             Surveyor.LOG.e("Error loading flow", e);
         }
-        return Flow.fromJson(flow);
+
+        String flowUUID = file.getParentFile().getName();
+        JsonParser parser = new JsonParser();
+
+        JsonObject root = parser.parse(flowString).getAsJsonObject();
+        root = migrateFlowToVersion9(flowUUID, root);
+
+        Map<String,Flow> flows = new HashMap<>();
+
+        for (JsonElement flowElement : root.get("flows").getAsJsonArray()) {
+            Flow flow = Flow.fromJson(flowElement.toString());
+            flows.put(flow.getUUID(), flow);
+        }
+
+        return flows;
+    }
+
+    /**
+     * Adds UUIDs where necessary to migrate a flow definition forward
+     */
+    private static JsonObject migrateToVersion9(JsonObject root) {
+        JsonArray steps = root.get("steps").getAsJsonArray();
+        String flowUUID = root.get("flow").getAsString();
+
+        for (JsonElement ele : steps) {
+            JsonObject step = ele.getAsJsonObject();
+            step.addProperty("flow_uuid", flowUUID);
+
+            JsonElement stepEle = step.get("rule");
+            if (!stepEle.isJsonNull()) {
+                JsonObject rule = stepEle.getAsJsonObject();
+                rule.addProperty("flow_uuid", flowUUID);
+            }
+        }
+        return root;
+    }
+
+    public static JsonObject migrateSubmission(JsonObject root) {
+        return migrateToVersion9(root);
     }
 
     /**
@@ -171,12 +230,13 @@ public class Submission implements Jsonizable {
     public static Submission load(String username, File file) {
         try {
 
-            Flow.DeserializationContext context = new Flow.DeserializationContext(getFlow(file));
             String json = FileUtils.readFileToString(file);
+            JsonParser parser = new JsonParser();
+            JsonObject root = migrateSubmission(parser.parse(json).getAsJsonObject());
+            Flow.DeserializationContext context = new Flow.DeserializationContext(getFlows(file));
 
-            Surveyor.LOG.d(" << " + json);
-            JsonElement obj = JsonUtils.getGson().fromJson(json, JsonElement.class);
-            Submission submission = JsonUtils.fromJson(obj, context, Submission.class);
+            Surveyor.LOG.d(" << " + root.toString());
+            Submission submission = JsonUtils.fromJson(root, context, Submission.class);
 
             if (submission.m_username == null) {
                 submission.m_username = username;
@@ -262,7 +322,13 @@ public class Submission implements Jsonizable {
 
         // get a unique filename for our submission
         File flowDir = getFlowDir(flow.getOrg().getId(), flow.getUuid());
-        m_file = getUniqueFile(flowDir, flow.getRevision() + "_" + UUID.randomUUID().toString(), "json");
+        m_completedFile = getUniqueFile(flowDir, flow.getRevision() + "_" + UUID.randomUUID().toString(), "json");
+
+        // start with an empty submission file
+        m_currentFile = new File(flowDir, CURRENT_FILE);
+        if (m_currentFile.exists()) {
+            m_currentFile.delete();
+        }
 
         // write our flow definition if it isn't there yet
         File flowFile = new File(flowDir, flow.getRevision() + "_" + FLOW_FILE);
@@ -277,7 +343,7 @@ public class Submission implements Jsonizable {
     }
 
     public String getFilename() {
-        return m_file.getAbsolutePath();
+        return m_currentFile.getAbsolutePath();
     }
 
     public void addSteps(RunState runState) {
@@ -357,10 +423,14 @@ public class Submission implements Jsonizable {
     }
 
     public void save() {
+        save(m_currentFile);
+    }
+
+    private void save(File file) {
         try {
             String output = toJson().toString();
             Surveyor.LOG.d(" >> " + output);
-            FileUtils.write(m_file, output);
+            FileUtils.write(file, output);
         } catch (IOException e) {
             Surveyor.LOG.e("Failure writing submission", e);
         }
@@ -383,10 +453,10 @@ public class Submission implements Jsonizable {
     }
 
     public void delete() {
-        if (m_file != null) {
+        if (m_currentFile != null) {
 
             // delete ourselves
-            FileUtils.deleteQuietly(m_file);
+            FileUtils.deleteQuietly(m_currentFile);
 
             // and our associated media files
             deleteMediaFiles();
@@ -394,7 +464,7 @@ public class Submission implements Jsonizable {
     }
 
     public void setFile(File file) {
-        m_file = file;
+        m_currentFile = file;
     }
 
     public boolean isCompleted() {
@@ -408,7 +478,7 @@ public class Submission implements Jsonizable {
     }
 
     public File getMediaDir() {
-        File submissionDir = m_file.getParentFile();
+        File submissionDir = m_currentFile.getParentFile();
         File mediaDir = new File(submissionDir, "media");
         mediaDir.mkdirs();
         return mediaDir;
@@ -421,7 +491,7 @@ public class Submission implements Jsonizable {
      */
     public String getPrefix() {
         // our prefix should be the filename up to the '.json' extension
-        String filename = m_file.getName();
+        String filename = m_currentFile.getName();
         return filename.substring(0, filename.length() - 5);
     }
 
@@ -446,5 +516,7 @@ public class Submission implements Jsonizable {
         }
     }
 
+    public void complete() {
+        save(m_completedFile);
+    }
 }
-
