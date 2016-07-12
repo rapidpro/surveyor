@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -193,7 +194,7 @@ public class Submission implements Jsonizable {
 
         for (JsonElement flowElement : root.get("flows").getAsJsonArray()) {
             Flow flow = Flow.fromJson(flowElement.toString());
-            flows.put(flow.getUUID(), flow);
+            flows.put(flow.getUuid(), flow);
         }
 
         return flows;
@@ -208,12 +209,16 @@ public class Submission implements Jsonizable {
 
         for (JsonElement ele : steps) {
             JsonObject step = ele.getAsJsonObject();
-            step.addProperty("flow_uuid", flowUUID);
+            if (!step.has("flow_uuid")) {
+                step.addProperty("flow_uuid", flowUUID);
+            }
 
             JsonElement stepEle = step.get("rule");
             if (!stepEle.isJsonNull()) {
                 JsonObject rule = stepEle.getAsJsonObject();
-                rule.addProperty("flow_uuid", flowUUID);
+                if (!rule.has("flow_uuid")) {
+                    rule.addProperty("flow_uuid", flowUUID);
+                }
             }
         }
         return root;
@@ -300,6 +305,49 @@ public class Submission implements Jsonizable {
         );
     }
 
+    public List<JsonObject> getResultsJson() {
+        Map<Flow, List<Step>> resultsMap = getResultsMap();
+        List<JsonObject> resultsJson = new ArrayList<>();
+        for (Map.Entry entry : resultsMap.entrySet()) {
+
+            List<Step> steps = (List<Step>) entry.getValue();
+            Flow flow = (Flow) entry.getKey();
+            Instant started = steps.get(0).getArrivedOn();
+
+            if (steps.size() > 0) {
+                resultsJson.add(JsonUtils.object(
+                        "fields", JsonUtils.toJsonArray(m_fields.values()),
+                        "steps", JsonUtils.toJsonArray(steps),
+                        "flow", flow.getUuid(),
+                        "contact", m_contact.getUuid(),
+                        "started", ExpressionUtils.formatJsonDate(started),
+                        "revision", flow.getMetadata().get("revision").getAsInt(),
+                        "completed", m_completed,
+                        "app_version", m_appVersion,
+                        "submitted_by", m_username
+                ));
+            }
+        }
+
+        return resultsJson;
+    }
+
+
+    private Map<Flow,List<Step>> getResultsMap() {
+        // build up a map for each flow to it's steps
+        Map<Flow,List<Step>> resultMap = new HashMap<>();
+        for (Step step : m_steps) {
+            List<Step> steps = resultMap.get(step.getFlow());
+            if (steps == null) {
+                steps = new ArrayList<>();
+            }
+            steps.add(step);
+            resultMap.put(step.getFlow(), steps);
+        }
+
+        return resultMap;
+    }
+
     private File getUniqueFile(File dir, String name, String ext) {
         File file =  new File(dir, name + "." + ext);
         int count = 2;
@@ -343,19 +391,18 @@ public class Submission implements Jsonizable {
         }
     }
 
-    public String getFilename() {
-        return m_currentFile.getAbsolutePath();
+    public File getCompletedFile() {
+        return m_completedFile;
     }
 
     public void addSteps(RunState runState) {
 
         m_contact = runState.getContact();
 
-        List<Step> completed = runState.getCompletedSteps();
         if (m_steps == null) {
             m_steps = new ArrayList<>();
         }
-        m_steps.addAll(completed);
+        m_steps.addAll(runState.getCompletedSteps());
 
         // keep track of when we were started
         m_started = runState.getStarted();
@@ -427,7 +474,7 @@ public class Submission implements Jsonizable {
         save(m_currentFile);
     }
 
-    private void save(File file) {
+    protected void save(File file) {
         try {
             String output = toJson().toString();
             Surveyor.LOG.d(" >> " + output);

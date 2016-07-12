@@ -159,38 +159,18 @@ public class TembaService {
         }
     }
 
-    public JsonObject prepareSubmission(Submission submission, boolean includeSteps) {
-        JsonObject obj = submission.toJson().getAsJsonObject();
-
-        if (!includeSteps) {
-            obj.add("steps", new JsonArray());
-        }
-
-        // replace contact with uuid
-        JsonObject contact = obj.get("contact").getAsJsonObject();
-        obj.addProperty("contact", contact.get("uuid").getAsString());
-        return obj;
-    }
-
-    public int getFlowRun(final Submission submission) {
-        try {
-            JsonObject obj = prepareSubmission(submission, false);
-            JsonObject response = m_api.addResults(getToken(), obj).execute().body();
-
-            if (response != null && response.has("run")) {
-                return response.get("run").getAsInt();
-            }
-            throw new TembaException("Failed to fetch new run id");
-        } catch (IOException e) {
-            throw new TembaException(e);
-        }
-    }
-
     public void addResults(final Submission submission) {
         try {
-            JsonObject obj = prepareSubmission(submission, true);
-            Response response = m_api.addResults(getToken(), obj).execute();
-            if (response.isSuccessful()) {
+
+            boolean success = false;
+            for (JsonObject result : submission.getResultsJson()) {
+                Response response = m_api.addResults(getToken(), result).execute();
+                if (response.isSuccessful()) {
+                    success = response.isSuccessful();
+                }
+
+            }
+            if (success) {
                 submission.delete();
             } else {
                 throw new TembaException("Error submitting results");

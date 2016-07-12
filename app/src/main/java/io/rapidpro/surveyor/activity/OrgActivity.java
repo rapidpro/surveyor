@@ -80,9 +80,6 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         }
 
         int pending = Submission.getPendingSubmissions(getDBOrg().getId()).length;
-
-        Surveyor.LOG.d("Pending: " + pending);
-
         ViewCache cache = getViewCache();
         cache.setVisible(R.id.container_pending, pending > 0);
         cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
