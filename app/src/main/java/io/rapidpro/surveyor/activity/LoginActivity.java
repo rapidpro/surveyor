@@ -3,17 +3,11 @@ package io.rapidpro.surveyor.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -21,29 +15,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBOrg;
-import io.realm.Realm;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import io.rapidpro.surveyor.net.APIError;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends BaseActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends BaseActivity {
 
     // UI references.
     private AutoCompleteTextView m_emailView;
@@ -61,7 +53,11 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
         // Set up the login form.
         m_emailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
+
+        // prepoulate with our previous username if we have one
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String username = prefs.getString(SurveyorIntent.PREF_USERNAME, "");
+        m_emailView.setText(username);
 
         m_passwordView = (EditText) findViewById(R.id.password);
         m_passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -89,6 +85,14 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         // set our error message if we have one
         setErrorMessage(getIntent().getStringExtra(SurveyorIntent.EXTRA_ERROR));
 
+    }
+
+    public void onResume() {
+        super.onResume();
+    }
+
+    public boolean validateLogin() {
+        return false;
     }
 
     private void setErrorMessage(String message) {
@@ -124,11 +128,6 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         return super.onOptionsItemSelected(item);
     }
 
-    private void populateAutoComplete() {
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
@@ -141,7 +140,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         m_passwordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = m_emailView.getText().toString();
+        final String email = m_emailView.getText().toString();
         String password = m_passwordView.getText().toString();
 
         boolean cancel = false;
@@ -176,45 +175,32 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
             getRapidProService().getOrgs(email, password, new Callback<List<DBOrg>>() {
                 @Override
-                public void success(List<DBOrg> orgs, Response response) {
+                public void onResponse(Call<List<DBOrg>> call, Response<List<DBOrg>> response) {
 
-                    Realm realm = getRealm();
-                    realm.beginTransaction();
-                    realm.where(DBOrg.class).findAll().clear();
-
-                    // add our orgs, make sure we don't consider duplicates
-                    HashSet<Integer> added = new HashSet<>();
-                    for (DBOrg org : orgs) {
-                        if (added.add(org.getId())) {
-                            realm.copyToRealm(org);
+                    if (response.isSuccessful()) {
+                        List<DBOrg> orgs = response.body();
+                        login(email, orgs);
+                    } else {
+                        APIError error = getRapidProService().parseError(response);
+                        int status = error.getStatus();
+                        if (status == 404) {
+                            setErrorMessage(getString(R.string.error_server_not_found));
+                        } else if (status == 500) {
+                            setErrorMessage(getString(R.string.error_server_failure));
+                        } else if (status == 403) {
+                            setErrorMessage(getString(R.string.error_invalid_login));
+                        } else {
+                            setErrorMessage(getString(R.string.error_network));
                         }
+                        showProgress(false);
                     }
-
-                    realm.commitTransaction();
-                    finish();
-
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                    prefs.edit().putBoolean(SurveyorIntent.PREF_LOGGED_IN, true).commit();
-
-                    startActivity(new Intent(LoginActivity.this, OrgListActivity.class));
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    Surveyor.LOG.e("Failure logging in", error);
-                    if (error == null|| error.getResponse() == null) {
-                        setErrorMessage(getString(R.string.error_server_not_found));
-                    } else if (error.getResponse().getStatus() == 404) {
-                        setErrorMessage(getString(R.string.error_server_not_found));
-                    } else if (error.getResponse().getStatus() == 500) {
-                        setErrorMessage(getString(R.string.error_server_failure));
-                    } else if (error.getResponse().getStatus() == 403) {
-                        setErrorMessage(getString(R.string.error_invalid_login));
-                    } else {
-                        setErrorMessage(getString(R.string.error_server_failure));
-                    }
+                public void onFailure(Call<List<DBOrg>> call, Throwable t) {
+                    Surveyor.LOG.e("Failure logging in", t);
+                    setErrorMessage(getString(R.string.error_network));
                     showProgress(false);
-
                 }
             });
         }
@@ -264,56 +250,12 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<String>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        m_emailView.setAdapter(adapter);
+    /**
+     * The user clicked on the link to create a new account,
+     * launch our CreateAccountActivity
+     **/
+    public void onCreateAccount(View view) {
+        startActivity(new Intent(this, CreateAccountActivity.class));
+        finish();
     }
 }

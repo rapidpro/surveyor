@@ -10,13 +10,13 @@ import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.fragment.RapidFlowsFragment;
+import io.rapidpro.surveyor.net.Definitions;
 import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.net.FlowList;
 import io.realm.Realm;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragment.RapidFlowListener {
 
@@ -31,7 +31,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
 
         getRapidProService().getFlows(new Callback<FlowList>() {
             @Override
-            public void success(FlowList flows, Response response) {
+            public void onResponse(Call<FlowList> call, Response<FlowList> response) {
                 if (!RapidFlowsActivity.this.isDestroyed()) {
                     setContentView(R.layout.fragment_container);
                     if (savedInstanceState == null) {
@@ -43,9 +43,10 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                Surveyor.LOG.e(error.getMessage(), error.getCause());
-                int message = getRapidProService().getErrorMessage(error);
+            public void onFailure(Call<FlowList> call, Throwable t) {
+                Surveyor.LOG.e("Failed fetching flows", t);
+
+                int message = getRapidProService().getErrorMessage(t);
                 Toast.makeText(RapidFlowsActivity.this, message, Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -54,8 +55,6 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
 
     @Override
     public void onRapidFlowSelection(final DBFlow flow) {
-
-        Surveyor.LOG.d("DBFlow selected: " + flow.getName());
 
         // save which org this DBFlow came from
         flow.setOrg(getDBOrg());
@@ -67,22 +66,38 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         finish();
 
         // go fetch our DBFlow definition async
-        getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
+        getRapidProService().getFlowDefinition(flow, new Callback<Definitions>() {
             @Override
-            public void success(FlowDefinition definition, Response response) {
-                realm.beginTransaction();
-                flow.setDefinition(new String(((TypedByteArray) response.getBody()).getBytes()));
-                flow.setRevision(definition.metadata.revision);
-                flow.setName(definition.metadata.name);
-                realm.copyToRealmOrUpdate(flow);
-                realm.commitTransaction();
+            public void onResponse(Call<Definitions> call, Response<Definitions> response) {
+
+                if (response.isSuccessful()) {
+                    Definitions definition = response.body();
+                    realm.beginTransaction();
+                    flow.setDefinition(definition.toString());
+
+                    Definitions definitions = response.body();
+
+                    for (FlowDefinition def : definitions.flows) {
+                        if (def.metadata.uuid.equals(flow.getUuid())) {
+                            flow.setRevision(def.metadata.revision);
+                            flow.setName(def.metadata.name);
+                            flow.setQuestionCount(def.rule_sets.size());
+                        }
+                    }
+
+                    flow.setDefinition(definitions.toString());
+
+                    realm.copyToRealmOrUpdate(flow);
+                    realm.commitTransaction();
+                } else {
+                    new FetchLegacyDefinition(RapidFlowsActivity.this, flow.getUuid(), null).execute();
+                }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                Surveyor.LOG.e("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error.getCause());
+            public void onFailure(Call<Definitions> call, Throwable t) {
+                Surveyor.LOG.e("Failure fetching: " + t.getMessage(), t);
             }
         });
-
     }
 }

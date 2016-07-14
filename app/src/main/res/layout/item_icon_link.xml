@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.rapidpro.surveyor.widget.IconLinkView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chat_bubble"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:onClick="onClickMedia"
+    android:layout_alignParentEnd="true"
+    android:clickable="true"
+    android:paddingTop="@dimen/bubble_margin"
+    android:paddingStart="@dimen/bubble_margin"
+    android:paddingEnd="@dimen/bubble_margin">
+
+    <View
+        android:id="@+id/spacer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="@dimen/bubble_space" />
+
+
+    <LinearLayout
+        android:background="@drawable/chat_bubble_out"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="6dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <io.rapidpro.surveyor.ui.IconTextView
+            android:id="@+id/media_icon"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="12dp"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_height="wrap_content"
+            android:textSize="26sp"
+            android:textColor="@color/primary_lightest"
+            android:text="@string/icon_volume_up" />
+
+        <TextView
+            android:id="@+id/text_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingEnd="16dp"
+            android:paddingStart="0dp"
+            android:paddingTop="14dp"
+            android:textSize="16sp"
+            android:layout_marginTop="-3dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="@dimen/bubble_size"
+            android:text="Made Recording" />
+
+
+    </LinearLayout>
+
+
+</io.rapidpro.surveyor.widget.IconLinkView>

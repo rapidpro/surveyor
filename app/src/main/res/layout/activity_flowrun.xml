@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/bottom_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
         <LinearLayout
             android:id="@+id/completion_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@color/white"
             android:weightSum="1"
             android:padding="8dp"
             android:visibility="gone">
@@ -40,32 +41,89 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:visibility="visible"
+            android:background="@drawable/primary_button"
+            android:layout_width="wrap_content"
+            android:id="@+id/container_request_media"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:clickable="true"
+            android:onClick="onRequestMedia"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="12dp"
+            android:layout_height="wrap_content" android:orientation="horizontal"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp">
+
+
+            <io.rapidpro.surveyor.ui.IconTextView
+                style="?android:textAppearanceSmall"
+                android:id="@+id/media_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:minHeight="0dp"
+                android:fontFamily=""
+                android:text="@string/icon_photo_camera"
+                android:textStyle="bold"
+                android:padding="4dp" />
+
+            <TextView
+                android:id="@+id/media_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:text="Take a photo"
+                android:layout_marginTop="-3dp"
+                android:padding="6dp" />
+
+
+        </LinearLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="8dp"
             android:paddingTop="5dp"
-            android:id="@+id/chat_box">
+            android:id="@+id/chat_box"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
             <io.rapidpro.surveyor.ui.IconTextView
                 android:id="@+id/button_send"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:text="@string/icon_send"
                 android:textColor="@color/light_gray"
+                android:clickable="true"
                 android:onClick="sendMessage"
-                android:textSize="32sp"/>
+                android:textSize="36sp"/>
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:hint="Send message"
                 android:layout_toStartOf="@+id/button_send"
-                android:layout_alignBaseline="@+id/button_send"
                 android:imeOptions="actionSend"
+                android:layout_marginEnd="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/white_rounded"
                 android:id="@+id/text_chat"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                android:transitionName="@string/transition_chat"
+                />
 
         </RelativeLayout>
 
@@ -76,8 +134,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_options"
-        android:background="@color/white"
-        android:id="@+id/scroll">
+        android:id="@+id/scroll"
+        android:fillViewport="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,20 +144,19 @@
             android:orientation="vertical">
 
             <RelativeLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/chat_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:background="@drawable/header">
+                android:paddingTop="@dimen/activity_vertical_margin">
 
                 <io.rapidpro.surveyor.ui.IconTextView
                     android:id="@+id/download_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/icon_forum"
+                    android:visibility="gone"
                     android:textColor="@color/light_gray"
                     android:textSize="22sp"/>
 
@@ -111,7 +168,9 @@
                     android:textColor="@color/light_gray"
                     android:textSize="16sp"
                     android:textStyle="italic"
-                    android:paddingTop="1dp"
+                    android:visibility="gone"
+                    android:paddingTop="0dp"
+                    android:layout_marginTop="-1dp"
                     android:layout_marginStart="14dp"
                     android:text="Started UNICEF U-Report Registration Flow"/>
 

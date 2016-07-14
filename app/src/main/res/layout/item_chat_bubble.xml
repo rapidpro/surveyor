@@ -16,14 +16,46 @@
         android:background="@drawable/chat_bubble_in"
         android:padding="16dp"
         android:textSize="16sp"
+        android:linksClickable="true"
+        android:clickable="true"
         android:layout_weight="@dimen/bubble_size"
         android:text="This is a DBFlow message sent by the DBFlow engine"
         />
+
+    <RelativeLayout
+        android:id="@+id/media_view"
+        android:background="@drawable/image_border"
+        android:onClick="onClickMedia"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            />
+        
+        <io.rapidpro.surveyor.ui.IconTextView
+            android:id="@+id/media_icon"
+            android:layout_alignBottom="@+id/thumbnail"
+            android:layout_alignEnd="@id/thumbnail"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="40sp"
+            android:textColor="@color/white"
+            android:text="@string/icon_photo"/>
+
+    </RelativeLayout>
 
     <View
         android:id="@+id/spacer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="@dimen/bubble_space" />
+
 
 </io.rapidpro.surveyor.widget.ChatBubbleView>

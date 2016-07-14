@@ -20,3 +20,6 @@
 -keep @io.realm.annotations.RealmModule class *
 -dontwarn javax.**
 -dontwarn io.realm.**
+
+# avoid crashes for 4.2.2 TECNO devices
+-keep class !android.support.v7.internal.view.menu.**,android.support.** {*;}

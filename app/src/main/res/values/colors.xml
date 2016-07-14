@@ -5,13 +5,14 @@
       Palette generated from paletton:
       http://paletton.com/#uid=53B0x0knyhTdHrQjdmlsEcMAt7T
     -->
+    <color name="background">#eeeeee</color>
 
-    <color name="primary_background">#a9c6f2</color>
-    <color name="primary_lightest">#587391</color>
-    <color name="primary_light">#345274</color>
-    <color name="primary">#1E3C5D</color>
-    <color name="primary_dark">#0C2642</color>
-    <color name="primary_darkest">#031529</color>
+    <color name="primary_background">#bad7e7</color>
+    <color name="primary_lightest">#6d9bb4</color>
+    <color name="primary_light">#FF107DB9</color>
+    <color name="primary">#0c6596</color>
+    <color name="primary_dark">#FF094A6E</color>
+    <color name="primary_darkest">#FF05283B</color>
 
     <color name="secondary_lightest">#68609A</color>
     <color name="secondary_light">#443B7B</color>
@@ -19,7 +20,7 @@
     <color name="secondary_dark">#171047</color>
     <color name="secondary_darkest">#0A052B</color>
 
-    <color name="tertiary_lightest">#196045</color>
+    <color name="tertiary_lightest">#B2DFDB</color>
     <color name="tertiary_light">#56967E</color>
     <color name="tertiary">#30785D</color>
     <color name="tertiary_dark">#07452E</color>
@@ -36,8 +37,11 @@
 
     <color name="pending_background">#b0c2ae</color>
     <color name="pending">#6e946a</color>
+    <color name="pending_border">#62865d</color>
     <color name="pending_button_text">#ebf2ea</color>
     <color name="pending_text">#2c4b27</color>
+
+    <color name="recording">#f4f4f4</color>
 
 
 </resources>

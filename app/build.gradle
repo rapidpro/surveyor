@@ -1,15 +1,20 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    compileSdkVersion 23
     buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 17
-        targetSdkVersion 22
-        versionCode 8
-        versionName "1.0.7"
+        targetSdkVersion 23
+        versionCode 21
+        versionName "1.3"
+        multiDexEnabled = true
     }
     buildTypes {
         release {
@@ -21,32 +26,44 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
+
+    testCompile 'junit:junit:4.12'
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // google services
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.google.android.gms:play-services:7.5.0'
-    compile 'com.android.support:support-v4:22.2.1'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:support-v4:23.4.0'
 
     // database ORM
     compile 'io.realm:realm-android:0.82.1'
 
     // rest api
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.squareup.retrofit2:retrofit:2.0.0'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0'
+
+    // for location services
+    compile 'com.google.android.gms:play-services-gcm:9.0.1'
+    compile 'com.google.android.gms:play-services-location:9.0.1'
 
     // internationalization, language iso codes
     compile 'com.neovisionaries:nv-i18n:1.11'
 
     // our flow engine
-    compile ('io.rapidpro:flows:1.2.9') {
+    compile ('io.rapidpro:flows:1.3') {
         // exclude threeten since it is inefficient in android land
         exclude group: 'org.threeten'
     }
@@ -54,7 +71,11 @@ dependencies {
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.2'
 
     // apache commons io
-    compile 'commons-io:commons-io:2.0.1'
-    // compile group: 'commons-io', name: 'commons-io', version: '2.0.1'
+    // compile 'commons-io:commons-io:1.3.2'
+    compile group: 'commons-io', name: 'commons-io', version: '2.4'
 
+    // Android M permissions
+    compile 'com.greysonparrelli.permiso:permiso:0.1.3'
 }
+
+

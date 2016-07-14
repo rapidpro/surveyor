@@ -15,15 +15,17 @@
             android:layout_height="wrap_content" android:orientation="horizontal">
 
             <Button style="?android:textAppearanceSmall"
-                    android:id="@+id/button_pending"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/pending"
-                    android:textColor="@color/pending_button_text"
-                    android:onClick="onClickSubmit"
-                    android:textSize="18dp"
-                    android:text="3,122"
-                    android:textStyle="bold" />
+                android:minHeight="0dp"
+                android:minWidth="80dp"
+                android:id="@+id/button_pending"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/tertiary_button"
+                android:textColor="@color/pending_button_text"
+                android:onClick="onClickSubmit"
+                android:textSize="18dp"
+                android:text="3,122"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_marginTop="-10dp"
@@ -32,7 +34,9 @@
                 android:textColor="@color/pending_text"
                 android:textSize="15sp"
                 android:paddingEnd="5dp"
-                android:layout_marginLeft="12dp"
+                android:paddingStart="5dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
                 android:text="@string/pending_summary"/>
 
         </LinearLayout>

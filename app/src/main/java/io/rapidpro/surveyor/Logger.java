@@ -30,6 +30,7 @@ public class Logger {
 
     public void e(String message, Throwable t) {
         Log.e(TAG, message, t);
+        t.printStackTrace();
     }
 
     public void v(String message) {

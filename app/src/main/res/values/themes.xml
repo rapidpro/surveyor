@@ -2,6 +2,7 @@
 <resources>
     <style name="RapidTheme" parent="RapidTheme.Base"/>
     <style name="RapidTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowBackground">@color/background</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/primary_lightest</item>
@@ -12,4 +13,15 @@
         <item name="colorControlNormal">@color/primary_lightest</item>
         <!-- colorControlActivated & colorControlHighlight use the colorAccent color by default -->
     </style>
+
+
+    <style name="RapidTheme.FullScreen" parent="@style/RapidTheme.Base">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+
+
 </resources>

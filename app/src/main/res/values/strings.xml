@@ -22,6 +22,7 @@
     <string name="title_activity_org">Organization</string>
     <string name="title_activity_flow_list">Download Flow</string>
     <string name="title_activity_flowrun">Flow Run</string>
+    <string name="title_activity_create_account">Create Account</string>
     <string name="error_org_missing">Org couldn\'t be found</string>
 
     <string name="icon_error">\ue000</string>
@@ -863,6 +864,41 @@
     <string name="one_moment">One Moment</string>
     <string name="delete_body">Deleting flow and all submissions..</string>
     <string name="unsupported_version">This flow needs a newer version of the Surveyor application. Would you like to download the latest version?</string>
-
+    <string name="please_login_again">Please login to your account again.</string>
+    <string name="action_send_debug">Bug Report</string>
+    <string name="confirm_bug_report">Oops, it looks like Surveyor is having difficulty with this flow. Would you like to send a bug report so we can look into it?</string>
+    <string name="transition_chat">transition_chat</string>
+    <string name="title_activity_video">Capture Video</string>
+    <string name="intro_message">Intro message</string>
+    <string name="stop">Stop Recording</string>
+    <string name="record">Record</string>
+    <string name="camera_error">Camera Error</string>
+    <string name="description_info">Description info</string>
+    <string name="tag_url">tag_url</string>
+    <string name="tag_handler">tag_handler</string>
+    <string name="tag_media_type">tag_media_type</string>
+    <string name="media_image">media_image</string>
+    <string name="media_video">media_video</string>
+    <string name="media_audio">media_audio</string>
+    <string name="tap_to_record">Tap to Record</string>
+    <string name="tap_to_stop">Recording. Tap to stop.</string>
+    <string name="title_audio_activity">Record Audio</string>
+    <string name="quit">Quit</string>
+    <string name="settings">Settings</string>
+    <string name="permission_storage">We need access to your storage in order to save your surveys that are in progress.</string>
+    <string name="title_permissions">Permission</string>
+    <string name="permission_camera">We need permission to access to the camera in order for you to record videos for your surveys.</string>
+    <string name="permission_contacts">Surveyor can access your contacts to help you fill out the login form. This permission is not required.</string>
+    <string name="permission_location">This survey requires access to your location to continue.</string>
+    <string name="location_unavailable">Your location is not currently available. Please try again.</string>
+    <string name="media_location">media_location</string>
+    <string name="made_recording">Made Recording</string>
+    <string name="error_invalid_host">Sorry, that is not a valid host. Try again.</string>
+    <string name="request_photo">Take a Photo</string>
+    <string name="request_video">Record a Video</string>
+    <string name="request_audio">Make a Recording</string>
+    <string name="request_location">Share Location</string>
+    <string name="web_load_failure">Check your network connection and try again.</string>
+    <string name="error_network">Could not contact server. Check your network connection and try again.</string>
 
 </resources>

@@ -1,12 +1,25 @@
 package io.rapidpro.surveyor;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import com.jakewharton.threetenabp.AndroidThreeTen;
+import io.rapidpro.surveyor.net.TembaService;
+import android.text.Editable;
+import android.widget.Toast;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
-import io.rapidpro.surveyor.net.RapidProService;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+
+import io.rapidpro.surveyor.activity.LoginActivity;
+import io.rapidpro.surveyor.activity.OrgListActivity;
+import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.net.TembaService;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -17,14 +30,19 @@ public class Surveyor extends Application {
     private static Surveyor s_this;
 
     private SharedPreferences m_prefs = null;
-    private RapidProService m_rapidProService = null;
+    private TembaService m_tembaService = null;
     private RealmConfiguration m_realmConfig;
 
     @Override
     public void onCreate() {
         super.onCreate();
         s_this = this;
-        updatePrefs();
+
+        try {
+            updatePrefs();
+        } catch (TembaException e) {
+            resetPrefs();
+        }
 
         m_realmConfig = new RealmConfiguration.Builder(this).build();
 
@@ -41,6 +59,16 @@ public class Surveyor extends Application {
         return s_this;
     }
 
+    public Realm getRealm() {
+        try {
+            return Realm.getDefaultInstance();
+        } catch (Throwable t) {
+            Surveyor.LOG.d("Invalid database, reinstall required");
+            Realm.deleteRealm(Surveyor.get().getRealmConfig());
+            return Realm.getDefaultInstance();
+        }
+    }
+
     public RealmConfiguration getRealmConfig() {
         return m_realmConfig;
     }
@@ -52,15 +80,26 @@ public class Surveyor extends Application {
         return m_prefs;
     }
 
+    public void resetPrefs() {
+        getPreferences().edit().clear().commit();
+        updatePrefs();
+    }
     public void updatePrefs() {
         BASE_URL = getPreferences().getString("pref_key_host", getString(R.string.pref_default_host));
-        m_rapidProService = null;
+        m_tembaService = null;
+
+        // try to create our accessor
+        getRapidProService();
     }
 
-    public RapidProService getRapidProService() {
-        if (m_rapidProService == null) {
-            m_rapidProService = new RapidProService();
+    public TembaService getRapidProService(String host) {
+        return new TembaService(host);
+    }
+
+    public TembaService getRapidProService() {
+        if (m_tembaService == null) {
+            m_tembaService = getRapidProService(Surveyor.BASE_URL);
         }
-        return m_rapidProService;
+        return m_tembaService;
     }
 }

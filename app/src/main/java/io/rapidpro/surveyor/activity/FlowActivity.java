@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -18,14 +19,15 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.Submission;
+import io.rapidpro.surveyor.net.Definitions;
 import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class FlowActivity extends BaseActivity {
 
@@ -92,28 +94,44 @@ public class FlowActivity extends BaseActivity {
                         m_refreshProgress.show();
 
                         // go fetch our DBFlow definition async
-                        getRapidProService().getFlowDefinition(flow, new Callback<FlowDefinition>() {
+                        getRapidProService().getFlowDefinition(flow, new Callback<Definitions>() {
                             @Override
-                            public void success(FlowDefinition definition, Response response) {
-                                Realm realm = getRealm();
-                                realm.beginTransaction();
-                                flow.setDefinition(new String(((TypedByteArray) response.getBody()).getBytes()));
-                                flow.setRevision(definition.metadata.revision);
-                                flow.setName(definition.metadata.name);
-                                flow.setQuestionCount(definition.rule_sets.size());
-                                realm.copyToRealmOrUpdate(flow);
-                                realm.commitTransaction();
+                            public void onResponse(Call<Definitions> call, Response<Definitions> response) {
 
-                                refresh();
+                                if (response.isSuccessful()) {
+                                    Realm realm = getRealm();
+                                    realm.beginTransaction();
 
-                                m_refreshProgress.incrementProgressBy(1);
-                                m_refreshProgress.hide();
-                                m_refreshProgress = null;
+                                    Definitions definitions = response.body();
+
+                                    for (FlowDefinition def : definitions.flows) {
+                                        if (def.metadata.uuid.equals(flow.getUuid())) {
+                                            flow.setRevision(def.metadata.revision);
+                                            flow.setName(def.metadata.name);
+                                            flow.setQuestionCount(def.rule_sets.size());
+                                        }
+                                    }
+
+                                    flow.setDefinition(definitions.toString());
+                                    realm.commitTransaction();
+                                    refresh();
+
+                                    m_refreshProgress.incrementProgressBy(1);
+                                    m_refreshProgress.hide();
+                                    m_refreshProgress = null;
+                                } else {
+                                    //
+                                    new FetchLegacyDefinition(FlowActivity.this, flow.getUuid(), m_refreshProgress).execute();
+                                }
                             }
 
                             @Override
-                            public void failure(RetrofitError error) {
-                                Surveyor.LOG.e("Failure fetching: " + error.getMessage() + " BODY: " + error.getBody(), error.getCause());
+                            public void onFailure(Call<Definitions> call, Throwable t) {
+                                Surveyor.LOG.e("Failure fetching flow", t);
+                                m_refreshProgress.hide();
+                                m_refreshProgress = null;
+                                Toast.makeText(FlowActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+
                             }
                         });
                     }

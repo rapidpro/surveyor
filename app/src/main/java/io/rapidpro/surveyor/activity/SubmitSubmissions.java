@@ -8,7 +8,6 @@ import java.io.File;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.ui.BlockingProgress;
-import retrofit.RetrofitError;
 
 /**
  * AsyncTask for sending submissions to the server
@@ -30,14 +29,13 @@ class SubmitSubmissions extends AsyncTask<String, Void, Void> {
     protected Void doInBackground(String... params) {
 
         for (File submission : m_submissions) {
-            Submission sub = Submission.load(submission);
+            Submission sub = Submission.load(m_activity.getUsername(), submission);
             if (sub != null) {
                 try {
                     sub.submit();
-                } catch (RetrofitError e) {
-                    Surveyor.LOG.e("Failed to submit flow run", e);
-                    m_error = m_activity.getRapidProService().getErrorMessage(e);
-                    return null;
+                } catch (Throwable t) {
+                    Surveyor.LOG.e("Failed to submit flow run", t);
+                    m_error = m_activity.getRapidProService().getErrorMessage(t);
                 }
             }
 

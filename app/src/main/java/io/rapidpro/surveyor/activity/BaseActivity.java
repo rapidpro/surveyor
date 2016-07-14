@@ -2,14 +2,28 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.ShareCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 
+
+import com.greysonparrelli.permiso.Permiso;
+import com.greysonparrelli.permiso.PermisoActivity;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.List;
+
+
+import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
@@ -17,7 +31,7 @@ import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
-import io.rapidpro.surveyor.net.RapidProService;
+import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
 
@@ -26,7 +40,7 @@ import io.realm.Realm;
  * which provides convenience methods for transferring state
  * between activities and the like.
  */
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends PermisoActivity {
 
     private DBOrg m_org;
     private DBFlow m_flow;
@@ -38,10 +52,81 @@ public class BaseActivity extends AppCompatActivity {
         return (Surveyor)getApplication();
     }
 
+    public boolean validateLogin() {
+        return true;
+    }
+
+    /**
+     * Logs in a user for the given orgs
+     */
+    public void login(String email, List<DBOrg> orgs) {
+        Realm realm = getRealm();
+        realm.beginTransaction();
+        realm.where(DBOrg.class).findAll().clear();
+
+        // add our orgs, make sure we don't consider duplicates
+        HashSet<Integer> added = new HashSet<>();
+        for (DBOrg org : orgs) {
+            if (added.add(org.getId())) {
+                realm.copyToRealm(org);
+            }
+        }
+
+        realm.commitTransaction();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(SurveyorIntent.PREF_USERNAME, email);
+        editor.apply();
+
+        startActivity(new Intent(this, OrgListActivity.class));
+        finish();
+    }
+
+    public void logout() {
+        logout(-1);
+    }
+
+
+    /**
+     * Logs the user out and returns them to the login page
+     */
+    public void logout(int error) {
+
+        Realm realm = getRealm();
+        realm.beginTransaction();
+        realm.clear(DBFlow.class);
+        realm.clear(DBOrg.class);
+        realm.commitTransaction();
+
+        Submission.clear();
+        OrgDetails.clear();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        if (error != -1) {
+            intent.putExtra(SurveyorIntent.EXTRA_ERROR, getString(error));
+        }
+        startActivity(intent);
+
+        finish();
+    }
+
+    public String getUsername() {
+        return PreferenceManager.getDefaultSharedPreferences(this).getString(SurveyorIntent.PREF_USERNAME, null);
+    }
+
+    public boolean isLoggedIn() {
+        return getUsername() != null;
+    }
 
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
+
+        // check if they are properly logged in
+        if (validateLogin() && !isLoggedIn()) {
+            logout();
+        }
     }
 
     public void finish() {
@@ -54,7 +139,6 @@ public class BaseActivity extends AppCompatActivity {
         super.setContentView(layoutResID);
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -64,6 +148,12 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+
+        // show the settings menu always in debug mode
+        if (BuildConfig.DEBUG) {
+            menu.findItem(R.id.action_settings).setVisible(true);
+        }
+
         return true;
     }
 
@@ -74,27 +164,64 @@ public class BaseActivity extends AppCompatActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         } else if (id == R.id.action_logout) {
-            Realm realm = getRealm();
-            realm.beginTransaction();
-            realm.clear(DBFlow.class);
-            realm.clear(DBOrg.class);
-            realm.commitTransaction();
-            finish();
-
-            PreferenceManager.getDefaultSharedPreferences(this).edit().remove(SurveyorIntent.PREF_LOGGED_IN).commit();
-
-            Submission.clear();
-            OrgDetails.clear();
-
-            startActivity(new Intent(this, LoginActivity.class));
+            logout();
             return true;
+        } else if (id == R.id.action_debug) {
+            sendBugReport();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void sendBugReport(){
+
+        // Log our build and device details
+        StringBuilder info = new StringBuilder();
+        info.append("Version: " + BuildConfig.VERSION_NAME + "; " + BuildConfig.VERSION_CODE);
+        info.append("\n  OS: " + System.getProperty("os.version") + " (API " + Build.VERSION.SDK_INT + ")");
+        info.append("\n  Model: " + android.os.Build.MODEL  + " (" + android.os.Build.DEVICE + ")");
+        Surveyor.LOG.d(info.toString());
+
+        // Generate a logcat file
+        File outputFile = new File(Environment.getExternalStorageDirectory(), "surveyor-debug.txt");
+
+        try {
+            Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E Surveyor:*\" ");
+        } catch (Throwable t) {
+            Surveyor.LOG.e("Failed to generate report", t);
+        }
+
+        ShareCompat.IntentBuilder.from(this)
+                .setType("message/rfc822")
+                .addEmailTo("support@rapidpro.io")
+                .setSubject("Surveyor Bug Report")
+                .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
+                .setStream(Uri.fromFile(outputFile))
+                .setChooserTitle("Send Email")
+                .startChooser();
+    }
+
+    public void showSendBugReport() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.confirm_bug_report))
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        sendBugReport();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
     }
 
     protected void onResume() {
         super.onResume();
         Surveyor.LOG.d(getClass().getSimpleName() + ".onResume()");
+
     }
 
     protected void onPause() {
@@ -108,7 +235,7 @@ public class BaseActivity extends AppCompatActivity {
 
     public ViewCache getViewCache() {
         if (m_viewCache == null) {
-            m_viewCache = new ViewCache(findViewById(android.R.id.content));
+            m_viewCache = new ViewCache(this, findViewById(android.R.id.content));
         }
         return m_viewCache;
     }
@@ -143,18 +270,12 @@ public class BaseActivity extends AppCompatActivity {
 
     public Realm getRealm() {
         if (m_realm == null) {
-            try {
-                m_realm = Realm.getDefaultInstance();
-            } catch (Throwable t) {
-                Surveyor.LOG.d("Invalid database, reinstall required");
-                Realm.deleteRealm(Surveyor.get().getRealmConfig());
-                m_realm = Realm.getDefaultInstance();
-            }
+            m_realm = Surveyor.get().getRealm();
         }
         return m_realm;
     }
 
-    public RapidProService getRapidProService() {
+    public TembaService getRapidProService() {
         return getSurveyor().getRapidProService();
     }
 
@@ -199,6 +320,9 @@ public class BaseActivity extends AppCompatActivity {
 
         dialog.show();
         return dialog;
+    }
 
+    public void showRationaleDialog(int body, Permiso.IOnRationaleProvided callback) {
+        Permiso.getInstance().showRationaleInDialog(getString(R.string.title_permissions), getString(body), null, callback);
     }
 }
