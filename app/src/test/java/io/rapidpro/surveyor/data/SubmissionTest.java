@@ -44,7 +44,7 @@ public class SubmissionTest extends TestCase {
         for (Step step : migrated.m_steps){
             assertEquals("adbd4e14-f294-4c80-ba75-edeaea3f420d", step.getFlow().getUuid());
             if (step.getRuleResult() != null) {
-                assertEquals("adbd4e14-f294-4c80-ba75-edeaea3f420d", step.getRuleResult().getFlowUuid());
+                assertEquals("adbd4e14-f294-4c80-ba75-edeaea3f420d", step.getRuleResult().getFlow().getUuid());
             }
         }
 

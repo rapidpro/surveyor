@@ -45,6 +45,11 @@ public interface TembaAPI {
             @Header("Authorization") String token,
             @Query("flow_uuid") String uuid);
 
+    @GET("/api/v1/flow_definition.json")
+    Call<FlowDefinition> getLegacyFlowDefinition(
+            @Header("Authorization") String token,
+            @Query("uuid") String uuid);
+
     @POST("/api/v1/steps.json")
     Call<JsonObject> addResults(
             @Header("Authorization") String token,

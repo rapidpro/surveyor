@@ -5,8 +5,6 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import java.io.IOException;
-
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.DBFlow;
@@ -58,8 +56,6 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
     @Override
     public void onRapidFlowSelection(final DBFlow flow) {
 
-        Surveyor.LOG.d("DBFlow selected: " + flow.getName());
-
         // save which org this DBFlow came from
         flow.setOrg(getDBOrg());
 
@@ -73,32 +69,35 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         getRapidProService().getFlowDefinition(flow, new Callback<Definitions>() {
             @Override
             public void onResponse(Call<Definitions> call, Response<Definitions> response) {
-                Definitions definition = response.body();
-                realm.beginTransaction();
-                flow.setDefinition(definition.toString());
 
-                Definitions definitions = response.body();
+                if (response.isSuccessful()) {
+                    Definitions definition = response.body();
+                    realm.beginTransaction();
+                    flow.setDefinition(definition.toString());
 
-                for (FlowDefinition def : definitions.flows) {
-                    if (def.metadata.uuid.equals(flow.getUuid())) {
-                        flow.setRevision(def.metadata.revision);
-                        flow.setName(def.metadata.name);
-                        flow.setQuestionCount(def.rule_sets.size());
+                    Definitions definitions = response.body();
+
+                    for (FlowDefinition def : definitions.flows) {
+                        if (def.metadata.uuid.equals(flow.getUuid())) {
+                            flow.setRevision(def.metadata.revision);
+                            flow.setName(def.metadata.name);
+                            flow.setQuestionCount(def.rule_sets.size());
+                        }
                     }
+
+                    flow.setDefinition(definitions.toString());
+
+                    realm.copyToRealmOrUpdate(flow);
+                    realm.commitTransaction();
+                } else {
+                    new FetchLegacyDefinition(RapidFlowsActivity.this, flow.getUuid(), null).execute();
                 }
-
-                flow.setDefinition(definitions.toString());
-
-                realm.copyToRealmOrUpdate(flow);
-                realm.commitTransaction();
             }
 
             @Override
             public void onFailure(Call<Definitions> call, Throwable t) {
                 Surveyor.LOG.e("Failure fetching: " + t.getMessage(), t);
             }
-
         });
-
     }
 }

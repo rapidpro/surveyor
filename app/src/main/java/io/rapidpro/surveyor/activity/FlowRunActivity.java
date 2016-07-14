@@ -232,7 +232,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
             m_runState = RunnerUtil.getRunState(m_runner, getDBFlow(), details.getFields());
 
             // if our contact creation is per login, add their urn
-            JsonObject metadata = m_runState.getFlow().getMetadata();
+            JsonObject metadata = m_runState.getActiveFlow().getMetadata();
             if (metadata.has("contact_creation")) {
                 String contactCreation = metadata.get("contact_creation").toString();
                 if (contactCreation != null) {
