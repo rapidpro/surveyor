@@ -151,7 +151,10 @@ public class BaseActivity extends PermisoActivity {
 
         // show the settings menu always in debug mode
         if (BuildConfig.DEBUG) {
-            menu.findItem(R.id.action_settings).setVisible(true);
+            MenuItem menuItem = menu.findItem(R.id.action_settings);
+            if (menuItem != null) {
+                menuItem.setVisible(true);
+            }
         }
 
         return true;
