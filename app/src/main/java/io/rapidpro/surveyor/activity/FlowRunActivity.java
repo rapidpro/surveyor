@@ -270,7 +270,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_run, menu);
-        menu.findItem(R.id.action_cancel).setVisible(!m_submission.isCompleted());
+        menu.findItem(R.id.action_cancel).setVisible(m_submission != null && !m_submission.isCompleted());
         return true;
     }
 
