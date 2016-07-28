@@ -22,7 +22,9 @@ import java.util.concurrent.TimeUnit;
 
 import io.rapidpro.flows.runner.Contact;
 import io.rapidpro.flows.runner.Field;
+import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.ResponseException;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.TembaException;
 import io.rapidpro.surveyor.data.DBFlow;
@@ -69,7 +71,9 @@ public class TembaService {
 
     public DBOrg getOrg() {
         try {
-            return m_api.getOrg(getToken()).execute().body();
+            Response<DBOrg> response = m_api.getOrg(getToken()).execute();
+            checkResponse(response);
+            return response.body();
         } catch (IOException e) {
             throw new TembaException(e);
         }
@@ -79,6 +83,7 @@ public class TembaService {
         m_api.getFlows(getToken(), "S", false).enqueue(new Callback<FlowList>() {
             @Override
             public void onResponse(Call<FlowList> call, Response<FlowList> response) {
+                checkResponse(response);
                 m_flowList = response.body();
                 callback.onResponse(call, response);
             }
@@ -97,6 +102,7 @@ public class TembaService {
     public Definitions getLegacyFlowDefinition(String flowUuid) {
         try {
             Response<FlowDefinition> flowDefinitionResponse = m_api.getLegacyFlowDefinition(getToken(), flowUuid).execute();
+            checkResponse(flowDefinitionResponse);
             FlowDefinition def = flowDefinitionResponse.body();
             Definitions definitions = new Definitions();
             definitions.version = def.version;
@@ -119,6 +125,8 @@ public class TembaService {
         m_api.getFlowDefinition(getToken(), flow.getUuid()).enqueue(new Callback<Definitions>() {
             @Override
             public void onResponse(final Call<Definitions> call, final Response<Definitions> response) {
+                checkResponse(response);
+
                 realm.beginTransaction();
                 flow.setFetching(false);
                 realm.commitTransaction();
@@ -144,12 +152,48 @@ public class TembaService {
         }
 
         try {
-            JsonObject result = m_api.addContact(getToken(), contact.toJson()).execute().body();
-            String uuid = result.get("uuid").getAsString();
+            Response<JsonObject> result = m_api.addContact(getToken(), contact.toJson()).execute();
+
+            checkResponse(result);
+
+            String uuid = result.body().get("uuid").getAsString();
             contact.setUuid(uuid);
             return contact;
+
         } catch (IOException e) {
             throw new TembaException(e);
+        }
+    }
+
+    public void checkResponse(Response<?> response) {
+
+        if (!response.isSuccessful()) {
+
+            String errorBody;
+            try {
+                errorBody = response.errorBody().string();
+            } catch (Exception e) {
+                throw new TembaException(e);
+            }
+
+            // make a note of the error in our log
+            Surveyor.LOG.d(errorBody);
+
+            // see if the server had anything interesting to say
+            JsonObject error = JsonUtils.getGson().fromJson(errorBody, JsonObject.class);
+            if (error != null) {
+                JsonElement detail = error.get("detail");
+                if (detail != null) {
+
+                    String message = detail.getAsString();
+                    if (message.equals("Invalid token")) {
+                        message = "Login failure, please logout and try again.";
+                    }
+                    throw new ResponseException(message);
+                }
+            }
+
+            throw new TembaException("Error reading response");
         }
     }
 
@@ -168,12 +212,15 @@ public class TembaService {
         RequestBody extBody = RequestBody.create(MediaType.parse("text/plain"), extension);
         map.put("extension", extBody);
 
+        Response<JsonObject> result;
         try {
-            JsonObject result = m_api.uploadMedia(getToken(), map).execute().body();
-            return result.get("location").getAsString();
+            result = m_api.uploadMedia(getToken(), map).execute();
+            checkResponse(result);
         } catch (IOException e) {
-            throw new TembaException(e);
+            throw new TembaException("Error uploading media", e);
         }
+
+        return result.body().get("location").getAsString();
     }
 
     public void addResults(final Submission submission) {
@@ -293,11 +340,9 @@ public class TembaService {
     }
 
     public int getErrorMessage(Throwable t) {
-
         if (t == null) {
             return R.string.error_server_not_found;
         }
-
         return R.string.error_server_failure;
     }
 

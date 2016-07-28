@@ -12,8 +12,8 @@ android {
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 21
-        versionName "1.3"
+        versionCode 22
+        versionName "1.3.1"
         multiDexEnabled = true
     }
     buildTypes {
