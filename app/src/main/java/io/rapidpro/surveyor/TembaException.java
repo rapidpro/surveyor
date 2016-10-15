@@ -9,4 +9,8 @@ public class TembaException extends RuntimeException {
     public TembaException (Exception e) {
         super(e);
     }
+
+    public TembaException(String message, Exception e) {
+        super(message, e);
+    }
 }

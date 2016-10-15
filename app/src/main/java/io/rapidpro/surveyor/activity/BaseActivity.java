@@ -66,9 +66,14 @@ public class BaseActivity extends PermisoActivity {
 
         // add our orgs, make sure we don't consider duplicates
         HashSet<Integer> added = new HashSet<>();
+
+        HashSet<String> tokens = new HashSet<>();
         for (DBOrg org : orgs) {
             if (added.add(org.getId())) {
-                realm.copyToRealm(org);
+                // don't add a token more than once
+                if (tokens.add(org.getToken())) {
+                    realm.copyToRealm(org);
+                }
             }
         }
 
@@ -151,7 +156,10 @@ public class BaseActivity extends PermisoActivity {
 
         // show the settings menu always in debug mode
         if (BuildConfig.DEBUG) {
-            menu.findItem(R.id.action_settings).setVisible(true);
+            MenuItem menuItem = menu.findItem(R.id.action_settings);
+            if (menuItem != null) {
+                menuItem.setVisible(true);
+            }
         }
 
         return true;

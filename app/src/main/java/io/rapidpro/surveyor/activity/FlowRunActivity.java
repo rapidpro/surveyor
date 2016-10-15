@@ -30,6 +30,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.greysonparrelli.permiso.Permiso;
 
@@ -234,9 +235,9 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
             // if our contact creation is per login, add their urn
             JsonObject metadata = m_runState.getActiveFlow().getMetadata();
             if (metadata.has("contact_creation")) {
-                String contactCreation = metadata.get("contact_creation").toString();
-                if (contactCreation != null) {
-                    if ("login".equals(contactCreation)) {
+                JsonElement contactCreation = metadata.get("contact_creation");
+                if (!contactCreation.isJsonNull()) {
+                    if ("login".equals(contactCreation.getAsString())) {
                         m_runState.getContact().getUrns().add(ContactUrn.fromString("mailto:" + getUsername()));
                     }
                 }
@@ -269,7 +270,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_run, menu);
-        menu.findItem(R.id.action_cancel).setVisible(!m_submission.isCompleted());
+        menu.findItem(R.id.action_cancel).setVisible(m_submission != null && !m_submission.isCompleted());
         return true;
     }
 

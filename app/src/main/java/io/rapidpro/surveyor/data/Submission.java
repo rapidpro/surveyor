@@ -32,6 +32,7 @@ import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.flows.utils.Jsonizable;
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.TembaException;
 import io.rapidpro.surveyor.activity.FlowRunActivity;
 import io.rapidpro.surveyor.net.TembaService;
 
@@ -484,7 +485,7 @@ public class Submission implements Jsonizable {
         }
     }
 
-    public void submit() throws IOException {
+    public void submit() {
         final TembaService rapid = Surveyor.get().getRapidProService();
         final Submission submission = this;
 
@@ -498,6 +499,7 @@ public class Submission implements Jsonizable {
         // then post the results
         submission.resolveMedia();
         rapid.addResults(submission);
+
     }
 
     public void delete() {
