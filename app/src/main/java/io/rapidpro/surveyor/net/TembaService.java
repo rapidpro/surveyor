@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import io.rapidpro.flows.runner.Contact;
 import io.rapidpro.flows.runner.Field;
 import io.rapidpro.flows.utils.JsonUtils;
+import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.ResponseException;
 import io.rapidpro.surveyor.Surveyor;
@@ -37,6 +38,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Converter;
@@ -304,22 +306,32 @@ public class TembaService {
             }
         }).registerTypeAdapterFactory(new FlowListTypeAdapterFactory()).create();
 
-        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .readTimeout(60, TimeUnit.SECONDS)
-                .connectTimeout(60, TimeUnit.SECONDS)
-                .build();
+                .connectTimeout(60, TimeUnit.SECONDS);
+
+        // add extra logging for debug mode
+        if (BuildConfig.DEBUG) {
+            builder.addInterceptor(interceptor);
+        }
+
+        final OkHttpClient okHttpClient = builder.build();
 
         try {
             m_retrofit = new Retrofit.Builder()
                     .baseUrl(host)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(okHttpClient)
+
                     .build();
         } catch (IllegalArgumentException e) {
             throw new TembaException(e);
         }
 
-        // .setLogLevel(RestAdapter.LogLevel.FULL)
         return m_retrofit.create(TembaAPI.class);
     }
 
