@@ -11,7 +11,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.adapter.OrgListAdapter;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.realm.RealmResults;

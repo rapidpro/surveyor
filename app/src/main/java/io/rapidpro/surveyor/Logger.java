@@ -20,10 +20,6 @@ package io.rapidpro.surveyor;
 
 import android.util.Log;
 
-import com.google.gson.JsonObject;
-
-import retrofit2.Response;
-
 public class Logger {
 
     public static final String TAG = "Surveyor";

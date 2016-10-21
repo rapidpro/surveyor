@@ -9,11 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.ui.CachedLinearLayout;

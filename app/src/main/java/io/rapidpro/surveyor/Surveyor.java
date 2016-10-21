@@ -1,24 +1,11 @@
 package io.rapidpro.surveyor;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import com.jakewharton.threetenabp.AndroidThreeTen;
-import io.rapidpro.surveyor.net.TembaService;
-import android.text.Editable;
-import android.widget.Toast;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-
-import io.rapidpro.surveyor.activity.LoginActivity;
-import io.rapidpro.surveyor.activity.OrgListActivity;
-import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.net.TembaService;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
