@@ -6,7 +6,7 @@ android {
     }
 
     compileSdkVersion 23
-    buildToolsVersion "22.0.1"
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "io.rapidpro.surveyor"
@@ -63,7 +63,7 @@ dependencies {
     compile 'com.neovisionaries:nv-i18n:1.11'
 
     // our flow engine
-    compile ('io.rapidpro:flows:1.3') {
+    compile ('io.rapidpro:flows:1.3.3') {
         // exclude threeten since it is inefficient in android land
         exclude group: 'org.threeten'
     }
