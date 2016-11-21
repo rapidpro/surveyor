@@ -11,9 +11,6 @@ import io.rapidpro.surveyor.data.DBOrg;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
-/**
- * Created by eric on 8/18/15.
- */
 public class OrgListAdapter extends RealmBaseAdapter<DBOrg> implements ListAdapter {
 
     private int m_resourceId;

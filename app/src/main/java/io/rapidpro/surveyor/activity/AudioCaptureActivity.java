@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 

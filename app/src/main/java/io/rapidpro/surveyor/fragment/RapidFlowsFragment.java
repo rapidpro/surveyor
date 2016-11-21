@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.activity.BaseActivity;
 import io.rapidpro.surveyor.adapter.RapidFlowListAdapter;

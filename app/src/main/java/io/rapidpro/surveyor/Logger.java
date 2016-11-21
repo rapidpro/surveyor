@@ -41,4 +41,5 @@ public class Logger {
     public void w(String message) {
         Log.w(TAG, message);
     }
+
 }

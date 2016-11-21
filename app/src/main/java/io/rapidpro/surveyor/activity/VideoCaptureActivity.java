@@ -2,8 +2,6 @@ package io.rapidpro.surveyor.activity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -27,7 +25,6 @@ import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.fragment.OrgListFragment;
 import io.rapidpro.surveyor.ui.CameraPreview;
 import io.rapidpro.surveyor.ui.CameraUtil;
 import io.rapidpro.surveyor.ui.IconTextView;

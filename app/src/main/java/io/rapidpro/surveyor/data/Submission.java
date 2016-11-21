@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -484,7 +483,7 @@ public class Submission implements Jsonizable {
         }
     }
 
-    public void submit() throws IOException {
+    public void submit() {
         final TembaService rapid = Surveyor.get().getRapidProService();
         final Submission submission = this;
 
@@ -498,6 +497,7 @@ public class Submission implements Jsonizable {
         // then post the results
         submission.resolveMedia();
         rapid.addResults(submission);
+
     }
 
     public void delete() {
