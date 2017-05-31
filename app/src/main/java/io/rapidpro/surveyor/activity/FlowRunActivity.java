@@ -65,6 +65,7 @@ import io.rapidpro.surveyor.TembaException;
 import io.rapidpro.surveyor.data.DBAlias;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.DBLocation;
+import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.net.Definitions;
@@ -207,7 +208,12 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
                         level = 2;
                     }
 
-                    DBLocation location = realm.where(DBLocation.class).equalTo("org.id", getDBOrg().getId()).equalTo("name", input, false).equalTo("level", level).findFirst();
+                    DBOrg org = getDBOrg();
+                    DBLocation location = null;
+
+                    if (org != null) {
+                        location = realm.where(DBLocation.class).equalTo("org.id", org.getId()).equalTo("name", input, false).equalTo("level", level).findFirst();
+                    }
 
                     if (location == null) {
                         DBAlias alias = realm.where(DBAlias.class).equalTo("name", input, false).equalTo("location.level", level).findFirst();
