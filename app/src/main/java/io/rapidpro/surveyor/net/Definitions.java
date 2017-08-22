@@ -12,7 +12,7 @@ import io.rapidpro.flows.utils.Jsonizable;
  * export format for RapidPro.
  */
 public class Definitions implements Jsonizable {
-    public int version;
+    public String version;
     public List<FlowDefinition> flows;
 
     @Override
