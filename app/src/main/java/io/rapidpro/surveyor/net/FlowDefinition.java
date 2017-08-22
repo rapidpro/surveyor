@@ -10,7 +10,7 @@ public class FlowDefinition implements Jsonizable {
     public String base_language;
     public JsonArray action_sets;
     public JsonArray rule_sets;
-    public int version;
+    public String version;
     public String flow_type;
     public String entry;
 
