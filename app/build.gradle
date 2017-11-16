@@ -6,14 +6,14 @@ android {
     }
 
     compileSdkVersion 24
-    buildToolsVersion "22.0.1"
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 24
-        versionName "1.3.3"
+        versionCode 140
+        versionName "1.4.0"
         multiDexEnabled = true
     }
     buildTypes {
@@ -35,6 +35,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url "https://jitpack.io" }
+    google()
 }
 
 dependencies {
@@ -48,6 +49,7 @@ dependencies {
     compile 'com.android.support:support-v4:24.2.1'
 
     // database ORM
+    annotationProcessor 'io.realm:realm-android:0.82.1'
     compile 'io.realm:realm-android:0.82.1'
 
     // rest api
