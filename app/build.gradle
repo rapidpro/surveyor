@@ -12,8 +12,8 @@ android {
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 140
-        versionName "1.4.0"
+        versionCode 1100
+        versionName "11.0.0"
         multiDexEnabled = true
     }
     buildTypes {
@@ -66,7 +66,7 @@ dependencies {
     compile 'com.neovisionaries:nv-i18n:1.11'
 
     // our flow engine
-    compile ('io.rapidpro:flows:1.4.0') {
+    compile ('io.rapidpro:flows:11.0.0') {
         // exclude threeten since it is inefficient in android land
         exclude group: 'org.threeten'
     }
