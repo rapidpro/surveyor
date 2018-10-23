@@ -1,9 +1,10 @@
-package io.rapidpro.surveyor.activity;
+package io.rapidpro.surveyor.task;
 
 import android.os.AsyncTask;
 import android.widget.Toast;
 
 import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.activity.BaseActivity;
 import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.net.Definitions;
 import io.rapidpro.surveyor.net.FlowDefinition;

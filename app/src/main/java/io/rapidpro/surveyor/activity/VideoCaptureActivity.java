@@ -30,7 +30,7 @@ import io.rapidpro.surveyor.ui.CameraUtil;
 import io.rapidpro.surveyor.ui.IconTextView;
 
 /**
- * Activity for capturing videos
+ * Activity for capturing a video message
  */
 public class VideoCaptureActivity extends PermisoActivity {
 

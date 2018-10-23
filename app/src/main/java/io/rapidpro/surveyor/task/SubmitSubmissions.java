@@ -1,4 +1,4 @@
-package io.rapidpro.surveyor.activity;
+package io.rapidpro.surveyor.task;
 
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -7,13 +7,14 @@ import java.io.File;
 
 import io.rapidpro.surveyor.ResponseException;
 import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.activity.BaseActivity;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 
 /**
  * AsyncTask for sending submissions to the server
  */
-class SubmitSubmissions extends AsyncTask<String, Void, Void> {
+public class SubmitSubmissions extends AsyncTask<String, Void, Void> {
 
     private BaseActivity m_activity;
     private File[] m_submissions;

@@ -12,6 +12,9 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.ui.IconTextView;
 
+/**
+ * Activity for capturing an audio message
+ */
 public class AudioCaptureActivity extends BaseActivity {
 
     private boolean m_isRecording = false;

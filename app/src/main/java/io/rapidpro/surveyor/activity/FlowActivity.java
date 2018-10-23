@@ -21,6 +21,8 @@ import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.net.Definitions;
 import io.rapidpro.surveyor.net.FlowDefinition;
+import io.rapidpro.surveyor.task.FetchLegacyDefinition;
+import io.rapidpro.surveyor.task.SubmitSubmissions;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.realm.Realm;
@@ -29,6 +31,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
+/**
+ * Activity for listing flows which are available for starting or submitting results
+ */
 public class FlowActivity extends BaseActivity {
 
     private BlockingProgress m_refreshProgress;

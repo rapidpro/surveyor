@@ -15,6 +15,9 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.DBOrg;
 
+/**
+ * Activity for creating a new surveyor account
+ */
 public class CreateAccountActivity extends BaseActivity {
 
     public static final String CREATE_ACCOUNT_URL = "/org/surveyor/";
