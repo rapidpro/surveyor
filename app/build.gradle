@@ -54,13 +54,13 @@ dependencies {
 
     // rest api
     implementation 'com.squareup.retrofit2:retrofit:2.1.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.2.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.0.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.3.1'
 
     // for location services
-    implementation 'com.google.android.gms:play-services-gcm:9.6.1'
-    implementation 'com.google.android.gms:play-services-location:9.6.1'
+    implementation 'com.google.android.gms:play-services-gcm:16.0.0'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
 
     // internationalization, language iso codes
     implementation 'com.neovisionaries:nv-i18n:1.11'
