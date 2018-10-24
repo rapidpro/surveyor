@@ -1,4 +1,5 @@
-# RapidPro Surveyor
+# RapidPro Surveyor [![Build Status](https://travis-ci.org/rapidpro/surveyor.svg?branch=master)](https://travis-ci.org/rapidpro/surveyor)
+
 RapidPro ushered in a new era of flow-based SMS interaction. Flows have now allowed project managers to easily implement SMS or Voice based applications with simple drag-and-drop mechanics. To further the reach of this innovative approach, a new Android application called Surveyor that can run RapidPro Flows in an offline context and submit them at a later time when a connection is available was created.
 
 <img src="https://raw.githubusercontent.com/rapidpro/surveyor/master/screens/screen_download.png" width="150">
