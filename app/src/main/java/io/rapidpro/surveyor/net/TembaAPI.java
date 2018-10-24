@@ -31,7 +31,7 @@ public interface TembaAPI {
             @Field("password") String password,
             @Field("role") String role);
 
-    @GET("/api/v1/org.json")
+    @GET("/api/v2/org.json")
     Call<DBOrg> getOrg(@Header("Authorization") String token);
 
     @GET("/api/v1/flows.json")
