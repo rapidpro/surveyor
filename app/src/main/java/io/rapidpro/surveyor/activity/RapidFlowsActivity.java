@@ -13,7 +13,6 @@ import io.rapidpro.surveyor.fragment.RapidFlowsFragment;
 import io.rapidpro.surveyor.net.Definitions;
 import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.net.FlowList;
-import io.rapidpro.surveyor.task.FetchLegacyDefinition;
 import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -90,8 +89,6 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
 
                     realm.copyToRealmOrUpdate(flow);
                     realm.commitTransaction();
-                } else {
-                    new FetchLegacyDefinition(RapidFlowsActivity.this, flow.getUuid(), null).execute();
                 }
             }
 

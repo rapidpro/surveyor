@@ -21,7 +21,6 @@ import io.rapidpro.surveyor.data.DBFlow;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.net.Definitions;
 import io.rapidpro.surveyor.net.FlowDefinition;
-import io.rapidpro.surveyor.task.FetchLegacyDefinition;
 import io.rapidpro.surveyor.task.SubmitSubmissions;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.rapidpro.surveyor.ui.ViewCache;
@@ -124,9 +123,6 @@ public class FlowActivity extends BaseActivity {
                                     m_refreshProgress.incrementProgressBy(1);
                                     m_refreshProgress.hide();
                                     m_refreshProgress = null;
-                                } else {
-                                    //
-                                    new FetchLegacyDefinition(FlowActivity.this, flow.getUuid(), m_refreshProgress).execute();
                                 }
                             }
 
