@@ -3,7 +3,7 @@ package io.rapidpro.surveyor.data;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-public class DBAlias extends RealmObject{
+public class DBAlias extends RealmObject {
 
     @PrimaryKey
     private String id;

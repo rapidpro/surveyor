@@ -19,7 +19,6 @@ public class SubmissionTest extends TestCase {
     }
 
     public void tearDown() throws Exception {
-
     }
 
     @Test
@@ -41,7 +40,7 @@ public class SubmissionTest extends TestCase {
 
         // see that it migrated properly
         Submission migrated = Submission.load("chancellor", migratedFile);
-        for (Step step : migrated.m_steps){
+        for (Step step : migrated.m_steps) {
             assertEquals("adbd4e14-f294-4c80-ba75-edeaea3f420d", step.getFlow().getUuid());
             if (step.getRuleResult() != null) {
                 assertEquals("adbd4e14-f294-4c80-ba75-edeaea3f420d", step.getRuleResult().getFlow().getUuid());

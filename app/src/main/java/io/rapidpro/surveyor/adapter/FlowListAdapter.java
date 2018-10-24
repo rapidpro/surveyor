@@ -21,8 +21,8 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
     private int m_resourceId;
 
     public FlowListAdapter(Context context, int resourceId,
-                          RealmResults<DBFlow> realmResults,
-                          boolean automaticUpdate) {
+                           RealmResults<DBFlow> realmResults,
+                           boolean automaticUpdate) {
         super(context, realmResults, automaticUpdate);
         m_resourceId = resourceId;
     }
@@ -33,18 +33,18 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
         View row = convertView;
         ViewCache cache;
 
-        if(row == null) {
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+        if (row == null) {
+            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(m_resourceId, parent, false);
 
             cache = new ViewCache();
-            cache.titleView = (TextView)row.findViewById(R.id.text_flow_name);
-            cache.questionView = (TextView)row.findViewById(R.id.text_flow_questions);
-            cache.pendingSubmissions = (TextView)row.findViewById(R.id.text_pending_submissions);
+            cache.titleView = (TextView) row.findViewById(R.id.text_flow_name);
+            cache.questionView = (TextView) row.findViewById(R.id.text_flow_questions);
+            cache.pendingSubmissions = (TextView) row.findViewById(R.id.text_pending_submissions);
 
             row.setTag(cache);
         } else {
-            cache = (ViewCache)row.getTag();
+            cache = (ViewCache) row.getTag();
         }
 
         DBFlow flow = getItem(position);
@@ -66,7 +66,7 @@ public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAda
             questionString = "Question";
         }
 
-        cache.questionView.setText(nf.format(flow.getQuestionCount()) + " " + questionString + " (v"+ nf.format(flow.getRevision()) + ")");
+        cache.questionView.setText(nf.format(flow.getQuestionCount()) + " " + questionString + " (v" + nf.format(flow.getRevision()) + ")");
         return row;
     }
 

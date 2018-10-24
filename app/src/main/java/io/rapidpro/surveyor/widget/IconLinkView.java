@@ -10,7 +10,7 @@ import io.rapidpro.surveyor.ui.CachedLinearLayout;
 import io.rapidpro.surveyor.ui.IconTextView;
 
 
-public class IconLinkView  extends CachedLinearLayout {
+public class IconLinkView extends CachedLinearLayout {
 
     public IconLinkView(Context context) {
         super(context);

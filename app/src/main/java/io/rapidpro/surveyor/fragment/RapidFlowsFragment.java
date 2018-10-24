@@ -31,7 +31,8 @@ public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnIt
     private ListView m_listView;
     private RapidFlowListAdapter m_adapter;
 
-    public RapidFlowsFragment() {}
+    public RapidFlowsFragment() {
+    }
 
     public static RapidFlowsFragment newInstance(int orgId) {
         RapidFlowsFragment fragment = new RapidFlowsFragment();
@@ -55,13 +56,13 @@ public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnIt
         List<DBFlow> existing = getRealm().where(DBFlow.class).equalTo("org.id", orgId).findAllSorted("name");
 
         // create a quick lookup for existing DBFlows
-        Map<String,Integer> existingIds = new HashMap<>();
+        Map<String, Integer> existingIds = new HashMap<>();
         for (DBFlow flow : existing) {
             existingIds.put(flow.getUuid(), flow.getRevision());
         }
 
         // exclude any DBFlows that are already in our database
-        FlowList flowList = ((BaseActivity)getActivity()).getRapidProService().getLastFlows();
+        FlowList flowList = ((BaseActivity) getActivity()).getRapidProService().getLastFlows();
         List<DBFlow> dbFlows = new ArrayList<>();
         if (flowList != null) {
             for (DBFlow newFlow : flowList.results) {
@@ -84,7 +85,7 @@ public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnIt
         // Set the adapter
         m_listView = (ListView) view.findViewById(android.R.id.list);
 
-        ViewGroup header = (ViewGroup)inflater.inflate(R.layout.header_flow, m_listView, false);
+        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.header_flow, m_listView, false);
         m_listView.addHeaderView(header, null, false);
         m_listView.setAdapter(m_adapter);
 

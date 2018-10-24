@@ -30,17 +30,17 @@ public class RapidFlowListAdapter extends ArrayAdapter {
         View row = convertView;
         ViewCache cache;
 
-        if(row == null) {
-            LayoutInflater inflater = ((Activity)m_context).getLayoutInflater();
+        if (row == null) {
+            LayoutInflater inflater = ((Activity) m_context).getLayoutInflater();
             row = inflater.inflate(m_resource, parent, false);
 
             cache = new ViewCache();
-            cache.titleView = (TextView)row.findViewById(R.id.text_flow_name);
-            cache.questionView = (TextView)row.findViewById(R.id.text_flow_questions);
+            cache.titleView = (TextView) row.findViewById(R.id.text_flow_name);
+            cache.questionView = (TextView) row.findViewById(R.id.text_flow_questions);
 
             row.setTag(cache);
         } else {
-            cache = (ViewCache)row.getTag();
+            cache = (ViewCache) row.getTag();
         }
 
         DBFlow flow = (DBFlow) getItem(position);

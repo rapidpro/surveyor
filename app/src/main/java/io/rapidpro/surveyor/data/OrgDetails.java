@@ -33,6 +33,7 @@ public class OrgDetails implements Jsonizable {
 
     /**
      * Serializes org details JSON
+     *
      * @return the JSON
      */
     @Override
@@ -60,7 +61,7 @@ public class OrgDetails implements Jsonizable {
         }
     }
 
-    public void setFields(List<Field> fields){
+    public void setFields(List<Field> fields) {
         m_fields = fields;
     }
 
@@ -72,7 +73,7 @@ public class OrgDetails implements Jsonizable {
         m_file = file;
     }
 
-    private static File getOrgDir(DBOrg org){
+    private static File getOrgDir(DBOrg org) {
         File orgDir = new File(getOrgsDir(), "" + org.getId());
         orgDir.mkdirs();
         return orgDir;

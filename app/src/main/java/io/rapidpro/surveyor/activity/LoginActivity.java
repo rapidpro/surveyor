@@ -115,7 +115,7 @@ public class LoginActivity extends BaseActivity {
 
     private void setErrorMessage(String message) {
 
-        TextView errorBox  = (TextView) findViewById(R.id.text_error_message);
+        TextView errorBox = (TextView) findViewById(R.id.text_error_message);
         if (message != null) {
             errorBox.setVisibility(View.VISIBLE);
             errorBox.setText(message);

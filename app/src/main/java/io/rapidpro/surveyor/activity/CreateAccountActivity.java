@@ -22,7 +22,9 @@ public class CreateAccountActivity extends BaseActivity {
 
     public static final String CREATE_ACCOUNT_URL = "/org/surveyor/";
 
-    public boolean validateLogin() { return false; }
+    public boolean validateLogin() {
+        return false;
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -58,13 +60,13 @@ public class CreateAccountActivity extends BaseActivity {
                     login(user, orgs);
                 }
 
-                if (url.endsWith(CREATE_ACCOUNT_URL))  {
+                if (url.endsWith(CREATE_ACCOUNT_URL)) {
                     getViewCache().hide(R.id.web_progress);
                 }
 
             }
 
-            public void onLoadResource (WebView view, String url) {
+            public void onLoadResource(WebView view, String url) {
                 if (url.endsWith(CREATE_ACCOUNT_URL)) {
                     getViewCache().show(R.id.web_progress);
                 }
@@ -80,5 +82,5 @@ public class CreateAccountActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
-    
+
 }

@@ -30,7 +30,7 @@ public class AudioCaptureActivity extends BaseActivity {
         m_instructions = (TextView) findViewById(R.id.text_instructions);
     }
 
-    public void recordAudio () {
+    public void recordAudio() {
         m_isRecording = true;
 
         try {

@@ -401,8 +401,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
                 mediaText.setText(getString(R.string.request_location));
                 vc.hide(R.id.chat_box, true);
                 vc.show(R.id.container_request_media);
-            }
-            else {
+            } else {
                 vc.show(R.id.chat_box);
                 vc.hide(R.id.container_request_media);
             }

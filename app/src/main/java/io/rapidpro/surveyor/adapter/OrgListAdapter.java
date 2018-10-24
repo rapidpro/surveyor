@@ -16,8 +16,8 @@ public class OrgListAdapter extends RealmBaseAdapter<DBOrg> implements ListAdapt
     private int m_resourceId;
 
     public OrgListAdapter(Context context, int resourceId,
-                     RealmResults<DBOrg> realmResults,
-                     boolean automaticUpdate) {
+                          RealmResults<DBOrg> realmResults,
+                          boolean automaticUpdate) {
         super(context, realmResults, automaticUpdate);
         m_resourceId = resourceId;
     }

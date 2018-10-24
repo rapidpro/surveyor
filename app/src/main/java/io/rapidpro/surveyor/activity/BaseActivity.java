@@ -49,7 +49,7 @@ public class BaseActivity extends PermisoActivity {
     private Realm m_realm;
 
     public Surveyor getSurveyor() {
-        return (Surveyor)getApplication();
+        return (Surveyor) getApplication();
     }
 
     public boolean validateLogin() {
@@ -180,13 +180,13 @@ public class BaseActivity extends PermisoActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void sendBugReport(){
+    public void sendBugReport() {
 
         // Log our build and device details
         StringBuilder info = new StringBuilder();
         info.append("Version: " + BuildConfig.VERSION_NAME + "; " + BuildConfig.VERSION_CODE);
         info.append("\n  OS: " + System.getProperty("os.version") + " (API " + Build.VERSION.SDK_INT + ")");
-        info.append("\n  Model: " + android.os.Build.MODEL  + " (" + android.os.Build.DEVICE + ")");
+        info.append("\n  Model: " + android.os.Build.MODEL + " (" + android.os.Build.DEVICE + ")");
         Surveyor.LOG.d(info.toString());
 
         // Generate a logcat file
@@ -308,7 +308,7 @@ public class BaseActivity extends PermisoActivity {
     public Intent getIntent(Activity from, Class to) {
         Intent intent = new Intent(from, to);
         DBOrg org = getDBOrg();
-        if (org !=null) {
+        if (org != null) {
             intent.putExtra(SurveyorIntent.EXTRA_ORG_ID, org.getId());
         }
 

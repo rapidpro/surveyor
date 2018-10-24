@@ -51,7 +51,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     if ((rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) && rotation != m_lastRotation) {
                         try {
                             updateOrientation();
-                        } catch (Exception e) {}
+                        } catch (Exception e) {
+                        }
                         m_lastRotation = rotation;
                     }
                 }

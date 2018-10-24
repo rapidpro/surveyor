@@ -61,7 +61,7 @@ public class FlowActivity extends BaseActivity {
         return true;
     }
 
-    public void setFlowDetails(DBFlow flow){
+    public void setFlowDetails(DBFlow flow) {
 
         String questionString = " Questions";
         if (flow.getQuestionCount() == 1) {

@@ -51,7 +51,7 @@ public class Submission implements Jsonizable {
     private transient File m_completedFile;
 
     // fields created during this submission
-    protected HashMap<String,Field> m_fields = new HashMap<>();
+    protected HashMap<String, Field> m_fields = new HashMap<>();
 
     protected List<Step> m_steps;
 
@@ -84,7 +84,8 @@ public class Submission implements Jsonizable {
         }
     };
 
-    public Submission() {}
+    public Submission() {
+    }
 
     /**
      * Clear out all submissions for all flows
@@ -172,7 +173,7 @@ public class Submission implements Jsonizable {
     /**
      * Read the flow definition from disk
      */
-    private static Map<String,Flow> getFlows(File file) {
+    private static Map<String, Flow> getFlows(File file) {
         String revision = file.getName().split("_")[0];
         File flowFile = new File(file.getParent(), revision + "_" + FLOW_FILE);
         Surveyor.LOG.d("Reading flow: " + flowFile.getName());
@@ -189,7 +190,7 @@ public class Submission implements Jsonizable {
         JsonObject root = parser.parse(flowString).getAsJsonObject();
         root = migrateFlowToVersion9(flowUUID, root);
 
-        Map<String,Flow> flows = new HashMap<>();
+        Map<String, Flow> flows = new HashMap<>();
 
         for (JsonElement flowElement : root.get("flows").getAsJsonArray()) {
             Flow flow = Flow.fromJson(flowElement.toString());
@@ -287,6 +288,7 @@ public class Submission implements Jsonizable {
 
     /**
      * Serializes this run state to JSON
+     *
      * @return the JSON
      */
     @Override
@@ -332,9 +334,9 @@ public class Submission implements Jsonizable {
     }
 
 
-    private Map<Flow,List<Step>> getResultsMap() {
+    private Map<Flow, List<Step>> getResultsMap() {
         // build up a map for each flow to it's steps
-        Map<Flow,List<Step>> resultMap = new HashMap<>();
+        Map<Flow, List<Step>> resultMap = new HashMap<>();
         for (Step step : m_steps) {
             List<Step> steps = resultMap.get(step.getFlow());
             if (steps == null) {
@@ -348,10 +350,10 @@ public class Submission implements Jsonizable {
     }
 
     private File getUniqueFile(File dir, String name, String ext) {
-        File file =  new File(dir, name + "." + ext);
+        File file = new File(dir, name + "." + ext);
         int count = 2;
         while (file.exists()) {
-            file =  new File(dir, name + "_" + count + "." + ext);
+            file = new File(dir, name + "_" + count + "." + ext);
             count++;
         }
         return file;
@@ -518,7 +520,8 @@ public class Submission implements Jsonizable {
     public static void deleteFlowSubmissions(int orgId, String uuid) {
         try {
             FileUtils.deleteDirectory(getFlowDir(orgId, uuid));
-        } catch (IOException e) {}
+        } catch (IOException e) {
+        }
     }
 
     public File getMediaDir() {
@@ -531,6 +534,7 @@ public class Submission implements Jsonizable {
 
     /**
      * Get the prefix associated with this submission
+     *
      * @return
      */
     public String getPrefix() {

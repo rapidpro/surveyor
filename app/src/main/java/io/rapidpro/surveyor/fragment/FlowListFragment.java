@@ -25,7 +25,8 @@ public class FlowListFragment extends BaseFragment implements AbsListView.OnItem
     private ListView m_listView;
     private ListAdapter m_adapter;
 
-    public FlowListFragment() {}
+    public FlowListFragment() {
+    }
 
     public static FlowListFragment newInstance(int orgId) {
         FlowListFragment fragment = new FlowListFragment();

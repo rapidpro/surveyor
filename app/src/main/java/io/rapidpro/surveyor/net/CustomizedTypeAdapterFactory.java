@@ -29,12 +29,15 @@ public abstract class CustomizedTypeAdapterFactory<C>
         final TypeAdapter<C> delegate = gson.getDelegateAdapter(this, type);
         final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
         return new TypeAdapter<C>() {
-            @Override public void write(JsonWriter out, C value) throws IOException {
+            @Override
+            public void write(JsonWriter out, C value) throws IOException {
                 JsonElement tree = delegate.toJsonTree(value);
                 beforeWrite(value, tree);
                 elementAdapter.write(out, tree);
             }
-            @Override public C read(JsonReader in) throws IOException {
+
+            @Override
+            public C read(JsonReader in) throws IOException {
                 JsonElement tree = elementAdapter.read(in);
                 afterRead(tree);
                 return delegate.fromJsonTree(tree);

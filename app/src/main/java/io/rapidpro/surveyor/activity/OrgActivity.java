@@ -225,7 +225,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                 incrementProgress();
 
                 // finally the fields for our org
-                List<Field> fields  = rapid.getFields();
+                List<Field> fields = rapid.getFields();
                 OrgDetails details = OrgDetails.load(org);
 
                 if (details != null) {

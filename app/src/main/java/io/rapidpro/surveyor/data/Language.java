@@ -24,11 +24,13 @@ public class Language {
         }
     }
 
-    public boolean isRecognized(){
+    public boolean isRecognized() {
         return m_recognized;
     }
 
-    public String getName() { return m_name; }
+    public String getName() {
+        return m_name;
+    }
 
     public String getCode() {
         return m_iso;

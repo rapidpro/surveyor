@@ -11,6 +11,7 @@ public class CameraUtil {
 
     /**
      * Determine the rotation to apply for the preview for a given camera
+     *
      * @param mirror whether to account for profile camera mirroring or not
      */
     public static int getRotationDegrees(Activity activity, int cameraId, boolean mirror) {
@@ -18,10 +19,18 @@ public class CameraUtil {
         int degrees = 0;
 
         switch (rotation) {
-            case Surface.ROTATION_0: degrees = 0; break;
-            case Surface.ROTATION_90: degrees = 90; break;
-            case Surface.ROTATION_180: degrees = 180; break;
-            case Surface.ROTATION_270: degrees = 270; break;
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
         }
 
         android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();

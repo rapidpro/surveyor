@@ -55,7 +55,9 @@ public class TembaService {
         m_api = getAPIAccessor(host);
     }
 
-    public FlowList getLastFlows() { return m_flowList; }
+    public FlowList getLastFlows() {
+        return m_flowList;
+    }
 
     public void setToken(String token) {
         m_token = "Token " + token;
@@ -199,6 +201,7 @@ public class TembaService {
 
     /**
      * Uploads a media file and returns the remove URL
+     *
      * @param file the local file to upload
      * @return the relative path to media
      */
@@ -333,7 +336,7 @@ public class TembaService {
         return m_retrofit.create(TembaAPI.class);
     }
 
-    public APIError parseError(Response<?> response){
+    public APIError parseError(Response<?> response) {
         Converter<ResponseBody, APIError> converter =
                 m_retrofit.responseBodyConverter(APIError.class, new Annotation[0]);
 
@@ -343,7 +346,8 @@ public class TembaService {
         } catch (IOException e) {
             try {
                 error = new APIError(response.code(), response.errorBody().string());
-            } catch (IOException last) {}
+            } catch (IOException last) {
+            }
         }
 
         return error;
@@ -362,16 +366,19 @@ public class TembaService {
             super(FlowList.class);
         }
 
-        @Override protected void beforeWrite(FlowList flow, JsonElement json) {}
+        @Override
+        protected void beforeWrite(FlowList flow, JsonElement json) {
+        }
 
-        @Override protected void afterRead(JsonElement deserialized) {
+        @Override
+        protected void afterRead(JsonElement deserialized) {
             JsonObject custom = deserialized.getAsJsonObject();
             JsonArray flows = custom.get("results").getAsJsonArray();
-            for (int i=0; i<flows.size(); i++) {
+            for (int i = 0; i < flows.size(); i++) {
                 int questionCount = 0;
                 JsonObject flow = flows.get(i).getAsJsonObject();
                 JsonArray rulesets = flow.get("rulesets").getAsJsonArray();
-                for (int j=0; j<rulesets.size(); j++) {
+                for (int j = 0; j < rulesets.size(); j++) {
                     String rulesetType = rulesets.get(j).getAsJsonObject().get("ruleset_type").getAsString();
                     if (rulesetType != null && rulesetType.startsWith("wait_")) {
                         questionCount++;

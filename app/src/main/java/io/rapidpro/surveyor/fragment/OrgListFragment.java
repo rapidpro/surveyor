@@ -26,7 +26,8 @@ public class OrgListFragment extends BaseFragment implements AbsListView.OnItemC
     private ListView m_listView;
     private ListAdapter m_adapter;
 
-    public OrgListFragment() {}
+    public OrgListFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

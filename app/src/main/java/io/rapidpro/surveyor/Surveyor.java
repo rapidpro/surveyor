@@ -71,6 +71,7 @@ public class Surveyor extends Application {
         getPreferences().edit().clear().commit();
         updatePrefs();
     }
+
     public void updatePrefs() {
         BASE_URL = getPreferences().getString("pref_key_host", getString(R.string.pref_default_host));
         m_tembaService = null;
