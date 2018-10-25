@@ -247,12 +247,6 @@ public class TembaService {
         }
     }
 
-    public void addCreatedFields(HashMap<String, Field> fields) {
-        for (Field field : fields.values()) {
-            m_api.addCreatedField(getToken(), field);
-        }
-    }
-
     public List<DBLocation> getLocations() {
 
         List<DBLocation> locations = new ArrayList<>();

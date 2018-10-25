@@ -489,9 +489,6 @@ public class Submission implements Jsonizable {
         final TembaService rapid = Surveyor.get().getRapidProService();
         final Submission submission = this;
 
-        // submit any created fields
-        rapid.addCreatedFields(m_fields);
-
         // first we need to create our contact
         Surveyor.LOG.d(m_contact.toJson().toString());
         rapid.addContact(m_contact);
