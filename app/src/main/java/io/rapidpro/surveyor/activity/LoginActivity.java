@@ -29,7 +29,9 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.data.DBToken;
 import io.rapidpro.surveyor.net.APIError;
+import io.rapidpro.surveyor.net.TokenResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -191,12 +193,12 @@ public class LoginActivity extends BaseActivity {
             // perform the user login attempt.
             showProgress(true);
 
-            getRapidProService().getOrgs(email, password, new Callback<List<DBOrg>>() {
+            getRapidProService().getOrgs(email, password, new Callback<TokenResults>() {
                 @Override
-                public void onResponse(Call<List<DBOrg>> call, Response<List<DBOrg>> response) {
+                public void onResponse(Call<TokenResults> call, Response<TokenResults> response) {
 
                     if (response.isSuccessful()) {
-                        List<DBOrg> orgs = response.body();
+                        List<DBOrg> orgs = response.body().asOrgs();
                         login(email, orgs);
                     } else {
                         APIError error = getRapidProService().parseError(response);
@@ -215,7 +217,7 @@ public class LoginActivity extends BaseActivity {
                 }
 
                 @Override
-                public void onFailure(Call<List<DBOrg>> call, Throwable t) {
+                public void onFailure(Call<TokenResults> call, Throwable t) {
                     Surveyor.LOG.e("Failure logging in", t);
                     setErrorMessage(getString(R.string.error_network));
                     showProgress(false);

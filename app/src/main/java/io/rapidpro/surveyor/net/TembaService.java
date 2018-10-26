@@ -67,8 +67,8 @@ public class TembaService {
         return m_token;
     }
 
-    public void getOrgs(String email, String password, Callback<List<DBOrg>> callback) {
-        m_api.getOrgs(email, password, "S").enqueue(callback);
+    public void getOrgs(String username, String password, Callback<TokenResults> callback) {
+        m_api.getTokens(username, password, "S").enqueue(callback);
     }
 
     public DBOrg getOrg() {
