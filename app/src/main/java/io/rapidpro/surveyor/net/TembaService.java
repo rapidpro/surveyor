@@ -97,26 +97,6 @@ public class TembaService {
         });
     }
 
-
-    /**
-     * Get the flow definition, or null if it fails
-     */
-    public Definitions getLegacyFlowDefinition(String flowUuid) {
-        try {
-            Response<FlowDefinition> flowDefinitionResponse = m_api.getLegacyFlowDefinition(getToken(), flowUuid).execute();
-            checkResponse(flowDefinitionResponse);
-            FlowDefinition def = flowDefinitionResponse.body();
-            Definitions definitions = new Definitions();
-            definitions.version = def.version;
-            definitions.flows = new ArrayList<>();
-            definitions.flows.add(def);
-            return definitions;
-        } catch (IOException e) {
-            Surveyor.LOG.e("Error fetching flow definition", e);
-        }
-        return null;
-    }
-
     public void getFlowDefinition(final DBFlow flow, final Callback<Definitions> callback) {
 
         final Realm realm = Realm.getDefaultInstance();

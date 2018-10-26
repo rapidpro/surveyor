@@ -45,11 +45,6 @@ public interface TembaAPI {
             @Header("Authorization") String token,
             @Query("flow_uuid") String uuid);
 
-    @GET("/api/v1/flow_definition.json")
-    Call<FlowDefinition> getLegacyFlowDefinition(
-            @Header("Authorization") String token,
-            @Query("uuid") String uuid);
-
     @POST("/api/v1/steps.json")
     Call<JsonObject> addResults(
             @Header("Authorization") String token,
@@ -66,7 +61,7 @@ public interface TembaAPI {
             @Query("aliases") boolean aliases,
             @Query("page") int page);
 
-    @GET("/api/v1/fields.json")
+    @GET("/api/v2/fields.json")
     Call<FieldResultPage> getFieldPage(
             @Header("Authorization") String token,
             @Query("page") int page);
