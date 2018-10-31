@@ -10,11 +10,7 @@ import java.util.Map;
 
 import io.rapidpro.flows.runner.Field;
 
-public class FieldResultPage {
-    public int page;
-    public String next;
-    public String previous;
-    public List<JsonElement> results;
+public class FieldPage extends PaginatedResults<JsonElement> {
 
     private static  Map<String, Field.ValueType> m_typeMapping = new HashMap<>();
     static {
@@ -26,9 +22,9 @@ public class FieldResultPage {
         m_typeMapping.put("ward", Field.ValueType.WARD);
     }
 
-    public List<Field> getRunnerFields() {
+    public List<Field> toRunnerFields() {
         List<Field> runnerFields = new ArrayList<>();
-        for (JsonElement ele : results) {
+        for (JsonElement ele : getResults()) {
             try {
                 JsonObject obj = ele.getAsJsonObject();
                 Field field = new Field(

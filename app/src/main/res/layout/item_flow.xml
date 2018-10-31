@@ -22,15 +22,6 @@
         android:textColor="@color/secondary_lightest"
         android:textSize="18sp"/>
 
-    <TextView
-        android:id="@+id/text_flow_questions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/text_flow_name"
-        android:text="7 Questions"
-        android:textColor="@color/light_gray"
-        android:textSize="12sp"/>
-
     <io.rapidpro.surveyor.ui.IconTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,7 +33,6 @@
         android:textColor="@color/secondary_lightest"
         android:textSize="24sp"
         android:visibility="gone"/>
-
 
 </RelativeLayout>
 

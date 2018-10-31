@@ -30,8 +30,8 @@ public interface TembaAPI {
     @GET("/api/v2/org.json")
     Call<DBOrg> getOrg(@Header("Authorization") String token);
 
-    @GET("/api/v1/flows.json")
-    Call<FlowList> getFlows(
+    @GET("/api/v2/flows.json")
+    Call<FlowPage> getFlows(
             @Header("Authorization") String token,
             @Query("type") String type,
             @Query("archived") boolean archived);
@@ -58,9 +58,9 @@ public interface TembaAPI {
             @Query("page") int page);
 
     @GET("/api/v2/fields.json")
-    Call<FieldResultPage> getFieldPage(
+    Call<FieldPage> getFieldPage(
             @Header("Authorization") String token,
-            @Query("page") int page);
+            @Query("page") String cursor);
 
     @Multipart
     @POST("/api/v2/media.json")

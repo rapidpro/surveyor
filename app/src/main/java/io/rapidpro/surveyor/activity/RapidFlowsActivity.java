@@ -12,7 +12,7 @@ import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.fragment.RapidFlowsFragment;
 import io.rapidpro.surveyor.net.Definitions;
 import io.rapidpro.surveyor.net.FlowDefinition;
-import io.rapidpro.surveyor.net.FlowList;
+import io.rapidpro.surveyor.net.FlowPage;
 import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,9 +29,9 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
         final DBOrg org = getDBOrg();
         Surveyor.LOG.d("Fetching flows for " + org.getName());
 
-        getRapidProService().getFlows(new Callback<FlowList>() {
+        getRapidProService().getFlows(new Callback<FlowPage>() {
             @Override
-            public void onResponse(Call<FlowList> call, Response<FlowList> response) {
+            public void onResponse(Call<FlowPage> call, Response<FlowPage> response) {
                 if (!RapidFlowsActivity.this.isDestroyed()) {
                     setContentView(R.layout.fragment_container);
                     if (savedInstanceState == null) {
@@ -43,7 +43,7 @@ public class RapidFlowsActivity extends BaseActivity implements RapidFlowsFragme
             }
 
             @Override
-            public void onFailure(Call<FlowList> call, Throwable t) {
+            public void onFailure(Call<FlowPage> call, Throwable t) {
                 Surveyor.LOG.e("Failed fetching flows", t);
 
                 int message = getRapidProService().getErrorMessage(t);

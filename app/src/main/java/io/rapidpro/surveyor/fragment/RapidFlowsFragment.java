@@ -11,15 +11,17 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.activity.BaseActivity;
 import io.rapidpro.surveyor.adapter.RapidFlowListAdapter;
 import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.net.FlowList;
+import io.rapidpro.surveyor.net.FlowPage;
 
 public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnItemClickListener {
 
@@ -45,6 +47,7 @@ public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnIt
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         m_adapter = new RapidFlowListAdapter(getActivity(), R.layout.item_flow, getItems());
     }
 
@@ -55,19 +58,19 @@ public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnIt
         int orgId = bundle.getInt(SurveyorIntent.EXTRA_ORG_ID);
         List<DBFlow> existing = getRealm().where(DBFlow.class).equalTo("org.id", orgId).findAllSorted("name");
 
-        // create a quick lookup for existing DBFlows
-        Map<String, Integer> existingIds = new HashMap<>();
+        // create a quick lookup for already fetched DBFlows
+        Set<String> existingFlowUUIDs = new HashSet<>();
         for (DBFlow flow : existing) {
-            existingIds.put(flow.getUuid(), flow.getRevision());
+            existingFlowUUIDs.add(flow.getUuid());
         }
 
         // exclude any DBFlows that are already in our database
-        FlowList flowList = ((BaseActivity) getActivity()).getRapidProService().getLastFlows();
+        FlowPage flowPage = ((BaseActivity) getActivity()).getRapidProService().getLastFlows();
         List<DBFlow> dbFlows = new ArrayList<>();
-        if (flowList != null) {
-            for (DBFlow newFlow : flowList.results) {
+        if (flowPage != null) {
+            for (DBFlow newFlow : flowPage.getResults()) {
 
-                if (!existingIds.keySet().contains(newFlow.getUuid())) {
+                if (!existingFlowUUIDs.contains(newFlow.getUuid())) {
                     dbFlows.add(newFlow);
                 }
             }

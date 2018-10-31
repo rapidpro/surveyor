@@ -9,7 +9,15 @@ import io.rapidpro.surveyor.data.DBToken;
 
 public class TokenResults {
 
-    public List<DBToken> tokens;
+    private List<DBToken> tokens;
+
+    public List<DBToken> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(List<DBToken> tokens) {
+        this.tokens = tokens;
+    }
 
     public List<DBOrg> asOrgs() {
         List<DBOrg> orgs = new ArrayList<>();

@@ -35,8 +35,7 @@ public class RapidFlowListAdapter extends ArrayAdapter {
             row = inflater.inflate(m_resource, parent, false);
 
             cache = new ViewCache();
-            cache.titleView = (TextView) row.findViewById(R.id.text_flow_name);
-            cache.questionView = (TextView) row.findViewById(R.id.text_flow_questions);
+            cache.titleView = row.findViewById(R.id.text_flow_name);
 
             row.setTag(cache);
         } else {
@@ -46,18 +45,10 @@ public class RapidFlowListAdapter extends ArrayAdapter {
         DBFlow flow = (DBFlow) getItem(position);
         cache.titleView.setText(flow.getName());
 
-        String questionString = "Questions";
-        if (flow.getQuestionCount() == 1) {
-            questionString = "Question";
-        }
-
-        cache.questionView.setText(flow.getQuestionCount() + " " + questionString);
-
         return row;
     }
 
     public static class ViewCache {
         TextView titleView;
-        TextView questionView;
     }
 }

@@ -49,14 +49,14 @@ public class TembaService {
     private TembaAPI m_api;
     private Retrofit m_retrofit;
     private String m_token;
-    private FlowList m_flowList;
+    private FlowPage m_flowPage;
 
     public TembaService(String host) {
         m_api = getAPIAccessor(host);
     }
 
-    public FlowList getLastFlows() {
-        return m_flowList;
+    public FlowPage getLastFlows() {
+        return m_flowPage;
     }
 
     public void setToken(String token) {
@@ -81,17 +81,17 @@ public class TembaService {
         }
     }
 
-    public void getFlows(final Callback<FlowList> callback) {
-        m_api.getFlows(getToken(), "S", false).enqueue(new Callback<FlowList>() {
+    public void getFlows(final Callback<FlowPage> callback) {
+        m_api.getFlows(getToken(), "survey", false).enqueue(new Callback<FlowPage>() {
             @Override
-            public void onResponse(Call<FlowList> call, Response<FlowList> response) {
+            public void onResponse(Call<FlowPage> call, Response<FlowPage> response) {
                 checkResponse(response);
-                m_flowList = response.body();
+                m_flowPage = response.body();
                 callback.onResponse(call, response);
             }
 
             @Override
-            public void onFailure(Call<FlowList> call, Throwable t) {
+            public void onFailure(Call<FlowPage> call, Throwable t) {
                 callback.onFailure(call, t);
             }
         });
@@ -235,12 +235,12 @@ public class TembaService {
             int pageNumber = 1;
             // fetch our first page
             LocationResultPage page = m_api.getLocationPage(getToken(), true, pageNumber).execute().body();
-            locations.addAll(page.results);
+            locations.addAll(page.getResults());
 
             // fetch subsequent pages until we are done
-            while (page != null && page.next != null && page.next.trim().length() != 0) {
+            while (page != null && page.hasNext()) {
                 page = m_api.getLocationPage(getToken(), true, ++pageNumber).execute().body();
-                locations.addAll(page.results);
+                locations.addAll(page.getResults());
             }
 
             return locations;
@@ -253,14 +253,15 @@ public class TembaService {
 
         try {
             List<Field> fields = new ArrayList<>();
-            int pageNumber = 1;
-            FieldResultPage page = m_api.getFieldPage(getToken(), pageNumber).execute().body();
-            fields.addAll(page.getRunnerFields());
+            FieldPage page = null;
 
-            while (page != null && page.next != null && page.next.trim().length() != 0) {
-                page = m_api.getFieldPage(getToken(), ++pageNumber).execute().body();
-                fields.addAll(page.getRunnerFields());
-            }
+            do {
+                String cursor = page != null ? page.getNextCursor() : null;
+                page = m_api.getFieldPage(getToken(), cursor).execute().body();
+                fields.addAll(page.toRunnerFields());
+
+            } while (page.hasNext());
+
             return fields;
         } catch (IOException e) {
             throw new TembaException(e);
@@ -279,7 +280,7 @@ public class TembaService {
             public boolean shouldSkipClass(Class<?> clazz) {
                 return false;
             }
-        }).registerTypeAdapterFactory(new FlowListTypeAdapterFactory()).create();
+        }).create();
 
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -332,39 +333,5 @@ public class TembaService {
             return R.string.error_server_not_found;
         }
         return R.string.error_server_failure;
-    }
-
-
-    private class FlowListTypeAdapterFactory extends CustomizedTypeAdapterFactory<FlowList> {
-        private FlowListTypeAdapterFactory() {
-            super(FlowList.class);
-        }
-
-        @Override
-        protected void beforeWrite(FlowList flow, JsonElement json) {
-        }
-
-        @Override
-        protected void afterRead(JsonElement deserialized) {
-            JsonObject custom = deserialized.getAsJsonObject();
-            JsonArray flows = custom.get("results").getAsJsonArray();
-            for (int i = 0; i < flows.size(); i++) {
-                int questionCount = 0;
-                JsonObject flow = flows.get(i).getAsJsonObject();
-                JsonArray rulesets = flow.get("rulesets").getAsJsonArray();
-                for (int j = 0; j < rulesets.size(); j++) {
-                    String rulesetType = rulesets.get(j).getAsJsonObject().get("ruleset_type").getAsString();
-                    if (rulesetType != null && rulesetType.startsWith("wait_")) {
-                        questionCount++;
-                    }
-                }
-
-                flow.add("questionCount", new JsonPrimitive(questionCount));
-                if (questionCount == 0) {
-                    flows.remove(i);
-                    i--;
-                }
-            }
-        }
     }
 }
