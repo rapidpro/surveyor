@@ -1,4 +1,4 @@
-package io.rapidpro.surveyor.net;
+package io.rapidpro.surveyor.net.responses;
 
 import android.net.Uri;
 

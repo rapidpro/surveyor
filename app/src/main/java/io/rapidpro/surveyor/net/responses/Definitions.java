@@ -1,4 +1,4 @@
-package io.rapidpro.surveyor.net;
+package io.rapidpro.surveyor.net.responses;
 
 import com.google.gson.JsonElement;
 
@@ -6,6 +6,7 @@ import java.util.List;
 
 import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.flows.utils.Jsonizable;
+import io.rapidpro.surveyor.net.FlowDefinition;
 
 /**
  * A file containing multiple definitions, the standard

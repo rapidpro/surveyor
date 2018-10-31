@@ -68,7 +68,7 @@ import io.rapidpro.surveyor.data.DBLocation;
 import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.data.OrgDetails;
 import io.rapidpro.surveyor.data.Submission;
-import io.rapidpro.surveyor.net.Definitions;
+import io.rapidpro.surveyor.net.responses.Definitions;
 import io.rapidpro.surveyor.net.FlowDefinition;
 import io.rapidpro.surveyor.ui.IconTextView;
 import io.rapidpro.surveyor.ui.ViewCache;

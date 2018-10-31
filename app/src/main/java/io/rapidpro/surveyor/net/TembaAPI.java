@@ -6,6 +6,11 @@ import com.google.gson.JsonObject;
 import java.util.Map;
 
 import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.net.responses.Definitions;
+import io.rapidpro.surveyor.net.responses.FieldPage;
+import io.rapidpro.surveyor.net.responses.FlowPage;
+import io.rapidpro.surveyor.net.responses.LocationResultPage;
+import io.rapidpro.surveyor.net.responses.TokenResults;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -60,7 +65,7 @@ public interface TembaAPI {
     @GET("/api/v2/fields.json")
     Call<FieldPage> getFieldPage(
             @Header("Authorization") String token,
-            @Query("page") String cursor);
+            @Query("cursor") String cursor);
 
     @Multipart
     @POST("/api/v2/media.json")

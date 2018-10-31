@@ -1,4 +1,4 @@
-package io.rapidpro.surveyor.net;
+package io.rapidpro.surveyor.net.responses;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

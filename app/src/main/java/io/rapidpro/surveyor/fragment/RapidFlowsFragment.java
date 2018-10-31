@@ -10,10 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import io.rapidpro.surveyor.R;
@@ -21,7 +19,7 @@ import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.activity.BaseActivity;
 import io.rapidpro.surveyor.adapter.RapidFlowListAdapter;
 import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.net.FlowPage;
+import io.rapidpro.surveyor.net.responses.FlowPage;
 
 public class RapidFlowsFragment extends BaseFragment implements AbsListView.OnItemClickListener {
 

@@ -1,4 +1,4 @@
-package io.rapidpro.surveyor.net;
+package io.rapidpro.surveyor.net.responses;
 
 import io.rapidpro.surveyor.data.DBFlow;
 
