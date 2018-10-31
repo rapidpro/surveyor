@@ -55,7 +55,13 @@ public class TembaService {
     private FlowPage m_flowPage;
 
     public TembaService(String host) {
-        m_api = getAPIAccessor(host);
+        m_retrofit = createRetrofit(host);
+        m_api = m_retrofit.create(TembaAPI.class);
+    }
+
+    public TembaService(Retrofit retrofit, TembaAPI api) {
+        m_retrofit = retrofit;
+        m_api = api;
     }
 
     public FlowPage getLastFlows() {
@@ -271,7 +277,7 @@ public class TembaService {
         }
     }
 
-    private TembaAPI getAPIAccessor(String host) {
+    private static Retrofit createRetrofit(String host) {
 
         Gson gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
             @Override
@@ -284,7 +290,6 @@ public class TembaService {
                 return false;
             }
         }).create();
-
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -301,17 +306,14 @@ public class TembaService {
         final OkHttpClient okHttpClient = builder.build();
 
         try {
-            m_retrofit = new Retrofit.Builder()
+            return new Retrofit.Builder()
                     .baseUrl(host)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(okHttpClient)
-
                     .build();
         } catch (IllegalArgumentException e) {
             throw new TembaException(e);
         }
-
-        return m_retrofit.create(TembaAPI.class);
     }
 
     public APIError parseError(Response<?> response) {
