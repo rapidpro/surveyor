@@ -31,7 +31,8 @@ import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.net.responses.Definitions;
 import io.rapidpro.surveyor.net.responses.FieldPage;
 import io.rapidpro.surveyor.net.responses.FlowPage;
-import io.rapidpro.surveyor.net.responses.LocationResultPage;
+import io.rapidpro.surveyor.net.responses.Location;
+import io.rapidpro.surveyor.net.responses.LocationPage;
 import io.rapidpro.surveyor.net.responses.TokenResults;
 import io.realm.Realm;
 import io.realm.RealmObject;
@@ -237,20 +238,18 @@ public class TembaService {
     }
 
     public List<DBLocation> getLocations() {
-
-        List<DBLocation> locations = new ArrayList<>();
-
         try {
-            int pageNumber = 1;
-            // fetch our first page
-            LocationResultPage page = m_api.getLocationPage(getToken(), true, pageNumber).execute().body();
-            locations.addAll(page.getResults());
+            List<DBLocation> locations = new ArrayList<>();
+            LocationPage page = null;
 
-            // fetch subsequent pages until we are done
-            while (page != null && page.hasNext()) {
-                page = m_api.getLocationPage(getToken(), true, ++pageNumber).execute().body();
-                locations.addAll(page.getResults());
-            }
+            do {
+                String cursor = page != null ? page.getNextCursor() : null;
+                page = m_api.getLocationPage(getToken(), cursor).execute().body();
+                for (Location loc : page.getResults()) {
+                    locations.add(loc.toDBLocation());
+                }
+
+            } while (page.hasNext());
 
             return locations;
         } catch (IOException e) {
@@ -259,7 +258,6 @@ public class TembaService {
     }
 
     public List<Field> getFields() {
-
         try {
             List<Field> fields = new ArrayList<>();
             FieldPage page = null;

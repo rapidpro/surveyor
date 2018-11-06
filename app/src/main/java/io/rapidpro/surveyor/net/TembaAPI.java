@@ -9,7 +9,7 @@ import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.net.responses.Definitions;
 import io.rapidpro.surveyor.net.responses.FieldPage;
 import io.rapidpro.surveyor.net.responses.FlowPage;
-import io.rapidpro.surveyor.net.responses.LocationResultPage;
+import io.rapidpro.surveyor.net.responses.LocationPage;
 import io.rapidpro.surveyor.net.responses.TokenResults;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -46,21 +46,10 @@ public interface TembaAPI {
             @Header("Authorization") String token,
             @Query("flow_uuid") String uuid);
 
-    @POST("/api/v1/steps.json")
-    Call<JsonObject> addResults(
+    @GET("/api/v2/boundaries.json")
+    Call<LocationPage> getLocationPage(
             @Header("Authorization") String token,
-            @Body JsonElement submissionJson);
-
-    @POST("/api/v1/contacts.json")
-    Call<JsonObject> addContact(
-            @Header("Authorization") String token,
-            @Body JsonElement contact);
-
-    @GET("/api/v1/boundaries.json")
-    Call<LocationResultPage> getLocationPage(
-            @Header("Authorization") String token,
-            @Query("aliases") boolean aliases,
-            @Query("page") int page);
+            @Query("cursor") String cursor);
 
     @GET("/api/v2/fields.json")
     Call<FieldPage> getFieldPage(
@@ -72,5 +61,17 @@ public interface TembaAPI {
     Call<JsonObject> uploadMedia(
             @Header("Authorization") String token,
             @PartMap Map<String, RequestBody> params);
+
+    /* the endpoints below will be replaced a new session endpoint */
+
+    @POST("/api/v1/steps.json")
+    Call<JsonObject> addResults(
+            @Header("Authorization") String token,
+            @Body JsonElement submissionJson);
+
+    @POST("/api/v1/contacts.json")
+    Call<JsonObject> addContact(
+            @Header("Authorization") String token,
+            @Body JsonElement contact);
 
 }

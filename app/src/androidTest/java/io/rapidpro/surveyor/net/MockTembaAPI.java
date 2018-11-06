@@ -15,7 +15,8 @@ import io.rapidpro.surveyor.data.DBOrg;
 import io.rapidpro.surveyor.net.responses.Definitions;
 import io.rapidpro.surveyor.net.responses.FieldPage;
 import io.rapidpro.surveyor.net.responses.FlowPage;
-import io.rapidpro.surveyor.net.responses.LocationResultPage;
+import io.rapidpro.surveyor.net.responses.Location;
+import io.rapidpro.surveyor.net.responses.LocationPage;
 import io.rapidpro.surveyor.net.responses.TokenResults;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -64,8 +65,27 @@ public class MockTembaAPI implements TembaAPI {
     }
 
     @Override
-    public Call<LocationResultPage> getLocationPage(String token, boolean aliases, int page) {
-        return null;
+    public Call<LocationPage> getLocationPage(String token, String cursor) {
+        LocationPage page = new LocationPage();
+
+        Location ecuador = new Location("123", "Ecuador", 0, null, Collections.singletonList("Ecuator"));
+        Location azuay = new Location("2535", "Azuay", 1, ecuador.toReference(), null);
+        Location cuenca = new Location("35355", "Cuenca", 1, azuay.toReference(), null);
+
+        // first page
+        if (StringUtils.isEmpty(cursor)) {
+            page.setResults(Arrays.asList(ecuador, azuay));
+            page.setNext("http://example.com/api/v2/boundaries.json?cursor=1234");
+
+            // second page
+        } else if (cursor.equals("1234")) {
+            page.setResults(Collections.singletonList(cuenca));
+            page.setNext(null);
+        } else {
+            page.setResults(Collections.<Location>emptyList());
+        }
+
+        return delegate.returningResponse(page).getLocationPage(token, cursor);
     }
 
     @Override
@@ -74,7 +94,7 @@ public class MockTembaAPI implements TembaAPI {
 
         // first page
         if (StringUtils.isEmpty(cursor)) {
-            List<JsonElement> fields = Arrays.<JsonElement>asList(
+            List<JsonObject> fields = Arrays.asList(
                     JsonUtils.object("key", "gender", "label", "Gender", "value_type", "text"),
                     JsonUtils.object("key", "age", "label", "Age", "value_type", "numeric")
             );
@@ -83,13 +103,13 @@ public class MockTembaAPI implements TembaAPI {
 
             // second page
         } else if (cursor.equals("1234")) {
-            List<JsonElement> fields = Collections.singletonList(
-                    (JsonElement) JsonUtils.object("key", "join_date", "label", "Join Date", "value_type", "datetime")
+            List<JsonObject> fields = Collections.singletonList(
+                    JsonUtils.object("key", "join_date", "label", "Join Date", "value_type", "datetime")
             );
             page.setResults(fields);
             page.setNext(null);
         } else {
-            page.setResults(Collections.<JsonElement>emptyList());
+            page.setResults(Collections.<JsonObject>emptyList());
         }
 
         return delegate.returningResponse(page).getFieldPage(token, cursor);

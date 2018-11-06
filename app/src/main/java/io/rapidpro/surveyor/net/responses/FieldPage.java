@@ -1,6 +1,5 @@
 package io.rapidpro.surveyor.net.responses;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -10,7 +9,7 @@ import java.util.Map;
 
 import io.rapidpro.flows.runner.Field;
 
-public class FieldPage extends PaginatedResults<JsonElement> {
+public class FieldPage extends PaginatedResults<JsonObject> {
 
     private static  Map<String, Field.ValueType> m_typeMapping = new HashMap<>();
     static {
@@ -23,20 +22,21 @@ public class FieldPage extends PaginatedResults<JsonElement> {
     }
 
     public List<Field> toRunnerFields() {
-        List<Field> runnerFields = new ArrayList<>();
-        for (JsonElement ele : getResults()) {
+        List<Field> objs = new ArrayList<>();
+        for (JsonObject obj : getResults()) {
             try {
-                JsonObject obj = ele.getAsJsonObject();
-                Field field = new Field(
-                        obj.get("key").getAsString(),
-                        obj.get("label").getAsString(),
-                        m_typeMapping.get(obj.get("value_type").getAsString())
-                );
-                runnerFields.add(field);
+                objs.add(unmarshalResult(obj));
             } catch (Throwable t) {
-                // if we fail to create the field, continue
             }
         }
-        return runnerFields;
+        return objs;
+    }
+
+    public Field unmarshalResult(JsonObject json) {
+        return new Field(
+                json.get("key").getAsString(),
+                json.get("label").getAsString(),
+                m_typeMapping.get(json.get("value_type").getAsString())
+        );
     }
 }
