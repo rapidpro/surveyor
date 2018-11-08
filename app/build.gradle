@@ -50,10 +50,6 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:support-v4:26.1.0'
 
-    // database ORM
-    annotationProcessor 'io.realm:realm-android:0.82.1'
-    implementation 'io.realm:realm-android:0.82.1'
-
     // rest api
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
@@ -67,14 +63,6 @@ dependencies {
     // internationalization, language iso codes
     implementation 'com.neovisionaries:nv-i18n:1.11'
 
-    // our flow engine
-    implementation ('io.rapidpro:flows:11.5') {
-        // exclude threeten since it is inefficient in android land
-        exclude group: 'org.threeten'
-    }
-    // instead, add jakewharton's android friendly backport
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.0.2'
-
     // apache commons io
     implementation group: 'commons-io', name: 'commons-io', version: '2.4'
 
@@ -83,7 +71,6 @@ dependencies {
 
     // Testing
     testImplementation 'junit:junit:4.12'
-    testAnnotationProcessor 'io.realm:realm-android:0.82.1'
     androidTestImplementation 'androidx.test:runner:1.1.0'
     androidTestImplementation 'androidx.test:rules:1.1.0'
     androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'

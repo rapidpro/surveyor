@@ -3,10 +3,10 @@ package io.rapidpro.surveyor.activity;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -23,14 +23,17 @@ import android.widget.TextView;
 
 import com.greysonparrelli.permiso.Permiso;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.DBOrg;
-import io.rapidpro.surveyor.net.APIError;
+import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.net.responses.Token;
 import io.rapidpro.surveyor.net.responses.TokenResults;
+import io.rapidpro.surveyor.task.FetchOrgsTask;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -160,7 +163,7 @@ public class LoginActivity extends BaseActivity {
 
         // Store values at the time of the login attempt.
         final String email = m_emailView.getText().toString();
-        String password = m_passwordView.getText().toString();
+        final String password = m_passwordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -192,24 +195,38 @@ public class LoginActivity extends BaseActivity {
             // perform the user login attempt.
             showProgress(true);
 
-            getRapidProService().getOrgs(email, password, new Callback<TokenResults>() {
+            getRapidProService().authenticate(email, password, new Callback<TokenResults>() {
                 @Override
                 public void onResponse(Call<TokenResults> call, Response<TokenResults> response) {
 
                     if (response.isSuccessful()) {
-                        List<DBOrg> orgs = response.body().asOrgs();
-                        login(email, orgs);
+                        String[] tokens = response.body().toRawTokens();
+
+                        new FetchOrgsTask(new FetchOrgsTask.FetchOrgsListener() {
+                            @Override
+                            public void onComplete() {
+                                login(email);
+                            }
+                            @Override
+                            public void onFailure() {
+                                setErrorMessage(getString(R.string.error_fetching_org));
+                                showProgress(false);
+                            }
+                        }).execute(tokens);
+
                     } else {
-                        APIError error = getRapidProService().parseError(response);
-                        int status = error.getStatus();
-                        if (status == 404) {
-                            setErrorMessage(getString(R.string.error_server_not_found));
-                        } else if (status == 500) {
-                            setErrorMessage(getString(R.string.error_server_failure));
-                        } else if (status == 403) {
-                            setErrorMessage(getString(R.string.error_invalid_login));
-                        } else {
-                            setErrorMessage(getString(R.string.error_network));
+                        switch (response.code()) {
+                            case 403:
+                                setErrorMessage(getString(R.string.error_invalid_login));
+                                break;
+                            case 404:
+                                setErrorMessage(getString(R.string.error_server_not_found));
+                                break;
+                            case 500:
+                                setErrorMessage(getString(R.string.error_server_failure));
+                                break;
+                            default:
+                                setErrorMessage(getString(R.string.error_network));
                         }
                         showProgress(false);
                     }
@@ -236,37 +253,26 @@ public class LoginActivity extends BaseActivity {
     /**
      * Shows the progress UI and hides the login form.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     public void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            m_loginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            m_loginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    m_loginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
+        m_loginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        m_loginFormView.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                m_loginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        });
 
-            m_progressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            m_progressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    m_progressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            m_progressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            m_loginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
+        m_progressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        m_progressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                m_progressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     /**

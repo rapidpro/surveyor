@@ -4,11 +4,7 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.jakewharton.threetenabp.AndroidThreeTen;
-
 import io.rapidpro.surveyor.net.TembaService;
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
 
 public class Surveyor extends Application {
 
@@ -18,7 +14,6 @@ public class Surveyor extends Application {
 
     private SharedPreferences m_prefs = null;
     private TembaService m_tembaService = null;
-    private RealmConfiguration m_realmConfig;
 
     @Override
     public void onCreate() {
@@ -30,34 +25,10 @@ public class Surveyor extends Application {
         } catch (TembaException e) {
             resetPrefs();
         }
-
-        m_realmConfig = new RealmConfiguration.Builder(this).build();
-
-        // Testing: nuke our db on every start until the schema is ironed out
-        // Realm.deleteRealm(config);
-
-        // set our default database config
-        Realm.setDefaultConfiguration(m_realmConfig);
-
-        AndroidThreeTen.init(this);
     }
 
     public static Surveyor get() {
         return s_this;
-    }
-
-    public Realm getRealm() {
-        try {
-            return Realm.getDefaultInstance();
-        } catch (Throwable t) {
-            Surveyor.LOG.d("Invalid database, reinstall required");
-            Realm.deleteRealm(Surveyor.get().getRealmConfig());
-            return Realm.getDefaultInstance();
-        }
-    }
-
-    public RealmConfiguration getRealmConfig() {
-        return m_realmConfig;
     }
 
     public SharedPreferences getPreferences() {
@@ -68,7 +39,7 @@ public class Surveyor extends Application {
     }
 
     public void resetPrefs() {
-        getPreferences().edit().clear().commit();
+        getPreferences().edit().clear().apply();
         updatePrefs();
     }
 

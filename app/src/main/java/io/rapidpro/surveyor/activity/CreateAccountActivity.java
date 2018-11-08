@@ -8,12 +8,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.Collections;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.data.Org;
 
 /**
  * Activity for creating a new surveyor account
@@ -46,18 +46,19 @@ public class CreateAccountActivity extends BaseActivity {
             public void onPageFinished(WebView view, String url) {
 
                 UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(url);
-                String user = sanitizer.getValue("user");
+                String email = sanitizer.getValue("user");
                 String token = sanitizer.getValue("token");
-                String name = sanitizer.getValue("org");
+                String orgName = sanitizer.getValue("org");
 
-                if (user != null && token != null && name != null) {
-                    DBOrg org = new DBOrg();
-                    org.setToken(token);
-                    org.setName(name);
+                if (email != null && token != null && orgName != null) {
 
-                    List<DBOrg> orgs = new ArrayList<>();
-                    orgs.add(org);
-                    login(user, orgs);
+                    try {
+                        Org.fetch(token);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    login(email);
                 }
 
                 if (url.endsWith(CREATE_ACCOUNT_URL)) {

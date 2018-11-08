@@ -8,11 +8,10 @@ import java.io.File;
 import io.rapidpro.surveyor.ResponseException;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.activity.BaseActivity;
-import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 
 /**
- * AsyncTask for sending submissions to the server
+ * Task for sending submissions to the server
  */
 public class SubmitSubmissions extends AsyncTask<String, Void, Void> {
 
@@ -32,18 +31,7 @@ public class SubmitSubmissions extends AsyncTask<String, Void, Void> {
     protected Void doInBackground(String... params) {
 
         for (File submission : m_submissions) {
-            Submission sub = Submission.load(m_activity.getUsername(), submission);
-            if (sub != null) {
-                try {
-                    sub.submit();
-                } catch (ResponseException e) {
-                    Surveyor.LOG.e("Failed to submit flow run", e);
-                    m_errorMessage = e.getMessage();
-                } catch (Throwable t) {
-                    Surveyor.LOG.e("Failed to submit flow run", t);
-                    m_error = m_activity.getRapidProService().getErrorMessage(t);
-                }
-            }
+            // TODO
 
             m_progress.incrementProgressBy(1);
         }

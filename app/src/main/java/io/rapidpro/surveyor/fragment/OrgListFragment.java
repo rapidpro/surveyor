@@ -1,6 +1,7 @@
 package io.rapidpro.surveyor.fragment;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,19 +11,17 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import java.io.IOException;
+import java.util.List;
+
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.adapter.OrgListAdapter;
-import io.rapidpro.surveyor.data.DBOrg;
-import io.realm.RealmResults;
+import io.rapidpro.surveyor.data.Org;
 
 
-public class OrgListFragment extends BaseFragment implements AbsListView.OnItemClickListener {
+public class OrgListFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     private OnFragmentInteractionListener m_listener;
-
-    /**
-     * The fragment's ListView/GridView.
-     */
     private ListView m_listView;
     private ListAdapter m_adapter;
 
@@ -32,11 +31,14 @@ public class OrgListFragment extends BaseFragment implements AbsListView.OnItemC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        m_adapter = new OrgListAdapter(getActivity(), R.layout.item_org, getItems(), true);
-    }
 
-    public RealmResults<DBOrg> getItems() {
-        return getRealm().where(DBOrg.class).findAllSorted("name", true);
+        List<Org> items = null;
+        try {
+            items = Org.loadAll();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        m_adapter = new OrgListAdapter(getActivity(), R.layout.item_org, items);
     }
 
     @Override
@@ -74,13 +76,11 @@ public class OrgListFragment extends BaseFragment implements AbsListView.OnItemC
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != m_listener) {
-            m_listener.onFragmentInteraction((DBOrg) m_adapter.getItem(position));
+            m_listener.onFragmentInteraction((Org) m_adapter.getItem(position));
         }
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(DBOrg org);
+        void onFragmentInteraction(Org org);
     }
-
 }

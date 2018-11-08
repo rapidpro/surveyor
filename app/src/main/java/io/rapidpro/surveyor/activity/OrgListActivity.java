@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.fragment.OrgListFragment;
 
 public class OrgListActivity extends BaseActivity implements OrgListFragment.OnFragmentInteractionListener {
@@ -22,8 +24,15 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
 
 
         if (isLoggedIn()) {
-            // if we don't have any orgs, take us back to the login screen
-            List<DBOrg> orgs = getRealm().where(DBOrg.class).findAll();
+            List<Org> orgs = new ArrayList<>();
+            try {
+                orgs = Org.loadAll();
+            } catch (IOException e) {
+                // TODO
+                e.printStackTrace();
+            }
+
+            // if we don't have any accounts, take us back to the login screen
             if (orgs.size() == 0) {
                 Intent i = new Intent(OrgListActivity.this, LoginActivity.class);
 
@@ -34,9 +43,9 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
                 finish();
                 overridePendingTransition(0, 0);
             }
-            // if it's a single org, skip our activity
+            // if we have access to a single account, then skip selection
             else if (orgs.size() == 1) {
-                getSurveyor().LOG.d("One org found, shortcutting: " + orgs.get(0).getName());
+                getSurveyor().LOG.d("One account found, shortcutting: " + orgs.get(0).getName());
                 onFragmentInteraction(orgs.get(0));
                 finish();
                 overridePendingTransition(0, 0);
@@ -66,10 +75,9 @@ public class OrgListActivity extends BaseActivity implements OrgListFragment.OnF
     }
 
     @Override
-    public void onFragmentInteraction(DBOrg org) {
+    public void onFragmentInteraction(Org org) {
         getRapidProService().setToken(org.getToken());
         Intent intent = new Intent(OrgListActivity.this, OrgActivity.class);
-        intent.putExtra(SurveyorIntent.EXTRA_ORG_ID, org.getId());
         startActivity(intent);
     }
 }

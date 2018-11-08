@@ -1,31 +1,28 @@
 package io.rapidpro.surveyor.net.responses;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import io.rapidpro.surveyor.data.DBLocation;
-import io.rapidpro.surveyor.data.DBOrg;
-import io.rapidpro.surveyor.data.DBToken;
 
 public class TokenResults {
 
-    private List<DBToken> tokens;
+    private List<Token> tokens;
 
-    public List<DBToken> getTokens() {
+    public List<Token> getTokens() {
         return tokens;
     }
 
-    public void setTokens(List<DBToken> tokens) {
+    public void setTokens(List<Token> tokens) {
         this.tokens = tokens;
     }
 
-    public List<DBOrg> asOrgs() {
-        List<DBOrg> orgs = new ArrayList<>();
-        for (DBToken token : tokens) {
-            DBOrg org = token.getOrg();
-            org.setToken(token.getToken());
-            orgs.add(org);
+    /**
+     * Gets the tokens as a simple array of token strings
+     * @return the array of tokens
+     */
+    public String[] toRawTokens() {
+        String[] raw = new String[this.tokens.size()];
+        for (int t = 0; t < this.tokens.size(); t++) {
+            raw[t] = this.tokens.get(t).getToken();
         }
-        return orgs;
+        return raw;
     }
 }

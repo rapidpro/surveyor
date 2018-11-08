@@ -1,10 +1,7 @@
 package io.rapidpro.surveyor.activity;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,30 +9,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import java.io.File;
-import java.text.NumberFormat;
-import java.util.List;
-
-import io.rapidpro.flows.runner.Field;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.adapter.FlowListAdapter;
-import io.rapidpro.surveyor.data.DBAlias;
-import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.data.DBLocation;
-import io.rapidpro.surveyor.data.DBOrg;
-import io.rapidpro.surveyor.data.OrgDetails;
-import io.rapidpro.surveyor.data.Submission;
-import io.rapidpro.surveyor.fragment.FlowListFragment;
 import io.rapidpro.surveyor.net.TembaService;
-import io.rapidpro.surveyor.task.SubmitSubmissions;
 import io.rapidpro.surveyor.ui.BlockingProgress;
-import io.rapidpro.surveyor.ui.ViewCache;
-import io.realm.Realm;
 
 
-public class OrgActivity extends BaseActivity implements FlowListFragment.OnFragmentInteractionListener {
+public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFragmentInteractionListener*/ {
 
     // progress dialog while we are refreshing org details
     private BlockingProgress m_refreshProgress;
@@ -44,7 +24,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final DBOrg org = getDBOrg();
+        /*final DBOrg org = getDBOrg();
 
         // if we don't know our timezone yet, fetch it
         if (org.getTimezone() == null || org.getTimezone().trim().length() == 0) {
@@ -64,7 +44,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                     startActivity(getIntent(OrgActivity.this, RapidFlowsActivity.class));
                 }
             }
-        }
+        }*/
     }
 
     @Override
@@ -74,7 +54,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
     }
 
     public void refresh() {
-        FlowListAdapter adapter = (FlowListAdapter) getViewCache().getListViewAdapter(android.R.id.list);
+        /*FlowListAdapter adapter = (FlowListAdapter) getViewCache().getListViewAdapter(android.R.id.list);
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
@@ -82,7 +62,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         int pending = Submission.getPendingSubmissions(getDBOrg().getId()).length;
         ViewCache cache = getViewCache();
         cache.setVisible(R.id.container_pending, pending > 0);
-        cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
+        cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));*/
 
     }
 
@@ -98,15 +78,16 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
+    /*@Override
     public void onFragmentInteraction(DBFlow flow) {
         Intent intent = new Intent(this, FlowActivity.class);
         intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
         startActivity(intent);
-    }
+    }*/
 
     public void showFlowList(MenuItem item) {
-        startActivity(getIntent(this, RapidFlowsActivity.class));
+        // TODO
+        // startActivity(getIntent(this, RapidFlowsActivity.class));
     }
 
     public void confirmRefreshOrg(MenuItem item) {
@@ -139,13 +120,14 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 
-                        final File[] submissions = Submission.getPendingSubmissions(getDBOrg().getId());
+                        // TODO
+                        /* final File[] submissions = Submission.getPendingSubmissions(getDBOrg().getId());
 
                         final BlockingProgress progress = new BlockingProgress(OrgActivity.this,
                                 R.string.submit_title, R.string.submit_body, submissions.length);
                         progress.show();
 
-                        new SubmitSubmissions(OrgActivity.this, submissions, progress).execute();
+                        new SubmitSubmissions(OrgActivity.this, submissions, progress).execute();*/
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -173,69 +155,8 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.OnFrag
             try {
                 TembaService rapid = getRapidProService();
 
-                // get our database
-                Realm realm = Realm.getDefaultInstance();
+                // TODO
 
-                int orgId = getIntent().getIntExtra(SurveyorIntent.EXTRA_ORG_ID, 0);
-                DBOrg org = realm.where(DBOrg.class).equalTo("id", orgId).findFirst();
-
-                // save the org properties to the database
-                DBOrg latest = rapid.getOrg();
-                realm.beginTransaction();
-                org.setName(latest.getName());
-                org.setAnonymous(latest.isAnonymous());
-                org.setDateStyle(latest.getDateStyle());
-
-                if (latest.getCountry() != null) {
-                    org.setCountry(latest.getCountry());
-                }
-
-                if (latest.getPrimaryLanguage() == null) {
-                    org.setPrimaryLanguage("base");
-                } else {
-                    org.setPrimaryLanguage(latest.getPrimaryLanguage());
-                }
-
-                org.setTimezone(latest.getTimezone());
-                incrementProgress();
-
-
-                // now go fetch the locations
-                List<DBLocation> results = rapid.getLocations();
-
-                for (DBLocation location : results) {
-                    location.setOrg(org);
-
-                    // create a composite primary key
-                    location.setId(org.getId() + ":" + location.getBoundary());
-
-                    realm.copyToRealmOrUpdate(location);
-
-                    for (String aliasName : location.getAliases()) {
-                        DBAlias alias = new DBAlias();
-
-                        // alias gets a composite primary key too
-                        alias.setId(location.getId() + ":" + aliasName);
-
-                        alias.setName(aliasName);
-                        alias.setLocation(location);
-                        realm.copyToRealmOrUpdate(alias);
-                    }
-                }
-                incrementProgress();
-
-                // finally the fields for our org
-                List<Field> fields = rapid.getFields();
-                OrgDetails details = OrgDetails.load(org);
-
-                if (details != null) {
-                    details.setFields(fields);
-                    details.save();
-                }
-
-
-                realm.commitTransaction();
-                realm.close();
                 incrementProgress();
 
             } catch (Throwable t) {

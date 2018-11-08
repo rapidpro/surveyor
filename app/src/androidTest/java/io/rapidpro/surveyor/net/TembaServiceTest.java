@@ -6,8 +6,6 @@ import org.junit.Test;
 import java.util.List;
 
 import io.rapidpro.flows.runner.Field;
-import io.rapidpro.surveyor.data.DBLocation;
-import io.rapidpro.surveyor.data.DBOrg;
 import retrofit2.Retrofit;
 import retrofit2.mock.BehaviorDelegate;
 import retrofit2.mock.MockRetrofit;

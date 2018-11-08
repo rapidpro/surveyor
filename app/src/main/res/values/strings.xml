@@ -847,6 +847,7 @@
     <string name="error_server_not_found">Server is unavailable. Please check your settings or try again later.</string>
     <string name="error_server_failure">Server error, please try again later.</string>
     <string name="error_invalid_login">Invalid login. Check your username and password and try again.</string>
+    <string name="error_fetching_org">Unable to fetch org details. Please check your settings or try again later.</string>
     <string name="button_submit">Submit Flow Runs</string>
     <string name="action_refresh">Refresh</string>
     <string name="refresh_org">Refreshing organization details..</string>

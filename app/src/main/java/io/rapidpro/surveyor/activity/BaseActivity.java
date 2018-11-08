@@ -1,6 +1,5 @@
 package io.rapidpro.surveyor.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,26 +13,18 @@ import android.support.v4.app.ShareCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 
-
 import com.greysonparrelli.permiso.Permiso;
 import com.greysonparrelli.permiso.PermisoActivity;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-
 
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.data.DBOrg;
-import io.rapidpro.surveyor.data.OrgDetails;
-import io.rapidpro.surveyor.data.Submission;
+import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.ui.ViewCache;
-import io.realm.Realm;
 
 /**
  * All activities for the Surveyor app extend BaseActivity
@@ -42,11 +33,8 @@ import io.realm.Realm;
  */
 public class BaseActivity extends PermisoActivity {
 
-    private DBOrg m_org;
-    private DBFlow m_flow;
+    private Org m_org;
     private ViewCache m_viewCache;
-
-    private Realm m_realm;
 
     public Surveyor getSurveyor() {
         return (Surveyor) getApplication();
@@ -59,31 +47,14 @@ public class BaseActivity extends PermisoActivity {
     /**
      * Logs in a user for the given orgs
      */
-    public void login(String email, List<DBOrg> orgs) {
-        Realm realm = getRealm();
-        realm.beginTransaction();
-        realm.where(DBOrg.class).findAll().clear();
-
-        // add our orgs, make sure we don't consider duplicates
-        HashSet<Integer> added = new HashSet<>();
-
-        HashSet<String> tokens = new HashSet<>();
-        for (DBOrg org : orgs) {
-            if (added.add(org.getId())) {
-                // don't add a token more than once
-                if (tokens.add(org.getToken())) {
-                    realm.copyToRealm(org);
-                }
-            }
-        }
-
-        realm.commitTransaction();
-
+    public void login(String email) {
+        // save email which we'll need for submissions later
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(SurveyorIntent.PREF_USERNAME, email);
         editor.apply();
 
+        // run account selection activity
         startActivity(new Intent(this, OrgListActivity.class));
         finish();
     }
@@ -98,14 +69,9 @@ public class BaseActivity extends PermisoActivity {
      */
     public void logout(int error) {
 
-        Realm realm = getRealm();
-        realm.beginTransaction();
-        realm.clear(DBFlow.class);
-        realm.clear(DBOrg.class);
-        realm.commitTransaction();
-
-        Submission.clear();
-        OrgDetails.clear();
+        // TODO
+        // Submission.clear();
+        // Org.clear();
 
         Intent intent = new Intent(this, LoginActivity.class);
         if (error != -1) {
@@ -226,21 +192,6 @@ public class BaseActivity extends PermisoActivity {
                 .show();
     }
 
-    protected void onResume() {
-        super.onResume();
-        Surveyor.LOG.d(getClass().getSimpleName() + ".onResume()");
-
-    }
-
-    protected void onPause() {
-        super.onPause();
-        if (m_realm != null) {
-            m_realm.close();
-            m_realm = null;
-        }
-        Surveyor.LOG.d(getClass().getSimpleName() + ".onPause()");
-    }
-
     public ViewCache getViewCache() {
         if (m_viewCache == null) {
             m_viewCache = new ViewCache(this, findViewById(android.R.id.content));
@@ -276,48 +227,8 @@ public class BaseActivity extends PermisoActivity {
         return getPreferences().getInt(getString(key), def);
     }
 
-    public Realm getRealm() {
-        if (m_realm == null) {
-            m_realm = Surveyor.get().getRealm();
-        }
-        return m_realm;
-    }
-
     public TembaService getRapidProService() {
         return getSurveyor().getRapidProService();
-    }
-
-    public DBFlow getDBFlow() {
-        if (m_flow == null) {
-            String flowId = getIntent().getStringExtra(SurveyorIntent.EXTRA_FLOW_ID);
-            if (flowId != null) {
-                m_flow = getRealm().where(DBFlow.class).equalTo("uuid", flowId).findFirst();
-            }
-        }
-        return m_flow;
-    }
-
-    public DBOrg getDBOrg() {
-        if (m_org == null) {
-            int orgId = getIntent().getIntExtra(SurveyorIntent.EXTRA_ORG_ID, 0);
-            m_org = getRealm().where(DBOrg.class).equalTo("id", orgId).findFirst();
-        }
-        return m_org;
-    }
-
-    public Intent getIntent(Activity from, Class to) {
-        Intent intent = new Intent(from, to);
-        DBOrg org = getDBOrg();
-        if (org != null) {
-            intent.putExtra(SurveyorIntent.EXTRA_ORG_ID, org.getId());
-        }
-
-        DBFlow flow = getDBFlow();
-        if (flow != null) {
-            intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
-        }
-
-        return intent;
     }
 
     public AlertDialog showAlert(int title, int body) {

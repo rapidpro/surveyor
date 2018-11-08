@@ -1,6 +1,10 @@
 package io.rapidpro.surveyor;
 
 public interface SurveyorIntent {
+    String PREF_ACCOUNTS = "surveyor.pref.accounts";
+    String PREF_CURRENT_ORG = "surveyor.pref.current_org";
+    String PREF_USERNAME = "surveyor.pref.username";
+
     String EXTRA_ORG_ID = "surveyor.extra.org_id";
     String EXTRA_FLOW_ID = "surveyor.extra.flow_id";
 
@@ -11,7 +15,5 @@ public interface SurveyorIntent {
 
     String EXTRA_ERROR = "surveyor.extra.error";
     String EXTRA_CAMERA_DIRECTION = "surveyor.extra.camera_direction";
-
-    String PREF_USERNAME = "surveyor.pref.username";
 }
 
