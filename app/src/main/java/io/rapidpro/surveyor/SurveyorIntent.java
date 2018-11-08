@@ -1,10 +1,6 @@
 package io.rapidpro.surveyor;
 
 public interface SurveyorIntent {
-    String PREF_ACCOUNTS = "surveyor.pref.accounts";
-    String PREF_CURRENT_ORG = "surveyor.pref.current_org";
-    String PREF_USERNAME = "surveyor.pref.username";
-
     String EXTRA_ORG_ID = "surveyor.extra.org_id";
     String EXTRA_FLOW_ID = "surveyor.extra.flow_id";
 

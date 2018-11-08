@@ -74,7 +74,7 @@ public class CreateAccountActivity extends BaseActivity {
             }
         });
 
-        web.loadUrl(Surveyor.BASE_URL + CREATE_ACCOUNT_URL);
+        web.loadUrl(Surveyor.get().getHost() + CREATE_ACCOUNT_URL);
     }
 
     @Override

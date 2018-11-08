@@ -78,7 +78,7 @@ public class LoginActivity extends BaseActivity {
 
         // prepoulate with our previous username if we have one
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String username = prefs.getString(SurveyorIntent.PREF_USERNAME, "");
+        String username = prefs.getString(Surveyor.PREF_USERNAME, "");
         m_emailView.setText(username);
 
         m_passwordView = (EditText) findViewById(R.id.password);

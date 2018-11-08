@@ -51,11 +51,11 @@ public class BaseActivity extends PermisoActivity {
         // save email which we'll need for submissions later
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(SurveyorIntent.PREF_USERNAME, email);
+        editor.putString(Surveyor.PREF_USERNAME, email);
         editor.apply();
 
         // run account selection activity
-        startActivity(new Intent(this, OrgListActivity.class));
+        startActivity(new Intent(this, OrgChooseActivity.class));
         finish();
     }
 
@@ -83,7 +83,7 @@ public class BaseActivity extends PermisoActivity {
     }
 
     public String getUsername() {
-        return PreferenceManager.getDefaultSharedPreferences(this).getString(SurveyorIntent.PREF_USERNAME, null);
+        return PreferenceManager.getDefaultSharedPreferences(this).getString(Surveyor.PREF_USERNAME, null);
     }
 
     public boolean isLoggedIn() {

@@ -14,9 +14,14 @@ import io.rapidpro.surveyor.Surveyor;
 public class Org {
     private static final String ORGS_DIR = "orgs";
     private static final String DETAILS_FILE = "details.json";
-    String token;
-    String name;
-    String country;
+    private String token;
+    private String name;
+    private String primaryLanguage;
+    private String[] languages;
+    private String timezone;
+    private String country;
+    private String dateStyle;
+    private boolean anon;
     private transient String uuid;
 
     /**
@@ -24,7 +29,7 @@ public class Org {
      *
      * @return the directory file object
      */
-    private static File getOrgsDir() {
+    protected static File getOrgsDir() {
         File orgsDir = new File(Surveyor.get().getFilesDir(), ORGS_DIR);
         orgsDir.mkdirs();
         return orgsDir;
@@ -60,7 +65,7 @@ public class Org {
     }
 
     /**
-     * Fetches an org using the given API token
+     * Fetches an org using the given API token and saves it to the org storage
      *
      * @param token the API token
      * @throws IOException
@@ -68,36 +73,85 @@ public class Org {
     public static Org fetch(String token) throws IOException {
         Org org = new Org();
         org.token = token;
-        org.refresh();
+        org.refresh(false);
         return org;
     }
 
+    /**
+     * Gets the API token for this org
+     *
+     * @return the API token
+     */
     public String getToken() {
         return token;
     }
 
+    /**
+     * Gets the UUID of this org
+     *
+     * @return the UUID
+     */
     public String getUUID() {
         return uuid;
     }
 
+    /**
+     * Gets the name of this org
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    public String getPrimaryLanguage() {
+        return primaryLanguage;
+    }
+
+    public String[] getLanguages() {
+        return languages;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public String getDateStyle() {
+        return dateStyle;
+    }
+
+    public boolean isAnon() {
+        return anon;
+    }
+
+    /**
+     * Gets the country code of this org
+     *
+     * @return the country code
+     */
     public String getCountry() {
         return country;
     }
 
     /**
-     * Refreshes the details of this org from RapidPro
+     * Refreshes this org from RapidPro
      */
-    public void refresh() throws IOException {
+    public void refresh(boolean full) throws IOException {
         io.rapidpro.surveyor.net.responses.Org apiOrg = Surveyor.get().getRapidProService().getOrgForToken(this.token);
 
         this.uuid = apiOrg.getUuid();
         this.name = apiOrg.getName();
+        this.primaryLanguage = apiOrg.getPrimaryLanguage();
+        this.languages = apiOrg.getLanguages();
+        this.timezone = apiOrg.getTimezone();
         this.country = apiOrg.getCountry();
+        this.dateStyle = apiOrg.getDateStyle();
+        this.anon = apiOrg.isAnon();
         this.save();
+
+        if (full) {
+            // TODO fetch assets
+        }
     }
 
     /**
