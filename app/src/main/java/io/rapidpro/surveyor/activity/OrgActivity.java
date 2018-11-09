@@ -9,8 +9,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 
@@ -23,6 +27,20 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
+        if (orgUUID == null) {
+            throw new RuntimeException("HOW IS THIS POSSIBLE??");
+        }
+        Org org = null;
+
+        try {
+            org = Org.load(orgUUID);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        setTitle(org.getName());
 
         /*final DBOrg org = getDBOrg();
 

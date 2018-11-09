@@ -11,7 +11,7 @@ import io.rapidpro.surveyor.fragment.SettingsFragment;
  */
 public class SettingsActivity extends BaseActivity {
 
-    public boolean validateLogin() {
+    public boolean requireLogin() {
         return false;
     }
 

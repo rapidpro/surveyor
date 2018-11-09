@@ -8,9 +8,26 @@ import io.rapidpro.surveyor.net.TembaService;
 
 public class Surveyor extends Application {
 
+    /**
+     * RapidPro host we are connected to
+     */
     public static String PREF_HOST = "pref_key_host";
-    public static String PREF_CURRENT_ORG = "surveyor.pref.current_org";
-    public static String PREF_USERNAME = "surveyor.pref.username";
+
+    /**
+     * Username/email we are logged in as. If this is set, we are logged in
+     */
+    public static String PREF_AUTH_USERNAME = "surveyor.pref.auth_username";
+
+    /**
+     * Username/email we were previously logged in as - used to prepopulate login form
+     */
+    public static String PREF_PREV_USERNAME = "surveyor.pref.prev_username";
+
+    /**
+     * UUIDs of the orgs this user has access to
+     */
+    public static String PREF_AUTH_ORGS = "surveyor.pref.auth_orgs";
+
     public static Logger LOG = new Logger();
 
     /**
@@ -18,13 +35,14 @@ public class Surveyor extends Application {
      */
     private static Surveyor s_this;
 
-    private SharedPreferences m_prefs = null;
     private TembaService m_tembaService = null;
 
     @Override
     public void onCreate() {
         super.onCreate();
         s_this = this;
+
+        Surveyor.LOG.d("Surveyor.onCreate");
 
         try {
             updatePrefs();
@@ -46,10 +64,7 @@ public class Surveyor extends Application {
      * @return the preferences
      */
     public SharedPreferences getPreferences() {
-        if (m_prefs == null) {
-            m_prefs = PreferenceManager.getDefaultSharedPreferences(s_this);
-        }
-        return m_prefs;
+        return PreferenceManager.getDefaultSharedPreferences(s_this);
     }
 
     public void resetPrefs() {

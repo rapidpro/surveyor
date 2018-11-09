@@ -23,10 +23,6 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.O
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!isLoggedIn()) {
-            return;
-        }
-
         List<Org> orgs = new ArrayList<>();
         try {
             orgs = Org.loadAll();
@@ -35,21 +31,18 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.O
             e.printStackTrace();
         }
 
+        Surveyor.LOG.d("Loaded " + orgs.size() + " orgs");
+
         // if we don't have any orgs, take us back to the login screen
         if (orgs.size() == 0) {
-            Intent i = new Intent(OrgChooseActivity.this, LoginActivity.class);
+            logout();
 
-            // if we are logged in, show an error
-            i.putExtra(SurveyorIntent.EXTRA_ERROR, getString(R.string.error_no_orgs));
-
-            startActivity(i);
-            finish();
             overridePendingTransition(0, 0);
         }
         // if we have access to a single org, then skip choosing
         else if (orgs.size() == 1) {
             Surveyor.LOG.d("One org found, shortcutting chooser to: " + orgs.get(0).getName());
-            onFragmentInteraction(orgs.get(0));
+            showOrg(orgs.get(0));
             finish();
             overridePendingTransition(0, 0);
         } else {
@@ -78,8 +71,13 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.O
 
     @Override
     public void onFragmentInteraction(Org org) {
+        showOrg(org);
+    }
+
+    private void showOrg(Org org) {
         getRapidProService().setToken(org.getToken());
         Intent intent = new Intent(OrgChooseActivity.this, OrgActivity.class);
+        intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, org.getUUID());
         startActivity(intent);
     }
 }

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ShareCompat;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -17,103 +18,101 @@ import com.greysonparrelli.permiso.Permiso;
 import com.greysonparrelli.permiso.PermisoActivity;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Set;
 
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
- * All activities for the Surveyor app extend BaseActivity
- * which provides convenience methods for transferring state
- * between activities and the like.
+ * All activities for the Surveyor app extend this base activity which provides convenience methods
+ * for things like authentication etc.
  */
 public class BaseActivity extends PermisoActivity {
 
-    private Org m_org;
     private ViewCache m_viewCache;
 
     public Surveyor getSurveyor() {
         return (Surveyor) getApplication();
     }
 
-    public boolean validateLogin() {
+    /**
+     * Whether this activity requires the user to be logged in
+     *
+     * @return true if activity requires login
+     */
+    public boolean requireLogin() {
         return true;
     }
 
     /**
      * Logs in a user for the given orgs
      */
-    public void login(String email) {
-        // save email which we'll need for submissions later
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Surveyor.PREF_USERNAME, email);
-        editor.apply();
+    public void login(String email, Set<String> orgUUIDs) {
+        Surveyor.LOG.d("Logging in as " + email + " with access to orgs " + TextUtils.join(",", orgUUIDs));
 
-        // run account selection activity
+        // save email which we'll need for submissions later
+        setPreferencesString(Surveyor.PREF_AUTH_USERNAME, email);
+        setPreferencesString(Surveyor.PREF_PREV_USERNAME, email);
+        setPreferencesStringSet(Surveyor.PREF_AUTH_ORGS, orgUUIDs);
+
+        // let the user pick an org...
         startActivity(new Intent(this, OrgChooseActivity.class));
         finish();
     }
 
-    public void logout() {
-        logout(-1);
-    }
-
-
     /**
      * Logs the user out and returns them to the login page
      */
-    public void logout(int error) {
+    protected void logout() {
+        logout(-1);
+    }
 
-        // TODO
-        // Submission.clear();
-        // Org.clear();
+    /**
+     * Logs the user out and returns them to the login page showing the given error string
+     */
+    protected void logout(int errorResId) {
+        Surveyor.LOG.d("Logging out with error " + errorResId);
+
+        setPreferencesString(Surveyor.PREF_AUTH_USERNAME, null);
+        setPreferencesStringSet(Surveyor.PREF_AUTH_ORGS, Collections.<String>emptySet());
 
         Intent intent = new Intent(this, LoginActivity.class);
-        if (error != -1) {
-            intent.putExtra(SurveyorIntent.EXTRA_ERROR, getString(error));
+        if (errorResId != -1) {
+            intent.putExtra(SurveyorIntent.EXTRA_ERROR, getString(errorResId));
         }
         startActivity(intent);
 
         finish();
     }
 
-    public String getUsername() {
-        return PreferenceManager.getDefaultSharedPreferences(this).getString(Surveyor.PREF_USERNAME, null);
-    }
-
-    public boolean isLoggedIn() {
-        return getUsername() != null;
-    }
-
+    /**
+     * @see android.app.Activity#onCreate(Bundle)
+     */
+    @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+
         overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
 
-        // check if they are properly logged in
-        if (validateLogin() && !isLoggedIn()) {
+        // if we're on an activity that requires a logged in user, and we aren't, redirect to login activity
+        if (requireLogin() && !isLoggedIn()) {
             logout();
         }
     }
 
+    /**
+     * @see android.app.Activity#finish()
+     */
+    @Override
     public void finish() {
         super.finish();
+
         overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
-    }
-
-    @Override
-    public void setContentView(int layoutResID) {
-        super.setContentView(layoutResID);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
     }
 
     @Override
@@ -199,32 +198,55 @@ public class BaseActivity extends PermisoActivity {
         return m_viewCache;
     }
 
-    public void refresh() {
-
+    /**
+     * Gets the currently authenticated username
+     *
+     * @return the username/email
+     */
+    protected String getUsername() {
+        return getPreferences().getString(Surveyor.PREF_AUTH_USERNAME, null);
     }
 
+    /**
+     * Checks whether we are currently authenticated
+     *
+     * @return truer if we are authenticated
+     */
+    protected boolean isLoggedIn() {
+        return !TextUtils.isEmpty(getUsername());
+    }
+
+    /**
+     * Gets the preferences for this application
+     *
+     * @return the preferences
+     */
     public SharedPreferences getPreferences() {
-        return getSurveyor().getPreferences();
+        return Surveyor.get().getPreferences();
     }
 
-    public void saveString(int key, String value) {
+    /**
+     * Saves a string preference for this application
+     *
+     * @param key   the preference key
+     * @param value the preference value
+     */
+    public void setPreferencesString(String key, String value) {
         SharedPreferences.Editor editor = getPreferences().edit();
-        editor.putString(getString(key), value);
+        editor.putString(key, value);
         editor.apply();
     }
 
-    public void saveInt(int key, int value) {
+    /**
+     * Saves a string set preference for this application
+     *
+     * @param key   the preference key
+     * @param values the preference value
+     */
+    public void setPreferencesStringSet(String key, Set<String> values) {
         SharedPreferences.Editor editor = getPreferences().edit();
-        editor.putInt(getString(key), value);
+        editor.putStringSet(key, values);
         editor.apply();
-    }
-
-    public String getPreferenceString(int key, String def) {
-        return getPreferences().getString(getString(key), def);
-    }
-
-    public int getPreferenceInt(int key, int def) {
-        return getPreferences().getInt(getString(key), def);
     }
 
     public TembaService getRapidProService() {

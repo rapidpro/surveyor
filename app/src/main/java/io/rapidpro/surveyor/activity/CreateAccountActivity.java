@@ -22,7 +22,7 @@ public class CreateAccountActivity extends BaseActivity {
 
     public static final String CREATE_ACCOUNT_URL = "/org/surveyor/";
 
-    public boolean validateLogin() {
+    public boolean requireLogin() {
         return false;
     }
 
@@ -53,12 +53,13 @@ public class CreateAccountActivity extends BaseActivity {
                 if (email != null && token != null && orgName != null) {
 
                     try {
-                        Org.fetch(token);
+                        Org org = Org.fetch(token);
+
+                        login(email, Collections.singleton(org.getUUID()));
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-                    login(email);
                 }
 
                 if (url.endsWith(CREATE_ACCOUNT_URL)) {

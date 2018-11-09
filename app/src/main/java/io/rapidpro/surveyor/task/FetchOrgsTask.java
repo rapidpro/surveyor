@@ -3,13 +3,16 @@ package io.rapidpro.surveyor.task;
 import android.os.AsyncTask;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
+import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.Org;
 
 /**
- * Task to fetch orgs from RapidPro
+ * Task to fetch orgs from RapidPro, create their directories, and return their UUIDs
  */
-public class FetchOrgsTask extends AsyncTask<String, Void, Void> {
+public class FetchOrgsTask extends AsyncTask<String, Void, Set<String>> {
 
     private FetchOrgsListener listener;
     private boolean failed;
@@ -20,31 +23,35 @@ public class FetchOrgsTask extends AsyncTask<String, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String... tokens) {
+    protected Set<String> doInBackground(String... tokens) {
+        Set<String> orgUUIDs = new HashSet<>();
         for (String token : tokens) {
             try {
-                Org.fetch(token);
+                Org org = Org.fetch(token);
+                orgUUIDs.add(org.getUUID());
+                Surveyor.LOG.d("Fetched org with UUID " + org.getUUID());
             } catch (IOException e) {
                 e.printStackTrace();
                 this.failed = true;
+                break;
             }
         }
-        return null;
+        return orgUUIDs;
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+    protected void onPostExecute(Set<String> orgUUIDs) {
+        super.onPostExecute(orgUUIDs);
 
         if (this.failed) {
             this.listener.onFailure();
         } else {
-            this.listener.onComplete();
+            this.listener.onComplete(orgUUIDs);
         }
     }
 
     public interface FetchOrgsListener {
-        void onComplete();
+        void onComplete(Set<String> orgUUIDs);
         void onFailure();
     }
 }

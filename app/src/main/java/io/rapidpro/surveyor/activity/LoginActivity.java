@@ -3,12 +3,8 @@ package io.rapidpro.surveyor.activity;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -23,15 +19,11 @@ import android.widget.TextView;
 
 import com.greysonparrelli.permiso.Permiso;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.Org;
-import io.rapidpro.surveyor.net.responses.Token;
 import io.rapidpro.surveyor.net.responses.TokenResults;
 import io.rapidpro.surveyor.task.FetchOrgsTask;
 import retrofit2.Call;
@@ -73,15 +65,12 @@ public class LoginActivity extends BaseActivity {
 
         setContentView(R.layout.activity_login);
 
-        // Set up the login form.
-        m_emailView = (AutoCompleteTextView) findViewById(R.id.email);
+        m_emailView = findViewById(R.id.email);
 
-        // prepoulate with our previous username if we have one
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String username = prefs.getString(Surveyor.PREF_USERNAME, "");
-        m_emailView.setText(username);
+        // prepopulate with our previous username if we have one
+        m_emailView.setText(getPreferences().getString(Surveyor.PREF_PREV_USERNAME, ""));
 
-        m_passwordView = (EditText) findViewById(R.id.password);
+        m_passwordView = findViewById(R.id.password);
         m_passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -93,7 +82,7 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
-        Button emailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button emailSignInButton = findViewById(R.id.email_sign_in_button);
         emailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,7 +102,7 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
     }
 
-    public boolean validateLogin() {
+    public boolean requireLogin() {
         return false;
     }
 
@@ -202,11 +191,14 @@ public class LoginActivity extends BaseActivity {
                     if (response.isSuccessful()) {
                         String[] tokens = response.body().toRawTokens();
 
+                        Surveyor.LOG.d("Authentication returned " + tokens.length + " tokens");
+
                         new FetchOrgsTask(new FetchOrgsTask.FetchOrgsListener() {
                             @Override
-                            public void onComplete() {
-                                login(email);
+                            public void onComplete(Set<String> orgUUIDs) {
+                                login(email, orgUUIDs);
                             }
+
                             @Override
                             public void onFailure() {
                                 setErrorMessage(getString(R.string.error_fetching_org));

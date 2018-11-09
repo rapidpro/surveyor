@@ -41,7 +41,6 @@ public class SubmitSubmissions extends AsyncTask<String, Void, Void> {
     @Override
     protected void onPostExecute(Void result) {
         m_progress.dismiss();
-        m_activity.refresh();
 
         if (m_error > 0) {
             Toast.makeText(m_activity, m_error, Toast.LENGTH_SHORT).show();

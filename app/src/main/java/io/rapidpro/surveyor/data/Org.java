@@ -7,9 +7,13 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import io.rapidpro.surveyor.Surveyor;
+
+import static io.rapidpro.surveyor.Surveyor.get;
 
 public class Org {
     private static final String ORGS_DIR = "orgs";
@@ -30,31 +34,41 @@ public class Org {
      * @return the directory file object
      */
     protected static File getOrgsDir() {
-        File orgsDir = new File(Surveyor.get().getFilesDir(), ORGS_DIR);
+        File orgsDir = new File(get().getFilesDir(), ORGS_DIR);
         orgsDir.mkdirs();
         return orgsDir;
     }
 
+    /**
+     * Loads all orgs that the current user has access to
+     * @return the org objects
+     */
     public static List<Org> loadAll() throws IOException {
+        Set<String> orgUUIDs = Surveyor.get().getPreferences().getStringSet(Surveyor.PREF_AUTH_ORGS, Collections.<String>emptySet());
+
         List<Org> all = new ArrayList<>();
-        for (File subDir : getOrgsDir().listFiles()) {
-            if (subDir.isDirectory()) {
-                all.add(Org.load(subDir));
-            }
+        for (String orgUUID : orgUUIDs) {
+            all.add(load(orgUUID));
         }
         return all;
     }
 
-    public static Org load(File directory) throws IOException {
-        Gson gson = new Gson();
-        File detailsFile = new File(directory, DETAILS_FILE);
-        String detailsJSON = FileUtils.readFileToString(detailsFile);
-
-        return gson.fromJson(detailsJSON, Org.class);
-    }
-
+    /**
+     * Loads the org with the given UUID
+     * @param uuid the org UUID
+     * @return the org
+     */
     public static Org load(String uuid) throws IOException {
-        return load(new File(getOrgsDir(), uuid));
+        File orgDir = new File(getOrgsDir(), uuid);
+        if (orgDir.exists() && orgDir.isDirectory()) {
+            Gson gson = new Gson();
+            File detailsFile = new File(orgDir, DETAILS_FILE);
+            String detailsJSON = FileUtils.readFileToString(detailsFile);
+            Org org = gson.fromJson(detailsJSON, Org.class);
+            org.uuid = uuid;
+            return org;
+        }
+        throw new RuntimeException("no org directory for org " + uuid);
     }
 
     /**
@@ -137,7 +151,7 @@ public class Org {
      * Refreshes this org from RapidPro
      */
     public void refresh(boolean full) throws IOException {
-        io.rapidpro.surveyor.net.responses.Org apiOrg = Surveyor.get().getRapidProService().getOrgForToken(this.token);
+        io.rapidpro.surveyor.net.responses.Org apiOrg = get().getRapidProService().getOrgForToken(this.token);
 
         this.uuid = apiOrg.getUuid();
         this.name = apiOrg.getName();
