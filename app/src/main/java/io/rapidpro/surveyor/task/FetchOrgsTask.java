@@ -10,7 +10,7 @@ import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.data.Org;
 
 /**
- * Task to fetch orgs from RapidPro, create their directories, and return their UUIDs
+ * Task to fetch orgs from RapidPro, create their directories, save their details, and return their UUIDs
  */
 public class FetchOrgsTask extends AsyncTask<String, Void, Set<String>> {
 
@@ -29,6 +29,7 @@ public class FetchOrgsTask extends AsyncTask<String, Void, Set<String>> {
             try {
                 Org org = Org.fetch(token);
                 orgUUIDs.add(org.getUUID());
+
                 Surveyor.LOG.d("Fetched org with UUID " + org.getUUID());
             } catch (IOException e) {
                 e.printStackTrace();

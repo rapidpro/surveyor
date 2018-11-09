@@ -151,7 +151,7 @@ public class Org {
      * Refreshes this org from RapidPro
      */
     public void refresh(boolean full) throws IOException {
-        io.rapidpro.surveyor.net.responses.Org apiOrg = get().getRapidProService().getOrgForToken(this.token);
+        io.rapidpro.surveyor.net.responses.Org apiOrg = get().getRapidProService().getOrg(this.token);
 
         this.uuid = apiOrg.getUuid();
         this.name = apiOrg.getName();

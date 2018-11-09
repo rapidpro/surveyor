@@ -6,6 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.rapidpro.surveyor.BuildConfig;
@@ -13,10 +15,14 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.ResponseException;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.TembaException;
+import io.rapidpro.surveyor.net.responses.Field;
+import io.rapidpro.surveyor.net.responses.Group;
 import io.rapidpro.surveyor.net.responses.Org;
+import io.rapidpro.surveyor.net.responses.PaginatedResults;
 import io.rapidpro.surveyor.net.responses.TokenResults;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -25,33 +31,87 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TembaService {
 
     private TembaAPI m_api;
-    private String m_token;
 
     public TembaService(String host) {
         m_api = createRetrofit(host).create(TembaAPI.class);
     }
 
-    public TembaService(TembaAPI api) {
+    /**
+     * For testing purposes so we can give it a mocked API instance
+     *
+     * @param api the API instance
+     */
+    protected TembaService(TembaAPI api) {
         m_api = api;
     }
 
-    public void setToken(String token) {
-        m_token = "Token " + token;
-    }
-
-    public String getToken() {
-        return m_token;
-    }
-
+    /**
+     * Calls RapidPro's authenticate endpoint to give us the list of tokens and orgs we can access
+     */
     public void authenticate(String username, String password, Callback<TokenResults> callback) {
         m_api.authenticate(username, password, "S").enqueue(callback);
     }
 
-    public Org getOrgForToken(String token) {
+    /**
+     * Gets the org associated with the given token
+     */
+    public Org getOrg(String token) {
         try {
             Response<Org> response = m_api.getOrg("Token " + token).execute();
             checkResponse(response);
             return response.body();
+        } catch (IOException e) {
+            throw new TembaException(e);
+        }
+    }
+
+    /**
+     * Gets all of the contact fields
+     */
+    public List<Field> getFields(final String token) {
+        return fetchAllPages(new PageCaller<Field>() {
+            @Override
+            public Call<PaginatedResults<Field>> createCall(String cursor) {
+                return m_api.getFields(token, cursor);
+            }
+        });
+    }
+
+    /**
+     * Gets all of the contact fields
+     */
+    public List<Group> getGroups(final String token) {
+        return fetchAllPages(new PageCaller<Group>() {
+            @Override
+            public Call<PaginatedResults<Group>> createCall(String cursor) {
+                return m_api.getGroups(token, cursor);
+            }
+        });
+    }
+
+    /**
+     * Utility for fetching all pages of a given type
+     */
+    private interface PageCaller<T> {
+        Call<PaginatedResults<T>> createCall(String cursor);
+    }
+
+    /**
+     * Utility for fetching all pages of a given type
+     */
+    private <T> List<T> fetchAllPages(PageCaller<T> caller) {
+        try {
+            List<T> all = new ArrayList<>();
+            PaginatedResults<T> page = null;
+
+            do {
+                String cursor = page != null ? page.getNextCursor() : null;
+                page = caller.createCall(cursor).execute().body();
+                all.addAll(page.getResults());
+
+            } while (page.hasNext());
+
+            return all;
         } catch (IOException e) {
             throw new TembaException(e);
         }

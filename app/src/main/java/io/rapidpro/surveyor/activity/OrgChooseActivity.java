@@ -75,7 +75,6 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.O
     }
 
     private void showOrg(Org org) {
-        getRapidProService().setToken(org.getToken());
         Intent intent = new Intent(OrgChooseActivity.this, OrgActivity.class);
         intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, org.getUUID());
         startActivity(intent);

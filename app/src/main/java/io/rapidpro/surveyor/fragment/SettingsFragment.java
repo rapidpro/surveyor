@@ -4,11 +4,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.util.Patterns;
 import android.widget.Toast;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.TembaException;
 import io.rapidpro.surveyor.activity.BaseActivity;
 
 /**
@@ -31,9 +31,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                try {
-                    Surveyor.get().getRapidProService((String) newValue);
-                } catch (TembaException e) {
+                if (!Patterns.WEB_URL.matcher((String) newValue).matches()) {
                     Toast.makeText(getActivity(), getString(R.string.error_invalid_host), Toast.LENGTH_SHORT).show();
                     return false;
                 }

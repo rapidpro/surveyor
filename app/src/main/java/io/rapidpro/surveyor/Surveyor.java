@@ -82,13 +82,9 @@ public class Surveyor extends Application {
         return getPreferences().getString(PREF_HOST, getString(R.string.pref_default_host));
     }
 
-    public TembaService getRapidProService(String host) {
-        return new TembaService(host);
-    }
-
     public TembaService getRapidProService() {
         if (m_tembaService == null) {
-            m_tembaService = getRapidProService(getHost());
+            m_tembaService = new TembaService(getHost());
         }
         return m_tembaService;
     }

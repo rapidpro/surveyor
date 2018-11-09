@@ -1,22 +1,24 @@
 package io.rapidpro.surveyor.test;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import org.apache.commons.lang3.StringUtils;
+import android.text.TextUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.net.TembaAPI;
+import io.rapidpro.surveyor.net.responses.Field;
+import io.rapidpro.surveyor.net.responses.Group;
+import io.rapidpro.surveyor.net.responses.Org;
+import io.rapidpro.surveyor.net.responses.PaginatedResults;
+import io.rapidpro.surveyor.net.responses.Token;
 import io.rapidpro.surveyor.net.responses.TokenResults;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.mock.BehaviorDelegate;
 
+/**
+ * Mocked version of the Temba API which returns test data
+ */
 public class MockTembaAPI implements TembaAPI {
 
     private final BehaviorDelegate<TembaAPI> delegate;
@@ -26,92 +28,79 @@ public class MockTembaAPI implements TembaAPI {
     }
 
     @Override
-    public Call<TokenResults> getTokens(String username, String password, String role) {
-        return null;
+    public Call<TokenResults> authenticate(String username, String password, String role) {
+        TokenResults results = new TokenResults();
+        results.setTokens(Arrays.asList(
+                new Token("abc123", new Token.OrgReference("3252-3453", "Nyaruka")),
+                new Token("cde456", new Token.OrgReference("7644-1245", "UNICEF"))
+        ));
+
+        return delegate.returningResponse(results).authenticate(username, password, role);
     }
 
     @Override
-    public Call<DBOrg> getOrg(String token) {
-        DBOrg org = new DBOrg();
-        org.setName("Test Org");
+    public Call<Org> getOrg(String token) {
+        Org org = new Org();
+        org.setUuid("b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06");
+        org.setName("Nyaruka");
         org.setPrimaryLanguage("eng");
+        org.setLanguages(new String[]{"eng", "fra"});
+        org.setTimezone("Africa/Kigali");
         org.setCountry("RW");
         return delegate.returningResponse(org).getOrg(token);
     }
 
     @Override
-    public Call<FlowPage> getFlows(String token, String type, boolean archived) {
-        return null;
-    }
-
-    @Override
-    public Call<Definitions> getFlowDefinition(String token, String uuid) {
-        return null;
-    }
-
-    @Override
-    public Call<JsonObject> addResults(String token, JsonElement submissionJson) {
-        return null;
-    }
-
-    @Override
-    public Call<JsonObject> addContact(String token, JsonElement contact) {
-        return null;
-    }
-
-    @Override
-    public Call<LocationPage> getLocationPage(String token, String cursor) {
-        LocationPage page = new LocationPage();
-
-        Location ecuador = new Location("123", "Ecuador", 0, null, Collections.singletonList("Ecuator"));
-        Location azuay = new Location("2535", "Azuay", 1, ecuador.toReference(), null);
-        Location cuenca = new Location("35355", "Cuenca", 1, azuay.toReference(), null);
+    public Call<PaginatedResults<Field>> getFields(String token, String cursor) {
+        PaginatedResults<Field> page = new PaginatedResults<>();
 
         // first page
-        if (StringUtils.isEmpty(cursor)) {
-            page.setResults(Arrays.asList(ecuador, azuay));
-            page.setNext("http://example.com/api/v2/boundaries.json?cursor=1234");
-
-            // second page
-        } else if (cursor.equals("1234")) {
-            page.setResults(Collections.singletonList(cuenca));
-            page.setNext(null);
-        } else {
-            page.setResults(Collections.<Location>emptyList());
-        }
-
-        return delegate.returningResponse(page).getLocationPage(token, cursor);
-    }
-
-    @Override
-    public Call<FieldPage> getFieldPage(String token, String cursor) {
-        FieldPage page = new FieldPage();
-
-        // first page
-        if (StringUtils.isEmpty(cursor)) {
-            List<JsonObject> fields = Arrays.asList(
-                    JsonUtils.object("key", "gender", "label", "Gender", "value_type", "text"),
-                    JsonUtils.object("key", "age", "label", "Age", "value_type", "numeric")
+        if (TextUtils.isEmpty(cursor)) {
+            List<Field> results = Arrays.asList(
+                    new Field("gender", "Gender", "text"),
+                    new Field("age", "Age", "numeric")
             );
-            page.setResults(fields);
+            page.setResults(results);
             page.setNext("http://example.com/api/v2/flows.json?cursor=1234");
 
             // second page
         } else if (cursor.equals("1234")) {
-            List<JsonObject> fields = Collections.singletonList(
-                    JsonUtils.object("key", "join_date", "label", "Join Date", "value_type", "datetime")
+            List<Field> results = Collections.singletonList(
+                    new Field("join_date", "Join Date", "datetime")
             );
-            page.setResults(fields);
+            page.setResults(results);
             page.setNext(null);
         } else {
-            page.setResults(Collections.<JsonObject>emptyList());
+            page.setResults(Collections.<Field>emptyList());
         }
 
-        return delegate.returningResponse(page).getFieldPage(token, cursor);
+        return delegate.returningResponse(page).getFields(token, cursor);
     }
 
     @Override
-    public Call<JsonObject> uploadMedia(String token, Map<String, RequestBody> params) {
-        return null;
+    public Call<PaginatedResults<Group>> getGroups(String token, String cursor) {
+        PaginatedResults<Group> page = new PaginatedResults<>();
+
+        // first page
+        if (TextUtils.isEmpty(cursor)) {
+            List<Group> results = Arrays.asList(
+                    new Group("b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06", "Testers", ""),
+                    new Group("372aba66-16e2-44ee-8486-fb5cedfe51d9", "Customers", "")
+            );
+            page.setResults(results);
+            page.setNext("http://example.com/api/v2/flows.json?cursor=1234");
+
+            // second page
+        } else if (cursor.equals("1234")) {
+            List<Group> results = Collections.singletonList(
+                    new Group("63867d07-c033-4ef1-957c-85fa9708c19c", "Youth", "age <= 18")
+            );
+            page.setResults(results);
+            page.setNext(null);
+        } else {
+            page.setResults(Collections.<Group>emptyList());
+        }
+
+        return delegate.returningResponse(page).getGroups(token, cursor);
     }
 }
