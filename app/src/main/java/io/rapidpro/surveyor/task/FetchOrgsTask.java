@@ -19,7 +19,6 @@ public class FetchOrgsTask extends AsyncTask<String, Void, Set<String>> {
 
     public FetchOrgsTask(FetchOrgsListener listener) {
         this.listener = listener;
-        this.failed = false;
     }
 
     @Override

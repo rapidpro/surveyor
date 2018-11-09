@@ -2,7 +2,6 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +14,7 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
-import io.rapidpro.surveyor.net.TembaService;
+import io.rapidpro.surveyor.task.FetchOrgAssets;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 
 
@@ -24,23 +23,25 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
     // progress dialog while we are refreshing org details
     private BlockingProgress m_refreshProgress;
 
+    private Org org;
+
+    private Org getOrg() {
+        if (this.org == null) {
+            try {
+                String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
+                this.org = Org.load(orgUUID);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return this.org;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
-        if (orgUUID == null) {
-            throw new RuntimeException("HOW IS THIS POSSIBLE??");
-        }
-        Org org = null;
-
-        try {
-            org = Org.load(orgUUID);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        setTitle(org.getName());
+        setTitle(getOrg().getName());
 
         /*final DBOrg org = getDBOrg();
 
@@ -115,10 +116,7 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        m_refreshProgress = new BlockingProgress(OrgActivity.this,
-                                R.string.one_moment, R.string.refresh_org, 3);
-                        m_refreshProgress.show();
-                        new FetchOrgData().execute();
+                        doRefresh();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -128,6 +126,32 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
                     }
                 })
                 .show();
+    }
+
+    protected void doRefresh() {
+        m_refreshProgress = new BlockingProgress(OrgActivity.this, R.string.one_moment, R.string.refresh_org, 3);
+        m_refreshProgress.show();
+
+        new FetchOrgAssets(new FetchOrgAssets.FetchOrgAssetsListener() {
+            @Override
+            public void onProgress(int percent) {
+                m_refreshProgress.setProgress(percent);
+            }
+
+            @Override
+            public void onComplete() {
+                m_refreshProgress.dismiss();
+                m_refreshProgress = null;
+            }
+
+            @Override
+            public void onFailure() {
+                m_refreshProgress.dismiss();
+                m_refreshProgress = null;
+
+                Toast.makeText(OrgActivity.this, getString(R.string.error_org_refresh), Toast.LENGTH_SHORT).show();
+            }
+        }).execute(getOrg());
     }
 
     public void onClickSubmit(View view) {
@@ -155,54 +179,5 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
                     }
                 })
                 .show();
-    }
-
-    private void incrementProgress() {
-        if (m_refreshProgress != null) {
-            m_refreshProgress.incrementProgressBy(1);
-        }
-    }
-
-    private class FetchOrgData extends AsyncTask<String, Void, Void> {
-
-        private int m_error;
-
-        @Override
-        protected Void doInBackground(String... params) {
-
-            try {
-                TembaService rapid = getRapidProService();
-
-                // TODO
-
-                incrementProgress();
-
-            } catch (Throwable t) {
-                m_error = getRapidProService().getErrorMessage(t);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-
-            overridePendingTransition(0, 0);
-
-            if (m_error > 0) {
-                Toast.makeText(OrgActivity.this, m_error, Toast.LENGTH_SHORT).show();
-                finish();
-            } else {
-                if (m_refreshProgress == null) {
-                    finish();
-                    startActivity(getIntent());
-                }
-            }
-
-            if (m_refreshProgress != null && m_refreshProgress.isShowing()) {
-                m_refreshProgress.hide();
-                m_refreshProgress = null;
-            }
-        }
     }
 }

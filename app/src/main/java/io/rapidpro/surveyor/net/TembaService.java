@@ -57,7 +57,7 @@ public class TembaService {
      */
     public Org getOrg(String token) {
         try {
-            Response<Org> response = m_api.getOrg("Token " + token).execute();
+            Response<Org> response = m_api.getOrg(asAuth(token)).execute();
             checkResponse(response);
             return response.body();
         } catch (IOException e) {
@@ -72,7 +72,7 @@ public class TembaService {
         return fetchAllPages(new PageCaller<Field>() {
             @Override
             public Call<PaginatedResults<Field>> createCall(String cursor) {
-                return m_api.getFields(token, cursor);
+                return m_api.getFields(asAuth(token), cursor);
             }
         });
     }
@@ -84,7 +84,7 @@ public class TembaService {
         return fetchAllPages(new PageCaller<Group>() {
             @Override
             public Call<PaginatedResults<Group>> createCall(String cursor) {
-                return m_api.getGroups(token, cursor);
+                return m_api.getGroups(asAuth(token), cursor);
             }
         });
     }
@@ -106,8 +106,14 @@ public class TembaService {
 
             do {
                 String cursor = page != null ? page.getNextCursor() : null;
-                page = caller.createCall(cursor).execute().body();
-                all.addAll(page.getResults());
+                Response<PaginatedResults<T>> response = caller.createCall(cursor).execute();
+
+                if (response.isSuccessful()) {
+                    page = response.body();
+                    all.addAll(page.getResults());
+                } else {
+                    throw new TembaException("Server returned non-200 response");
+                }
 
             } while (page.hasNext());
 
@@ -115,6 +121,10 @@ public class TembaService {
         } catch (IOException e) {
             throw new TembaException(e);
         }
+    }
+
+    private static String asAuth(String token) {
+        return "Token " + token;
     }
 
     private void checkResponse(Response<?> response) {

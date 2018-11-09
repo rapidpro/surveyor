@@ -854,7 +854,8 @@
     <string name="refresh_title">Refresh</string>
     <string name="confirm_flow_refresh">Are you sure you want to refresh the flow definition? This will overwrite the existing version and cannot be undone.</string>
     <string name="refresh_flow">Refreshing flow definition.</string>
-    <string name="confirm_org_refresh">Refresh the contact fields and locations for this organization?</string>
+    <string name="confirm_org_refresh">Refresh all flows for this organization?</string>
+    <string name="error_org_refresh">A problem occurred whilst refreshing this org. Please try again later.</string>
     <string name="action_delete">Delete</string>
     <string name="flow_delete_warning">Delete this flow and all existing submissions.</string>
     <string name="action_submit">Submit</string>
