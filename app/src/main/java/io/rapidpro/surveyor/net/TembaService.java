@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.ResponseException;
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.TembaException;
 import io.rapidpro.surveyor.net.responses.Field;
 import io.rapidpro.surveyor.net.responses.Group;
@@ -139,7 +139,7 @@ public class TembaService {
             }
 
             // make a note of the error in our log
-            Surveyor.LOG.d(errorBody);
+            SurveyorApplication.LOG.d(errorBody);
 
             // see if the server had anything interesting to say
             Gson gson = new Gson();

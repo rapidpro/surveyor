@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ShareCompat;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -23,21 +22,26 @@ import java.util.Set;
 
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.SurveyorPrefs;
 import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
- * All activities for the Surveyor app extend this base activity which provides convenience methods
+ * All activities for the SurveyorApplication app extend this base activity which provides convenience methods
  * for things like authentication etc.
  */
-public class BaseActivity extends PermisoActivity {
+public abstract class BaseActivity extends PermisoActivity {
 
     private ViewCache m_viewCache;
 
-    public Surveyor getSurveyor() {
-        return (Surveyor) getApplication();
+    /**
+     * Gets the instance of the application
+     * @return the application
+     */
+    public SurveyorApplication getSurveyor() {
+        return (SurveyorApplication) getApplication();
     }
 
     /**
@@ -53,12 +57,12 @@ public class BaseActivity extends PermisoActivity {
      * Logs in a user for the given orgs
      */
     public void login(String email, Set<String> orgUUIDs) {
-        Surveyor.LOG.d("Logging in as " + email + " with access to orgs " + TextUtils.join(",", orgUUIDs));
+        SurveyorApplication.LOG.d("Logging in as " + email + " with access to orgs " + TextUtils.join(",", orgUUIDs));
 
         // save email which we'll need for submissions later
-        setPreferencesString(Surveyor.PREF_AUTH_USERNAME, email);
-        setPreferencesString(Surveyor.PREF_PREV_USERNAME, email);
-        setPreferencesStringSet(Surveyor.PREF_AUTH_ORGS, orgUUIDs);
+        setPreferencesString(SurveyorPrefs.AUTH_USERNAME, email);
+        setPreferencesString(SurveyorPrefs.PREV_USERNAME, email);
+        setPreferencesStringSet(SurveyorPrefs.AUTH_ORGS, orgUUIDs);
 
         // let the user pick an org...
         startActivity(new Intent(this, OrgChooseActivity.class));
@@ -76,10 +80,10 @@ public class BaseActivity extends PermisoActivity {
      * Logs the user out and returns them to the login page showing the given error string
      */
     protected void logout(int errorResId) {
-        Surveyor.LOG.d("Logging out with error " + errorResId);
+        SurveyorApplication.LOG.d("Logging out with error " + errorResId);
 
-        setPreferencesString(Surveyor.PREF_AUTH_USERNAME, null);
-        setPreferencesStringSet(Surveyor.PREF_AUTH_ORGS, Collections.<String>emptySet());
+        setPreferencesString(SurveyorPrefs.AUTH_USERNAME, null);
+        setPreferencesStringSet(SurveyorPrefs.AUTH_ORGS, Collections.<String>emptySet());
 
         Intent intent = new Intent(this, LoginActivity.class);
         if (errorResId != -1) {
@@ -95,7 +99,7 @@ public class BaseActivity extends PermisoActivity {
      */
     @Override
     protected void onCreate(Bundle bundle) {
-        Surveyor.LOG.d(getClass().getSimpleName() + ".onCreate");
+        SurveyorApplication.LOG.d(getClass().getSimpleName() + ".onCreate");
 
         super.onCreate(bundle);
 
@@ -112,7 +116,7 @@ public class BaseActivity extends PermisoActivity {
      */
     @Override
     public void finish() {
-        Surveyor.LOG.d(getClass().getSimpleName() + ".finish");
+        SurveyorApplication.LOG.d(getClass().getSimpleName() + ".finish");
 
         super.finish();
 
@@ -156,21 +160,21 @@ public class BaseActivity extends PermisoActivity {
         info.append("Version: " + BuildConfig.VERSION_NAME + "; " + BuildConfig.VERSION_CODE);
         info.append("\n  OS: " + System.getProperty("os.version") + " (API " + Build.VERSION.SDK_INT + ")");
         info.append("\n  Model: " + android.os.Build.MODEL + " (" + android.os.Build.DEVICE + ")");
-        Surveyor.LOG.d(info.toString());
+        SurveyorApplication.LOG.d(info.toString());
 
         // Generate a logcat file
         File outputFile = new File(Environment.getExternalStorageDirectory(), "surveyor-debug.txt");
 
         try {
-            Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E Surveyor:*\" ");
+            Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E SurveyorApplication:*\" ");
         } catch (Throwable t) {
-            Surveyor.LOG.e("Failed to generate report", t);
+            SurveyorApplication.LOG.e("Failed to generate report", t);
         }
 
         ShareCompat.IntentBuilder.from(this)
                 .setType("message/rfc822")
                 .addEmailTo("support@rapidpro.io")
-                .setSubject("Surveyor Bug Report")
+                .setSubject("SurveyorApplication Bug Report")
                 .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
                 .setStream(Uri.fromFile(outputFile))
                 .setChooserTitle("Send Email")
@@ -208,7 +212,7 @@ public class BaseActivity extends PermisoActivity {
      * @return the username/email
      */
     protected String getUsername() {
-        return getPreferences().getString(Surveyor.PREF_AUTH_USERNAME, null);
+        return getPreferences().getString(SurveyorPrefs.AUTH_USERNAME, null);
     }
 
     /**
@@ -226,7 +230,7 @@ public class BaseActivity extends PermisoActivity {
      * @return the preferences
      */
     public SharedPreferences getPreferences() {
-        return Surveyor.get().getPreferences();
+        return getSurveyor().getPreferences();
     }
 
     /**

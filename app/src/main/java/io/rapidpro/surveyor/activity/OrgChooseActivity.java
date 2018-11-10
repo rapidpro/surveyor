@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.fragment.OrgListFragment;
@@ -31,7 +31,7 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.O
             e.printStackTrace();
         }
 
-        Surveyor.LOG.d("Loaded " + orgs.size() + " orgs");
+        SurveyorApplication.LOG.d("Loaded " + orgs.size() + " orgs");
 
         // if we don't have any orgs, take us back to the login screen
         if (orgs.size() == 0) {
@@ -41,7 +41,7 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.O
         }
         // if we have access to a single org, then skip choosing
         else if (orgs.size() == 1) {
-            Surveyor.LOG.d("One org found, shortcutting chooser to: " + orgs.get(0).getName());
+            SurveyorApplication.LOG.d("One org found, shortcutting chooser to: " + orgs.get(0).getName());
             showOrg(orgs.get(0));
             finish();
             overridePendingTransition(0, 0);

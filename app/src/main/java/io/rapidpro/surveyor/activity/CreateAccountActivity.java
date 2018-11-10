@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Org;
 
 /**
@@ -75,7 +75,7 @@ public class CreateAccountActivity extends BaseActivity {
             }
         });
 
-        web.loadUrl(Surveyor.get().getHost() + CREATE_ACCOUNT_URL);
+        web.loadUrl(SurveyorApplication.get().getHost() + CREATE_ACCOUNT_URL);
     }
 
     @Override

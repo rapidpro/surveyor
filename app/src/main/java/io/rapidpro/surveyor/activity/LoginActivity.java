@@ -22,8 +22,9 @@ import com.greysonparrelli.permiso.Permiso;
 import java.util.Set;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.SurveyorPrefs;
 import io.rapidpro.surveyor.net.responses.TokenResults;
 import io.rapidpro.surveyor.task.FetchOrgsTask;
 import retrofit2.Call;
@@ -67,7 +68,7 @@ public class LoginActivity extends BaseActivity {
         m_emailView = findViewById(R.id.email);
 
         // prepopulate with our previous username if we have one
-        m_emailView.setText(getPreferences().getString(Surveyor.PREF_PREV_USERNAME, ""));
+        m_emailView.setText(getPreferences().getString(SurveyorPrefs.PREV_USERNAME, ""));
 
         m_passwordView = findViewById(R.id.password);
         m_passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -188,7 +189,7 @@ public class LoginActivity extends BaseActivity {
                     if (response.isSuccessful()) {
                         String[] tokens = response.body().toRawTokens();
 
-                        Surveyor.LOG.d("Authentication returned " + tokens.length + " tokens");
+                        SurveyorApplication.LOG.d("Authentication returned " + tokens.length + " tokens");
 
                         new FetchOrgsTask(new FetchOrgsTask.FetchOrgsListener() {
                             @Override
@@ -223,7 +224,7 @@ public class LoginActivity extends BaseActivity {
 
                 @Override
                 public void onFailure(Call<TokenResults> call, Throwable t) {
-                    Surveyor.LOG.e("Failure logging in", t);
+                    SurveyorApplication.LOG.e("Failure logging in", t);
                     setErrorMessage(getString(R.string.error_network));
                     showProgress(false);
                 }

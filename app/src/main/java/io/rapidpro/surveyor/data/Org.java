@@ -11,13 +11,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import io.rapidpro.surveyor.Surveyor;
-
-import static io.rapidpro.surveyor.Surveyor.get;
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.SurveyorPrefs;
+import io.rapidpro.surveyor.net.TembaService;
 
 public class Org {
     private static final String ORGS_DIR = "orgs";
     private static final String DETAILS_FILE = "details.json";
+
+    private transient String uuid;
     private String token;
     private String name;
     private String primaryLanguage;
@@ -26,7 +28,6 @@ public class Org {
     private String country;
     private String dateStyle;
     private boolean anon;
-    private transient String uuid;
 
     /**
      * Gets the base directory for all org storage
@@ -34,17 +35,18 @@ public class Org {
      * @return the directory file object
      */
     protected static File getOrgsDir() {
-        File orgsDir = new File(get().getFilesDir(), ORGS_DIR);
+        File orgsDir = new File(SurveyorApplication.get().getFilesDir(), ORGS_DIR);
         orgsDir.mkdirs();
         return orgsDir;
     }
 
     /**
      * Loads all orgs that the current user has access to
+     *
      * @return the org objects
      */
     public static List<Org> loadAll() throws IOException {
-        Set<String> orgUUIDs = Surveyor.get().getPreferences().getStringSet(Surveyor.PREF_AUTH_ORGS, Collections.<String>emptySet());
+        Set<String> orgUUIDs = SurveyorApplication.get().getPreferences().getStringSet(SurveyorPrefs.AUTH_ORGS, Collections.<String>emptySet());
 
         List<Org> all = new ArrayList<>();
         for (String orgUUID : orgUUIDs) {
@@ -55,6 +57,7 @@ public class Org {
 
     /**
      * Loads the org with the given UUID
+     *
      * @param uuid the org UUID
      * @return the org
      */
@@ -92,6 +95,15 @@ public class Org {
     }
 
     /**
+     * Gets the UUID of this org
+     *
+     * @return the UUID
+     */
+    public String getUUID() {
+        return uuid;
+    }
+
+    /**
      * Gets the API token for this org
      *
      * @return the API token
@@ -100,14 +112,6 @@ public class Org {
         return token;
     }
 
-    /**
-     * Gets the UUID of this org
-     *
-     * @return the UUID
-     */
-    public String getUUID() {
-        return uuid;
-    }
 
     /**
      * Gets the name of this org
@@ -151,7 +155,8 @@ public class Org {
      * Refreshes this org from RapidPro
      */
     public void refresh(boolean full) throws IOException {
-        io.rapidpro.surveyor.net.responses.Org apiOrg = get().getRapidProService().getOrg(this.token);
+        TembaService svc = SurveyorApplication.get().getRapidProService();
+        io.rapidpro.surveyor.net.responses.Org apiOrg = svc.getOrg(this.token);
 
         this.uuid = apiOrg.getUuid();
         this.name = apiOrg.getName();

@@ -8,7 +8,8 @@ import android.util.Patterns;
 import android.widget.Toast;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.SurveyorPrefs;
 import io.rapidpro.surveyor.activity.BaseActivity;
 
 /**
@@ -27,7 +28,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
-        Preference pref = findPreference(Surveyor.PREF_HOST);
+        Preference pref = findPreference(SurveyorPrefs.HOST);
         pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {

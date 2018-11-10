@@ -5,8 +5,6 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import io.rapidpro.surveyor.ResponseException;
-import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.activity.BaseActivity;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 

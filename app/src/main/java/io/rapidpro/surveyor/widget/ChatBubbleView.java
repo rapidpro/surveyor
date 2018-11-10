@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.ui.CachedLinearLayout;
 import io.rapidpro.surveyor.ui.IconTextView;
 
@@ -72,7 +72,7 @@ public class ChatBubbleView extends CachedLinearLayout {
         View mediaView = getView(R.id.media_view);
         mediaView.setVisibility(VISIBLE);
 
-        Surveyor.LOG.d("URL: " + url);
+        SurveyorApplication.LOG.d("URL: " + url);
 
         mediaView.setTag(R.string.tag_url, url);
         mediaView.setTag(R.string.tag_media_type, type);

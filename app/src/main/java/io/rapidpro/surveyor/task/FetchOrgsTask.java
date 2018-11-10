@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Org;
 
 /**
@@ -29,7 +29,7 @@ public class FetchOrgsTask extends AsyncTask<String, Void, Set<String>> {
                 Org org = Org.fetch(token);
                 orgUUIDs.add(org.getUUID());
 
-                Surveyor.LOG.d("Fetched org with UUID " + org.getUUID());
+                SurveyorApplication.LOG.d("Fetched org with UUID " + org.getUUID());
             } catch (IOException e) {
                 e.printStackTrace();
                 this.failed = true;

@@ -1,48 +1,33 @@
 package io.rapidpro.surveyor;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import io.rapidpro.surveyor.net.TembaService;
 
-public class Surveyor extends Application {
+public class SurveyorApplication extends Application {
 
     /**
-     * RapidPro host we are connected to
+     * Name of the preferences file (overridden in tests)
      */
-    public static String PREF_HOST = "pref_key_host";
+    public static String PREFS_NAME = "default";
 
-    /**
-     * Username/email we are logged in as. If this is set, we are logged in
-     */
-    public static String PREF_AUTH_USERNAME = "surveyor.pref.auth_username";
-
-    /**
-     * Username/email we were previously logged in as - used to prepopulate login form
-     */
-    public static String PREF_PREV_USERNAME = "surveyor.pref.prev_username";
-
-    /**
-     * UUIDs of the orgs this user has access to
-     */
-    public static String PREF_AUTH_ORGS = "surveyor.pref.auth_orgs";
-
-    public static Logger LOG = new Logger();
+    public static final Logger LOG = new Logger();
 
     /**
      * The singleton instance of this app
      */
-    private static Surveyor s_this;
+    private static SurveyorApplication s_this;
 
     private TembaService m_tembaService = null;
 
     @Override
     public void onCreate() {
+        LOG.d("SurveyorApplication.onCreate");
+
         super.onCreate();
         s_this = this;
-
-        Surveyor.LOG.d("Surveyor.onCreate");
 
         try {
             updatePrefs();
@@ -55,7 +40,7 @@ public class Surveyor extends Application {
      * Gets the singleton instance of this app
      * @return the instance
      */
-    public static Surveyor get() {
+    public static SurveyorApplication get() {
         return s_this;
     }
 
@@ -64,7 +49,7 @@ public class Surveyor extends Application {
      * @return the preferences
      */
     public SharedPreferences getPreferences() {
-        return PreferenceManager.getDefaultSharedPreferences(s_this);
+        return s_this.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
     public void resetPrefs() {
@@ -73,13 +58,12 @@ public class Surveyor extends Application {
     }
 
     public void updatePrefs() {
-        // re-create our service
+        // get rid of our cached service
         m_tembaService = null;
-        getRapidProService();
     }
 
     public String getHost() {
-        return getPreferences().getString(PREF_HOST, getString(R.string.pref_default_host));
+        return getPreferences().getString(SurveyorPrefs.HOST, getString(R.string.pref_default_host));
     }
 
     public TembaService getRapidProService() {

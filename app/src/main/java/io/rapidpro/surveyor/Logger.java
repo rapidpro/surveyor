@@ -22,7 +22,7 @@ import android.util.Log;
 
 public class Logger {
 
-    public static final String TAG = "Surveyor";
+    public static final String TAG = "SurveyorApplication";
 
     public void d(String message) {
         Log.d(TAG, message);

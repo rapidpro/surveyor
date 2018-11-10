@@ -11,7 +11,7 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.task.FetchOrgAssets;
@@ -155,7 +155,7 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
     }
 
     public void onClickSubmit(View view) {
-        Surveyor.LOG.d("Clicked on submit..");
+        SurveyorApplication.LOG.d("Clicked on submit..");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirm_send_all_submissions))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {

@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 
 import java.util.List;
 
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.net.responses.Field;
 import io.rapidpro.surveyor.net.responses.Group;
@@ -31,11 +31,11 @@ public class FetchOrgAssets extends AsyncTask<Org, Integer, Void> {
 
             publishProgress(10);
 
-            List<Field> fields = Surveyor.get().getRapidProService().getFields(org.getToken());
+            List<Field> fields = SurveyorApplication.get().getRapidProService().getFields(org.getToken());
 
             publishProgress(50);
 
-            List<Group> groups = Surveyor.get().getRapidProService().getGroups(org.getToken());
+            List<Group> groups = SurveyorApplication.get().getRapidProService().getGroups(org.getToken());
 
             publishProgress(100);
 

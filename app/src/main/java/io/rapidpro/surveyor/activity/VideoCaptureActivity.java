@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.ui.CameraPreview;
 import io.rapidpro.surveyor.ui.CameraUtil;
@@ -108,7 +108,7 @@ public class VideoCaptureActivity extends PermisoActivity {
                                                                  }
 
                                                                  try {
-                                                                     Surveyor.LOG.d("Opening camera: " + m_cameraId);
+                                                                     SurveyorApplication.LOG.d("Opening camera: " + m_cameraId);
                                                                      m_camera = Camera.open(m_cameraId);
                                                                      m_preview.refreshCamera(m_camera, m_cameraId);
 
@@ -121,7 +121,7 @@ public class VideoCaptureActivity extends PermisoActivity {
                                                                          m_camera.setParameters(params);
                                                                      }
                                                                  } catch (Exception e) {
-                                                                     Surveyor.LOG.e("Failed to open camera", e);
+                                                                     SurveyorApplication.LOG.e("Failed to open camera", e);
                                                                      finish();
                                                                  }
                                                              }

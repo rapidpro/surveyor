@@ -14,8 +14,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.SurveyorApplication;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder m_surfaceHolder;
@@ -120,7 +119,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             m_camera.setPreviewDisplay(m_surfaceHolder);
             m_camera.startPreview();
         } catch (Exception e) {
-            Surveyor.LOG.e("Error starting camera preview: " + e.getMessage(), e);
+            SurveyorApplication.LOG.e("Error starting camera preview: " + e.getMessage(), e);
         }
     }
 
