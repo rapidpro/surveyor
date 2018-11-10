@@ -60,7 +60,6 @@ public class LoginActivity extends BaseActivity {
             }
         }, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-
         overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
 
         setContentView(R.layout.activity_login);
@@ -95,7 +94,6 @@ public class LoginActivity extends BaseActivity {
 
         // set our error message if we have one
         setErrorMessage(getIntent().getStringExtra(SurveyorIntent.EXTRA_ERROR));
-
     }
 
     public void onResume() {

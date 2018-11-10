@@ -95,6 +95,8 @@ public class BaseActivity extends PermisoActivity {
      */
     @Override
     protected void onCreate(Bundle bundle) {
+        Surveyor.LOG.d(getClass().getSimpleName() + ".onCreate");
+
         super.onCreate(bundle);
 
         overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
@@ -110,6 +112,8 @@ public class BaseActivity extends PermisoActivity {
      */
     @Override
     public void finish() {
+        Surveyor.LOG.d(getClass().getSimpleName() + ".finish");
+
         super.finish();
 
         overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
