@@ -56,6 +56,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        ((BaseActivity) getActivity()).getSurveyor().updatePrefs();
+        if (key.equals(SurveyorPreferences.TEMBA_HOST)) {
+            ((BaseActivity) getActivity()).getSurveyor().onTembaHostChange();
+        }
     }
 }

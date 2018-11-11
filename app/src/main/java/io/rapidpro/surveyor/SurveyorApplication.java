@@ -34,13 +34,9 @@ public class SurveyorApplication extends Application {
         LOG.d("SurveyorApplication.onCreate");
 
         super.onCreate();
-        s_this = this;
 
-        try {
-            updatePrefs();
-        } catch (TembaException e) {
-            resetPrefs();
-        }
+        s_this = this;
+        m_tembaService = new TembaService(getTembaHost());
     }
 
     /**
@@ -61,16 +57,6 @@ public class SurveyorApplication extends Application {
         return s_this.getSharedPreferences(getPreferencesName(), Context.MODE_PRIVATE);
     }
 
-    public void resetPrefs() {
-        getPreferences().edit().clear().apply();
-        updatePrefs();
-    }
-
-    public void updatePrefs() {
-        // get rid of our cached service
-        m_tembaService = null;
-    }
-
     /**
      * Gets the base URL of the Temba instance we're connected to
      *
@@ -81,13 +67,17 @@ public class SurveyorApplication extends Application {
     }
 
     /**
-     * Returns our Temba service for communicating with a Temba instance
-     * @return the temba service
+     * Called when our host setting has changed
+     */
+    public void onTembaHostChange() {
+        m_tembaService = new TembaService(getTembaHost());
+    }
+
+    /**
+     * Returns the Temba API service
+     * @return the service
      */
     public TembaService getTembaService() {
-        if (m_tembaService == null) {
-            m_tembaService = new TembaService(getTembaHost());
-        }
         return m_tembaService;
     }
 }
