@@ -24,8 +24,7 @@ import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.SurveyorPrefs;
-import io.rapidpro.surveyor.net.TembaService;
+import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
@@ -60,9 +59,9 @@ public abstract class BaseActivity extends PermisoActivity {
         SurveyorApplication.LOG.d("Logging in as " + email + " with access to orgs " + TextUtils.join(",", orgUUIDs));
 
         // save email which we'll need for submissions later
-        setPreferencesString(SurveyorPrefs.AUTH_USERNAME, email);
-        setPreferencesString(SurveyorPrefs.PREV_USERNAME, email);
-        setPreferencesStringSet(SurveyorPrefs.AUTH_ORGS, orgUUIDs);
+        setPreference(SurveyorPreferences.AUTH_USERNAME, email);
+        setPreference(SurveyorPreferences.PREV_USERNAME, email);
+        setPreference(SurveyorPreferences.AUTH_ORGS, orgUUIDs);
 
         // let the user pick an org...
         startActivity(new Intent(this, OrgChooseActivity.class));
@@ -82,8 +81,8 @@ public abstract class BaseActivity extends PermisoActivity {
     protected void logout(int errorResId) {
         SurveyorApplication.LOG.d("Logging out with error " + errorResId);
 
-        setPreferencesString(SurveyorPrefs.AUTH_USERNAME, null);
-        setPreferencesStringSet(SurveyorPrefs.AUTH_ORGS, Collections.<String>emptySet());
+        clearPreference(SurveyorPreferences.AUTH_USERNAME);
+        setPreference(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet());
 
         Intent intent = new Intent(this, LoginActivity.class);
         if (errorResId != -1) {
@@ -212,7 +211,7 @@ public abstract class BaseActivity extends PermisoActivity {
      * @return the username/email
      */
     protected String getUsername() {
-        return getPreferences().getString(SurveyorPrefs.AUTH_USERNAME, null);
+        return getPreferences().getString(SurveyorPreferences.AUTH_USERNAME, null);
     }
 
     /**
@@ -234,31 +233,32 @@ public abstract class BaseActivity extends PermisoActivity {
     }
 
     /**
-     * Saves a string preference for this application
+     * Saves a string shared preference for this application
      *
      * @param key   the preference key
      * @param value the preference value
      */
-    public void setPreferencesString(String key, String value) {
-        SharedPreferences.Editor editor = getPreferences().edit();
-        editor.putString(key, value);
-        editor.apply();
+    public void setPreference(String key, String value) {
+        getPreferences().edit().putString(key, value).apply();
     }
 
     /**
-     * Saves a string set preference for this application
+     * Saves a string-set shared preference for this application
      *
      * @param key   the preference key
      * @param values the preference value
      */
-    public void setPreferencesStringSet(String key, Set<String> values) {
-        SharedPreferences.Editor editor = getPreferences().edit();
-        editor.putStringSet(key, values);
-        editor.apply();
+    public void setPreference(String key, Set<String> values) {
+        getPreferences().edit().putStringSet(key, values).apply();
     }
 
-    public TembaService getRapidProService() {
-        return getSurveyor().getRapidProService();
+    /**
+     * Clears a shared preference for this application
+     *
+     * @param key   the preference key
+     */
+    public void clearPreference(String key) {
+        getPreferences().edit().remove(key).apply();
     }
 
     public AlertDialog showAlert(int title, int body) {

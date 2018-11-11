@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.rapidpro.surveyor.SurveyorApplication;
-import io.rapidpro.surveyor.SurveyorPrefs;
+import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.net.TembaService;
 
 public class Org {
@@ -46,7 +46,7 @@ public class Org {
      * @return the org objects
      */
     public static List<Org> loadAll() throws IOException {
-        Set<String> orgUUIDs = SurveyorApplication.get().getPreferences().getStringSet(SurveyorPrefs.AUTH_ORGS, Collections.<String>emptySet());
+        Set<String> orgUUIDs = SurveyorApplication.get().getPreferences().getStringSet(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet());
 
         List<Org> all = new ArrayList<>();
         for (String orgUUID : orgUUIDs) {
@@ -155,7 +155,7 @@ public class Org {
      * Refreshes this org from RapidPro
      */
     public void refresh(boolean full) throws IOException {
-        TembaService svc = SurveyorApplication.get().getRapidProService();
+        TembaService svc = SurveyorApplication.get().getTembaService();
         io.rapidpro.surveyor.net.responses.Org apiOrg = svc.getOrg(this.token);
 
         this.uuid = apiOrg.getUuid();

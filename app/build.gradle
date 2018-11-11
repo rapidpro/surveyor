@@ -16,7 +16,7 @@ android {
         versionName "11.5.0"
         multiDexEnabled = true
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "io.rapidpro.surveyor.test.TestRunner"
     }
     buildTypes {
         release {

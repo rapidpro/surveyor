@@ -75,7 +75,7 @@ public class CreateAccountActivity extends BaseActivity {
             }
         });
 
-        web.loadUrl(SurveyorApplication.get().getHost() + CREATE_ACCOUNT_URL);
+        web.loadUrl(SurveyorApplication.get().getTembaHost() + CREATE_ACCOUNT_URL);
     }
 
     @Override

@@ -31,11 +31,11 @@ public class FetchOrgAssets extends AsyncTask<Org, Integer, Void> {
 
             publishProgress(10);
 
-            List<Field> fields = SurveyorApplication.get().getRapidProService().getFields(org.getToken());
+            List<Field> fields = SurveyorApplication.get().getTembaService().getFields(org.getToken());
 
             publishProgress(50);
 
-            List<Group> groups = SurveyorApplication.get().getRapidProService().getGroups(org.getToken());
+            List<Group> groups = SurveyorApplication.get().getTembaService().getGroups(org.getToken());
 
             publishProgress(100);
 

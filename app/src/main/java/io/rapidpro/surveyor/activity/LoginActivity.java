@@ -24,7 +24,8 @@ import java.util.Set;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.SurveyorPrefs;
+import io.rapidpro.surveyor.SurveyorPreferences;
+import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.net.responses.TokenResults;
 import io.rapidpro.surveyor.task.FetchOrgsTask;
 import retrofit2.Call;
@@ -68,7 +69,7 @@ public class LoginActivity extends BaseActivity {
         m_emailView = findViewById(R.id.email);
 
         // prepopulate with our previous username if we have one
-        m_emailView.setText(getPreferences().getString(SurveyorPrefs.PREV_USERNAME, ""));
+        m_emailView.setText(getPreferences().getString(SurveyorPreferences.PREV_USERNAME, ""));
 
         m_passwordView = findViewById(R.id.password);
         m_passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -182,7 +183,8 @@ public class LoginActivity extends BaseActivity {
             // perform the user login attempt.
             showProgress(true);
 
-            getRapidProService().authenticate(email, password, new Callback<TokenResults>() {
+            TembaService svc = getSurveyor().getTembaService();
+            svc.authenticate(email, password, new Callback<TokenResults>() {
                 @Override
                 public void onResponse(Call<TokenResults> call, Response<TokenResults> response) {
 
