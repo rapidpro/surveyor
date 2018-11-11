@@ -12,7 +12,7 @@ android:
     - tools
     - build-tools-28.0.3
     - android-26
-    - android-22
+    - ${ANDROID_TARGET}
     - extra
     - extra-android-m2repository
     - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
@@ -20,7 +20,7 @@ android:
 script:
   - ./gradlew build jacocoTestReport assembleAndroidTest
   - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
-  - emulator -avd test -no-skin -no-audio -no-window &
+  - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell setprop dalvik.vm.dexopt-flags v=n,o=v
   - ./gradlew connectedCheck

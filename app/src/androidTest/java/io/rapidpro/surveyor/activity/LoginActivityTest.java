@@ -29,8 +29,8 @@ public class LoginActivityTest extends BaseActivityTest {
         rule.launchActivity(null);
 
         onView(withId(R.id.text_error_message)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.email)).check(matches(isCompletelyDisplayed()));
-        onView(withId(R.id.password)).check(matches(isCompletelyDisplayed()));
+        onView(withId(R.id.email)).check(matches(isDisplayed()));
+        onView(withId(R.id.password)).check(matches(isDisplayed()));
     }
 
     @Test
