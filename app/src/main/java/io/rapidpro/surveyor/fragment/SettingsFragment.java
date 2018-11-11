@@ -8,6 +8,7 @@ import android.util.Patterns;
 import android.widget.Toast;
 
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.activity.BaseActivity;
 
@@ -27,7 +28,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
-        Preference pref = findPreference(SurveyorPreferences.TEMBA_HOST);
+        Preference pref = findPreference(SurveyorPreferences.HOST);
         pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -38,26 +39,28 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 return true;
             }
         });
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-
+        getSurveyor().getPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onPause() {
-        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        getSurveyor().getPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onPause();
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(SurveyorPreferences.TEMBA_HOST)) {
-            ((BaseActivity) getActivity()).getSurveyor().onTembaHostChange();
+        if (key.equals(SurveyorPreferences.HOST)) {
+            getSurveyor().onTembaHostChange();
         }
+    }
+
+    private SurveyorApplication getSurveyor() {
+       return ((BaseActivity) getActivity()).getSurveyor();
     }
 }

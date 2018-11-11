@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Set;
+
 import io.rapidpro.surveyor.net.TembaService;
 
 /**
@@ -49,7 +51,7 @@ public class SurveyorApplication extends Application {
     }
 
     /**
-     * Gets the preferences for this app
+     * Gets the shared preferences for this application
      *
      * @return the preferences
      */
@@ -58,12 +60,41 @@ public class SurveyorApplication extends Application {
     }
 
     /**
+     * Saves a string shared preference for this application
+     *
+     * @param key   the preference key
+     * @param value the preference value
+     */
+    public void setPreference(String key, String value) {
+        getPreferences().edit().putString(key, value).apply();
+    }
+
+    /**
+     * Saves a string-set shared preference for this application
+     *
+     * @param key   the preference key
+     * @param values the preference value
+     */
+    public void setPreference(String key, Set<String> values) {
+        getPreferences().edit().putStringSet(key, values).apply();
+    }
+
+    /**
+     * Clears a shared preference for this application
+     *
+     * @param key the preference key
+     */
+    public void clearPreference(String key) {
+        getPreferences().edit().remove(key).apply();
+    }
+
+    /**
      * Gets the base URL of the Temba instance we're connected to
      *
      * @return the base URL
      */
     public String getTembaHost() {
-        return getPreferences().getString(SurveyorPreferences.TEMBA_HOST, getString(R.string.pref_default_host));
+        return getPreferences().getString(SurveyorPreferences.HOST, getString(R.string.pref_default_host));
     }
 
     /**
@@ -71,6 +102,9 @@ public class SurveyorApplication extends Application {
      */
     public void onTembaHostChange() {
         m_tembaService = new TembaService(getTembaHost());
+
+        clearPreference(SurveyorPreferences.AUTH_USERNAME);
+        clearPreference(SurveyorPreferences.AUTH_ORGS);
     }
 
     /**

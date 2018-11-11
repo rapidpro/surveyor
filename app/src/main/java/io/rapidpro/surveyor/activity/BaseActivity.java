@@ -59,9 +59,9 @@ public abstract class BaseActivity extends PermisoActivity {
         SurveyorApplication.LOG.d("Logging in as " + email + " with access to orgs " + TextUtils.join(",", orgUUIDs));
 
         // save email which we'll need for submissions later
-        setPreference(SurveyorPreferences.AUTH_USERNAME, email);
-        setPreference(SurveyorPreferences.PREV_USERNAME, email);
-        setPreference(SurveyorPreferences.AUTH_ORGS, orgUUIDs);
+        getSurveyor().setPreference(SurveyorPreferences.AUTH_USERNAME, email);
+        getSurveyor().setPreference(SurveyorPreferences.PREV_USERNAME, email);
+        getSurveyor().setPreference(SurveyorPreferences.AUTH_ORGS, orgUUIDs);
 
         // let the user pick an org...
         startActivity(new Intent(this, OrgChooseActivity.class));
@@ -81,8 +81,8 @@ public abstract class BaseActivity extends PermisoActivity {
     protected void logout(int errorResId) {
         SurveyorApplication.LOG.d("Logging out with error " + errorResId);
 
-        clearPreference(SurveyorPreferences.AUTH_USERNAME);
-        setPreference(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet());
+        getSurveyor().clearPreference(SurveyorPreferences.AUTH_USERNAME);
+        getSurveyor().setPreference(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet());
 
         Intent intent = new Intent(this, LoginActivity.class);
         if (errorResId != -1) {
@@ -230,35 +230,6 @@ public abstract class BaseActivity extends PermisoActivity {
      */
     public SharedPreferences getPreferences() {
         return getSurveyor().getPreferences();
-    }
-
-    /**
-     * Saves a string shared preference for this application
-     *
-     * @param key   the preference key
-     * @param value the preference value
-     */
-    public void setPreference(String key, String value) {
-        getPreferences().edit().putString(key, value).apply();
-    }
-
-    /**
-     * Saves a string-set shared preference for this application
-     *
-     * @param key   the preference key
-     * @param values the preference value
-     */
-    public void setPreference(String key, Set<String> values) {
-        getPreferences().edit().putStringSet(key, values).apply();
-    }
-
-    /**
-     * Clears a shared preference for this application
-     *
-     * @param key   the preference key
-     */
-    public void clearPreference(String key) {
-        getPreferences().edit().remove(key).apply();
     }
 
     public AlertDialog showAlert(int title, int body) {

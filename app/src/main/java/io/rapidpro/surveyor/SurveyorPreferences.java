@@ -2,9 +2,9 @@ package io.rapidpro.surveyor;
 
 public interface SurveyorPreferences {
     /**
-     * Temba host we are connected to
+     * Host we are connected to
      */
-    String TEMBA_HOST = "host";
+    String HOST = "host";
 
     /**
      * Username/email we are logged in as. If this is set, we are logged in
