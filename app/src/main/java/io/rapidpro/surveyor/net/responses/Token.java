@@ -16,10 +16,6 @@ public class Token {
         return token;
     }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
     public OrgReference getOrg() {
         return org;
     }
@@ -44,16 +40,8 @@ public class Token {
             return uuid;
         }
 
-        public void setUuid(String uuid) {
-            this.uuid = uuid;
-        }
-
         public String getName() {
             return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
         }
     }
 }

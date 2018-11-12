@@ -22,23 +22,11 @@ public class PaginatedResults<T> {
         return next;
     }
 
-    public void setNext(String next) {
-        this.next = next;
-    }
-
     public String getPrevious() {
         return previous;
     }
 
-    public void setPrevious(String previous) {
-        this.previous = previous;
-    }
-
     public List<T> getResults() {
         return results;
-    }
-
-    public void setResults(List<T> results) {
-        this.results = results;
     }
 }

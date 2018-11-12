@@ -27,14 +27,14 @@ import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
 @RunWith(AndroidJUnit4.class)
 public abstract class BaseApplicationTest {
 
-    private MockWebServer m_server;
+    protected MockWebServer mockServer;
 
     @Before
     public void startMockServer() throws IOException {
-        m_server = new MockWebServer();
-        m_server.start();
+        mockServer = new MockWebServer();
+        mockServer.start();
 
-        String mockServerURL = m_server.url("/").toString();
+        String mockServerURL = mockServer.url("/").toString();
         SurveyorApplication.LOG.d("mock server started at " + mockServerURL);
 
         getSurveyor().setPreference(SurveyorPreferences.HOST, mockServerURL);
@@ -43,7 +43,7 @@ public abstract class BaseApplicationTest {
 
     @After
     public void stopMockServer() throws IOException {
-        m_server.shutdown();
+        mockServer.shutdown();
     }
 
     /**
@@ -70,7 +70,7 @@ public abstract class BaseApplicationTest {
                 .addHeader("Content-Type", mimeType + "; charset=utf-8")
                 .addHeader("Cache-Control", "no-cache");
 
-        m_server.enqueue(response);
+        mockServer.enqueue(response);
     }
 
     /**
@@ -92,6 +92,6 @@ public abstract class BaseApplicationTest {
                 .setResponseCode(HTTP_MOVED_TEMP)
                 .setHeader("Location", location);
 
-        m_server.enqueue(response);
+        mockServer.enqueue(response);
     }
 }

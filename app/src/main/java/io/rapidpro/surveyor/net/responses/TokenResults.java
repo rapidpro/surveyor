@@ -10,10 +10,6 @@ public class TokenResults {
         return tokens;
     }
 
-    public void setTokens(List<Token> tokens) {
-        this.tokens = tokens;
-    }
-
     /**
      * Gets the tokens as a simple array of token strings
      * @return the array of tokens

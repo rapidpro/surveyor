@@ -1,0 +1,11 @@
+{
+  "next": null,
+  "previous": "https://app.rapidpro.io/api/v2/fields/json?cursor=987654321",
+  "results": [
+    {
+      "key": "join_date",
+      "label": "Join Date",
+      "value_type": "datetime"
+    }
+  ]
+}

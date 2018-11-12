@@ -37,15 +37,6 @@ public class TembaService {
     }
 
     /**
-     * For testing purposes so we can give it a mocked API instance
-     *
-     * @param api the API instance
-     */
-    protected TembaService(TembaAPI api) {
-        m_api = api;
-    }
-
-    /**
      * Calls RapidPro's authenticate endpoint to give us the list of tokens and orgs we can access
      */
     public void authenticate(String username, String password, Callback<TokenResults> callback) {
