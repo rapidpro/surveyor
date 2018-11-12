@@ -75,7 +75,11 @@ public class CreateAccountActivity extends BaseActivity {
             }
         });
 
-        web.loadUrl(SurveyorApplication.get().getTembaHost() + CREATE_ACCOUNT_URL);
+        String createAccountURL = SurveyorApplication.get().getTembaHost() + CREATE_ACCOUNT_URL;
+
+        SurveyorApplication.LOG.d("Connecting to " + createAccountURL + "...");
+
+        web.loadUrl(createAccountURL);
     }
 
     @Override

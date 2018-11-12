@@ -9,8 +9,7 @@ import androidx.test.rule.ActivityTestRule;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.SurveyorPreferences;
-import io.rapidpro.surveyor.test.BaseActivityTest;
-import okhttp3.mockwebserver.MockResponse;
+import io.rapidpro.surveyor.test.BaseApplicationTest;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -22,7 +21,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.not;
 
-public class LoginActivityTest extends BaseActivityTest {
+public class LoginActivityTest extends BaseApplicationTest {
 
     @Rule
     public ActivityTestRule<LoginActivity> rule = new ActivityTestRule<>(LoginActivity.class, true, false);
@@ -40,10 +39,10 @@ public class LoginActivityTest extends BaseActivityTest {
     public void showErrorIfAuthenticationFails() {
         rule.launchActivity(null);
 
-        m_server.enqueue(new MockResponse().setResponseCode(502));
-        m_server.enqueue(new MockResponse().setResponseCode(500));
-        m_server.enqueue(new MockResponse().setResponseCode(404));
-        m_server.enqueue(new MockResponse().setResponseCode(403));
+        mockServerResponse("", "text/html", 502);
+        mockServerResponse("", "text/html", 500);
+        mockServerResponse("", "text/html", 404);
+        mockServerResponse("", "text/html", 403);
 
         onView(withId(R.id.email)).perform(click(), typeText("bob@nyaruka.com"));
         onView(withId(R.id.password)).perform(click(), typeText("Qwerty123"), closeSoftKeyboard());
