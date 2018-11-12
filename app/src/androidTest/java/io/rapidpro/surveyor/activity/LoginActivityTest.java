@@ -45,8 +45,8 @@ public class LoginActivityTest extends BaseActivityTest {
         m_server.enqueue(new MockResponse().setResponseCode(404));
         m_server.enqueue(new MockResponse().setResponseCode(403));
 
-        onView(withId(R.id.email)).perform(click()).perform(typeText("bob@nyaruka.com"));
-        onView(withId(R.id.password)).perform(click()).perform(typeText("Qwerty123")).perform(closeSoftKeyboard());
+        onView(withId(R.id.email)).perform(click(), typeText("bob@nyaruka.com"));
+        onView(withId(R.id.password)).perform(click(), typeText("Qwerty123"), closeSoftKeyboard());
         onView(withId(R.id.email_sign_in_button)).perform(click());
 
         onView(withId(R.id.text_error_message))
