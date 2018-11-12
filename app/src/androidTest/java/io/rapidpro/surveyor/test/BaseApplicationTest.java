@@ -19,6 +19,11 @@ import io.rapidpro.surveyor.SurveyorPreferences;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
+import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
+
+/**
+ * Base for all the instrumented tests
+ */
 @RunWith(AndroidJUnit4.class)
 public abstract class BaseApplicationTest {
 
@@ -41,6 +46,9 @@ public abstract class BaseApplicationTest {
         m_server.shutdown();
     }
 
+    /**
+     * Clears all shared preferences after each test
+     */
     @After
     public void clearPreferences() {
         SharedPreferences.Editor editor = getSurveyor().getPreferences().edit();
@@ -74,5 +82,16 @@ public abstract class BaseApplicationTest {
         String body = IOUtils.toString(input, StandardCharsets.UTF_8);
 
         mockServerResponse(body, mimeType, code);
+    }
+
+    /**
+     * Enqueues a redirect response on the mock HTTP server
+     */
+    protected void mockServerRedirect(String location) {
+        MockResponse response = new MockResponse()
+                .setResponseCode(HTTP_MOVED_TEMP)
+                .setHeader("Location", location);
+
+        m_server.enqueue(response);
     }
 }

@@ -11,7 +11,9 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.web.assertion.WebViewAssertions.webContent;
 import static androidx.test.espresso.web.assertion.WebViewAssertions.webMatches;
+import static androidx.test.espresso.web.matcher.DomMatchers.hasElementWithId;
 import static androidx.test.espresso.web.sugar.Web.onWebView;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.findElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.getText;
@@ -36,8 +38,7 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
 
         rule.launchActivity(null);
 
-        onWebView().withElement(findElement(Locator.ID, "id_surveyor_password"))
-                .check(webMatches(getText(), containsString("")));
+        onWebView().check(webContent(hasElementWithId("id_surveyor_password")));
     }
 
     @Test
@@ -50,12 +51,62 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
         onWebView().withElement(findElement(Locator.ID, "id_surveyor_password"))
                 .perform(webClick())
                 .perform(webKeys("wrong"));
-
         onWebView().withElement(findElement(Locator.CLASS_NAME, "btn"))
                 .perform(webClick());
 
         onWebView().withElement(findElement(Locator.CSS_SELECTOR, ".errorlist li"))
                 .check(webMatches(getText(), containsString("Invalid surveyor password, please check with your project leader and try again.")));
+    }
 
+    @Test
+    public void showStep2OnCorrectPassword() throws IOException {
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_get, "text/html", 200);
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_post_correct_password, "text/html", 200);
+
+        rule.launchActivity(null);
+
+        onWebView().withElement(findElement(Locator.ID, "id_surveyor_password"))
+                .perform(webClick())
+                .perform(webKeys("surv3ys"));
+        onWebView().withElement(findElement(Locator.CLASS_NAME, "btn"))
+                .perform(webClick());
+
+        onWebView().check(webContent(hasElementWithId("id_first_name")));
+        onWebView().check(webContent(hasElementWithId("id_last_name")));
+    }
+
+    @Test
+    public void loginIfStep2Successful() throws IOException {
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_get, "text/html", 200);
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_post_correct_password, "text/html", 200);
+        mockServerRedirect("/org/surveyor/?org=Nyaruka&token=abc123&user=bob@nyaruka.com");
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_get, "text/html", 200);
+
+        rule.launchActivity(null);
+
+        // step 1
+
+        onWebView().withElement(findElement(Locator.ID, "id_surveyor_password"))
+                .perform(webClick())
+                .perform(webKeys("surv3ys"));
+        onWebView().withElement(findElement(Locator.CLASS_NAME, "btn"))
+                .perform(webClick());
+
+        // step 2
+
+        onWebView().withElement(findElement(Locator.ID, "id_first_name"))
+                .perform(webClick())
+                .perform(webKeys("Bob"));
+        onWebView().withElement(findElement(Locator.ID, "id_last_name"))
+                .perform(webClick())
+                .perform(webKeys("Smith"));
+        onWebView().withElement(findElement(Locator.ID, "id_email"))
+                .perform(webClick())
+                .perform(webKeys("bob@nyaruka.com"));
+        onWebView().withElement(findElement(Locator.ID, "id_password"))
+                .perform(webClick())
+                .perform(webKeys("Qwerty123"));
+
+        // TODO
     }
 }
