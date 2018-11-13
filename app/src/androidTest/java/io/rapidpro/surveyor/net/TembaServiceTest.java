@@ -92,7 +92,7 @@ public class TembaServiceTest extends BaseApplicationTest {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_org_get, "application/json", 200);
 
         Org org = getSurveyor().getTembaService().getOrg("abc123");
-        assertThat(org.getUuid(), is("b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06"));
+        assertThat(org.getUuid(), is("dc8123a1-168c-4962-ab9e-f784f3d804a2"));
         assertThat(org.getName(), is("Nyaruka"));
         assertThat(org.getPrimaryLanguage(), is("eng"));
         assertThat(org.getLanguages(), arrayContaining("eng", "fra"));

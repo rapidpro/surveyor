@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -128,9 +129,16 @@ public abstract class BaseActivity extends PermisoActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
 
-        // show the settings menu always in debug mode
+        // show the settings menu in debug mode
         if (BuildConfig.DEBUG) {
             MenuItem menuItem = menu.findItem(R.id.action_settings);
+            if (menuItem != null) {
+                menuItem.setVisible(true);
+            }
+        }
+        // show logout action if we're logged in
+        if (isLoggedIn()) {
+            MenuItem menuItem = menu.findItem(R.id.action_logout);
             if (menuItem != null) {
                 menuItem.setVisible(true);
             }
@@ -148,7 +156,7 @@ public abstract class BaseActivity extends PermisoActivity {
         } else if (id == R.id.action_logout) {
             logout();
             return true;
-        } else if (id == R.id.action_debug) {
+        } else if (id == R.id.action_bug_report) {
             sendBugReport();
         }
         return super.onOptionsItemSelected(item);
@@ -163,21 +171,22 @@ public abstract class BaseActivity extends PermisoActivity {
         info.append("\n  Model: " + android.os.Build.MODEL + " (" + android.os.Build.DEVICE + ")");
         SurveyorApplication.LOG.d(info.toString());
 
-        // Generate a logcat file
+        // generate a dump file
         File outputFile = new File(Environment.getExternalStorageDirectory(), "surveyor-debug.txt");
-
         try {
             Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E SurveyorApplication:*\" ");
         } catch (Throwable t) {
             SurveyorApplication.LOG.e("Failed to generate report", t);
         }
 
+        Uri outputUri = FileProvider.getUriForFile(BaseActivity.this, BuildConfig.APPLICATION_ID + ".provider", outputFile);
+
         ShareCompat.IntentBuilder.from(this)
                 .setType("message/rfc822")
                 .addEmailTo("support@rapidpro.io")
                 .setSubject("SurveyorApplication Bug Report")
                 .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
-                .setStream(Uri.fromFile(outputFile))
+                .setStream(outputUri)
                 .setChooserTitle("Send Email")
                 .startChooser();
     }

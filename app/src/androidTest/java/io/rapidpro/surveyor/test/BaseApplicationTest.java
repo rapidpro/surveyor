@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -60,6 +61,12 @@ public abstract class BaseApplicationTest {
 
     protected SurveyorApplication getSurveyor() {
         return SurveyorApplication.get();
+    }
+
+    protected void login(String email, Set<String> orgUUIDs) {
+        getSurveyor().setPreference(SurveyorPreferences.AUTH_USERNAME, email);
+        getSurveyor().setPreference(SurveyorPreferences.PREV_USERNAME, email);
+        getSurveyor().setPreference(SurveyorPreferences.AUTH_ORGS, orgUUIDs);
     }
 
     /**

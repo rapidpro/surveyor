@@ -41,7 +41,12 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTitle(getOrg().getName());
+        Org org = getOrg();
+        setTitle(org.getName());
+
+        if (!org.hasAssets()) {
+            confirmRefreshOrg(true);
+        }
 
         /*final DBOrg org = getDBOrg();
 
@@ -104,22 +109,22 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
         startActivity(intent);
     }*/
 
-    public void showFlowList(MenuItem item) {
-        // TODO
-        // startActivity(getIntent(this, RapidFlowsActivity.class));
+    public void onActionRefresh(MenuItem item) {
+        confirmRefreshOrg(false);
     }
 
-    public void confirmRefreshOrg(MenuItem item) {
+    public void confirmRefreshOrg(boolean initial) {
+        int msgId = initial ? R.string.confirm_org_download : R.string.confirm_org_refresh;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.confirm_org_refresh))
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        builder.setMessage(getString(msgId))
+                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         doRefresh();
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();

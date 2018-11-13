@@ -16,8 +16,8 @@ import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.net.TembaService;
 
 public class Org {
-    private static final String ORGS_DIR = "orgs";
     private static final String DETAILS_FILE = "details.json";
+    private static final String ASSETS_FILE = "assets.json";
 
     private transient String uuid;
     private String token;
@@ -134,6 +134,11 @@ public class Org {
         return country;
     }
 
+    public boolean hasAssets() {
+        File assetsFile = new File(getDirectory(), ASSETS_FILE);
+        return assetsFile.exists();
+    }
+
     /**
      * Refreshes this org from RapidPro
      */
@@ -164,7 +169,7 @@ public class Org {
     public void save() throws IOException {
         Gson gson = new Gson();
         String detailsJSON = gson.toJson(this);
-        File detailsFile = new File(getOrgDir(), DETAILS_FILE);
+        File detailsFile = new File(getDirectory(), DETAILS_FILE);
 
         FileUtils.writeStringToFile(detailsFile, detailsJSON);
     }
@@ -174,7 +179,7 @@ public class Org {
      *
      * @return the directory file object
      */
-    private File getOrgDir() {
+    private File getDirectory() {
         File dir = new File(SurveyorApplication.get().getOrgsDirectory(), this.uuid);
         dir.mkdirs();
         return dir;

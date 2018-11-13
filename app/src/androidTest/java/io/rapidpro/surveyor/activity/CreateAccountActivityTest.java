@@ -1,5 +1,9 @@
 package io.rapidpro.surveyor.activity;
 
+import android.app.Activity;
+import android.app.Instrumentation;
+import android.content.Intent;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,10 +18,16 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 import okhttp3.mockwebserver.RecordedRequest;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.Intents.intending;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.espresso.web.assertion.WebViewAssertions.webContent;
 import static androidx.test.espresso.web.assertion.WebViewAssertions.webMatches;
 import static androidx.test.espresso.web.matcher.DomMatchers.hasElementWithId;
@@ -26,6 +36,8 @@ import static androidx.test.espresso.web.webdriver.DriverAtoms.findElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.getText;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.webClick;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.webKeys;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 
@@ -166,5 +178,27 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
         assertThat(request6.getPath(), is("/api/v2/org.json"));
 
         intended(hasComponent(OrgActivity.class.getName()));
+    }
+
+    /**
+     * @see BaseActivity#sendBugReport()
+     *
+     * tested here because we need a IntentsTestRule based test
+     */
+    @Test
+    public void sendBugReport() throws IOException {
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_get, "text/html", 200);
+
+        // mock the intent to pick an app to send the bug report too
+        intending(hasAction(Intent.ACTION_CHOOSER)).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, null));
+
+        rule.launchActivity(null);
+
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        onView(withText("Bug Report"))
+                .perform(click());
+
+        // check intent was launched
+        intended(hasAction(Intent.ACTION_CHOOSER));
     }
 }
