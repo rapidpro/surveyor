@@ -6,15 +6,6 @@ public class Field {
     private String key;
     private String label;
 
-    public Field() {
-    }
-
-    public Field(String key, String label, String valueType) {
-        this.key = key;
-        this.label = label;
-        this.valueType = valueType;
-    }
-
     @SerializedName("value_type")
     private String valueType;
 

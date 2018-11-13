@@ -1,0 +1,47 @@
+{
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "osm_id": "192787",
+      "name": "Nigeria",
+      "parent": null,
+      "level": 0,
+      "aliases": [],
+      "geometry": null
+    },
+    {
+      "osm_id": "3698564",
+      "name": "Yobe",
+      "parent": {
+        "osm_id": "192787",
+        "name": "Nigeria"
+      },
+      "level": 1,
+      "aliases": ["Iobe"],
+      "geometry": null
+    },
+    {
+      "osm_id": "3698565",
+      "name": "Barde",
+      "parent": {
+        "osm_id": "3698564",
+        "name": "Yobe"
+      },
+      "level": 2,
+      "aliases": [],
+      "geometry": null
+    },
+    {
+      "osm_id": "3698566",
+      "name": "Borsari",
+      "parent": {
+        "osm_id": "3698564",
+        "name": "Yobe"
+      },
+      "level": 2,
+      "aliases": [],
+      "geometry": null
+    }
+  ]
+}

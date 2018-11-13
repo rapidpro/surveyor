@@ -1,6 +1,8 @@
 package io.rapidpro.surveyor.net;
 
+import io.rapidpro.surveyor.net.responses.Boundary;
 import io.rapidpro.surveyor.net.responses.Field;
+import io.rapidpro.surveyor.net.responses.Flow;
 import io.rapidpro.surveyor.net.responses.Group;
 import io.rapidpro.surveyor.net.responses.Org;
 import io.rapidpro.surveyor.net.responses.PaginatedResults;
@@ -19,14 +21,35 @@ public interface TembaAPI {
     Call<TokenResults> authenticate(
             @retrofit2.http.Field("username") String username,
             @retrofit2.http.Field("password") String password,
-            @retrofit2.http.Field("role") String role);
+            @retrofit2.http.Field("role") String role
+    );
+
+    @GET("/api/v2/boundaries.json")
+    Call<PaginatedResults<Boundary>> getBoundaries(
+            @Header("Authorization") String token,
+            @Query("cursor") String cursor
+    );
 
     @GET("/api/v2/org.json")
     Call<Org> getOrg(@Header("Authorization") String token);
 
     @GET("/api/v2/fields.json")
-    Call<PaginatedResults<Field>> getFields(@Header("Authorization") String token, @Query("cursor") String cursor);
+    Call<PaginatedResults<Field>> getFields(
+            @Header("Authorization") String token,
+            @Query("cursor") String cursor
+    );
+
+    @GET("/api/v2/flows.json")
+    Call<PaginatedResults<Flow>> getFlows(
+            @Header("Authorization") String token,
+            @Query("type") String type,
+            @Query("archived") Boolean archived,
+            @Query("cursor") String cursor
+    );
 
     @GET("/api/v2/groups.json")
-    Call<PaginatedResults<Group>> getGroups(@Header("Authorization") String token, @Query("cursor") String cursor);
+    Call<PaginatedResults<Group>> getGroups(
+            @Header("Authorization") String token,
+            @Query("cursor") String cursor
+    );
 }

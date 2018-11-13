@@ -15,7 +15,9 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.ResponseException;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.TembaException;
+import io.rapidpro.surveyor.net.responses.Boundary;
 import io.rapidpro.surveyor.net.responses.Field;
+import io.rapidpro.surveyor.net.responses.Flow;
 import io.rapidpro.surveyor.net.responses.Group;
 import io.rapidpro.surveyor.net.responses.Org;
 import io.rapidpro.surveyor.net.responses.PaginatedResults;
@@ -44,6 +46,18 @@ public class TembaService {
     }
 
     /**
+     * Gets all of the admin boundaries
+     */
+    public List<Boundary> getBoundaries(final String token) {
+        return fetchAllPages(new PageCaller<Boundary>() {
+            @Override
+            public Call<PaginatedResults<Boundary>> createCall(String cursor) {
+                return m_api.getBoundaries(asAuth(token), cursor);
+            }
+        });
+    }
+
+    /**
      * Gets the org associated with the given token
      */
     public Org getOrg(String token) {
@@ -69,7 +83,19 @@ public class TembaService {
     }
 
     /**
-     * Gets all of the contact fields
+     * Gets all of the non-archived surveyor flows
+     */
+    public List<Flow> getFlows(final String token) {
+        return fetchAllPages(new PageCaller<Flow>() {
+            @Override
+            public Call<PaginatedResults<Flow>> createCall(String cursor) {
+                return m_api.getFlows(asAuth(token), "survey", false, cursor);
+            }
+        });
+    }
+
+    /**
+     * Gets all of the contact groups
      */
     public List<Group> getGroups(final String token) {
         return fetchAllPages(new PageCaller<Group>() {
@@ -114,6 +140,9 @@ public class TembaService {
         }
     }
 
+    /**
+     * Utility to create a Authorization header value from a token
+     */
     private static String asAuth(String token) {
         return "Token " + token;
     }

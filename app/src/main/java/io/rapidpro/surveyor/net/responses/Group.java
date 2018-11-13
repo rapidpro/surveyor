@@ -5,15 +5,6 @@ public class Group {
     private String name;
     private String query;
 
-    public Group() {
-    }
-
-    public Group(String uuid, String name, String query) {
-        this.uuid = uuid;
-        this.name = name;
-        this.query = query;
-    }
-
     public String getUuid() {
         return uuid;
     }

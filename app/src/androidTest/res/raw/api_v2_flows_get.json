@@ -1,0 +1,38 @@
+{
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "uuid": "37560e1b-9271-41fc-8087-1ff37cb839d7",
+      "name": "My Survey",
+      "type": "survey",
+      "archived": false,
+      "labels": [{"name": "Important", "uuid": "ae046471-e90d-4dae-ae4b-86f63230cd32"}],
+      "expires": 600,
+      "created_on": "2016-01-06T15:33:00.813162Z",
+      "modified_on": "2017-01-07T13:14:00.453567Z",
+      "runs": {
+        "active": 47,
+        "completed": 123,
+        "interrupted": 2,
+        "expired": 34
+      }
+    },
+    {
+      "uuid": "01b4825a-1e6b-49a8-b7ad-2550ead74ec8",
+      "name": "Collect Age",
+      "type": "survey",
+      "archived": false,
+      "labels": [],
+      "expires": 600,
+      "created_on": "2016-01-06T15:33:00.813162Z",
+      "modified_on": "2017-01-07T13:14:00.453567Z",
+      "runs": {
+        "active": 0,
+        "completed": 1,
+        "interrupted": 0,
+        "expired": 0
+      }
+    }
+  ]
+}
