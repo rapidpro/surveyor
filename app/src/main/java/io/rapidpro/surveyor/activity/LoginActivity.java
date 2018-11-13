@@ -193,18 +193,7 @@ public class LoginActivity extends BaseActivity {
 
                         SurveyorApplication.LOG.d("Authentication returned " + tokens.length + " tokens");
 
-                        new FetchOrgsTask(new FetchOrgsTask.FetchOrgsListener() {
-                            @Override
-                            public void onComplete(Set<String> orgUUIDs) {
-                                login(email, orgUUIDs);
-                            }
-
-                            @Override
-                            public void onFailure() {
-                                setErrorMessage(getString(R.string.error_fetching_org));
-                                showProgress(false);
-                            }
-                        }).execute(tokens);
+                        fetchOrgsAndLogin(email, tokens);
 
                     } else {
                         switch (response.code()) {
@@ -239,7 +228,22 @@ public class LoginActivity extends BaseActivity {
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+        return password.length() >= 8;
+    }
+
+    protected void fetchOrgsAndLogin(final String email, final String[] tokens) {
+        new FetchOrgsTask(new FetchOrgsTask.FetchOrgsListener() {
+            @Override
+            public void onComplete(Set<String> orgUUIDs) {
+                login(email, orgUUIDs);
+            }
+
+            @Override
+            public void onFailure() {
+                setErrorMessage(getString(R.string.error_fetching_org));
+                showProgress(false);
+            }
+        }).execute(tokens);
     }
 
     /**

@@ -10,10 +10,12 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Set;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.task.FetchOrgsTask;
 
 /**
  * Activity for creating a new surveyor account
@@ -51,21 +53,12 @@ public class CreateAccountActivity extends BaseActivity {
                 String orgName = sanitizer.getValue("org");
 
                 if (email != null && token != null && orgName != null) {
-
-                    try {
-                        Org org = Org.fetch(token);
-
-                        login(email, Collections.singleton(org.getUUID()));
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    fetchOrgAndLogin(email, token);
                 }
 
                 if (url.endsWith(CREATE_ACCOUNT_URL)) {
                     getViewCache().hide(R.id.web_progress);
                 }
-
             }
 
             public void onLoadResource(WebView view, String url) {
@@ -80,6 +73,21 @@ public class CreateAccountActivity extends BaseActivity {
         SurveyorApplication.LOG.d("Connecting to " + createAccountURL + "...");
 
         web.loadUrl(createAccountURL);
+    }
+
+    protected void fetchOrgAndLogin(final String email, final String token) {
+
+        new FetchOrgsTask(new FetchOrgsTask.FetchOrgsListener() {
+            @Override
+            public void onComplete(Set<String> orgUUIDs) {
+                login(email, orgUUIDs);
+            }
+
+            @Override
+            public void onFailure() {
+                // TODO
+            }
+        }).execute(token);
     }
 
     @Override

@@ -18,6 +18,7 @@ import com.greysonparrelli.permiso.PermisoActivity;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import io.rapidpro.surveyor.BuildConfig;
@@ -25,6 +26,7 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.SurveyorPreferences;
+import io.rapidpro.surveyor.task.FetchOrgsTask;
 import io.rapidpro.surveyor.ui.ViewCache;
 
 /**

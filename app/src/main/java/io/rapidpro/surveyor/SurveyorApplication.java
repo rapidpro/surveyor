@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.io.File;
 import java.util.Set;
 
 import io.rapidpro.surveyor.net.TembaService;
@@ -42,11 +43,11 @@ public class SurveyorApplication extends Application {
     }
 
     /**
-     * Gets the name of the preferences file (this is a method so it can be overridden for testing)
+     * Gets the name of the preferences file
      *
      * @return the name of the preferences
      */
-    protected String getPreferencesName() {
+    public String getPreferencesName() {
         return "default";
     }
 
@@ -94,17 +95,34 @@ public class SurveyorApplication extends Application {
      * @return the base URL
      */
     public String getTembaHost() {
-        return getPreferences().getString(SurveyorPreferences.HOST, getString(R.string.pref_default_host));
+        String host = getPreferences().getString(SurveyorPreferences.HOST, getString(R.string.pref_default_host));
+
+        // strip any trailing slash
+        if (host.endsWith("/")) {
+            host = host.substring(0, host.length() - 1);
+        }
+
+        return host;
     }
 
     /**
      * Called when our host setting has changed
      */
-    public void onTembaHostChange() {
-        m_tembaService = new TembaService(getTembaHost());
-
+    public void onTembaHostChanged() {
         clearPreference(SurveyorPreferences.AUTH_USERNAME);
         clearPreference(SurveyorPreferences.AUTH_ORGS);
+
+        m_tembaService = new TembaService(getTembaHost());
+    }
+
+    /**
+     * Gets the org storage directory
+     * @return the directory
+     */
+    public File getOrgsDirectory() {
+        File dir = new File(getFilesDir(), "orgs");
+        dir.mkdirs();
+        return dir;
     }
 
     /**

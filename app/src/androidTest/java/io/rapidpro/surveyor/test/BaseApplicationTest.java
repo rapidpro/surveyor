@@ -38,12 +38,14 @@ public abstract class BaseApplicationTest {
         SurveyorApplication.LOG.d("mock server started at " + mockServerURL);
 
         getSurveyor().setPreference(SurveyorPreferences.HOST, mockServerURL);
-        getSurveyor().onTembaHostChange();
+        getSurveyor().onTembaHostChanged();
     }
 
     @After
     public void stopMockServer() throws IOException {
         mockServer.shutdown();
+
+        SurveyorApplication.LOG.d("mock server stopped after " + mockServer.getRequestCount() + " requests");
     }
 
     /**

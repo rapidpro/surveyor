@@ -30,17 +30,6 @@ public class Org {
     private boolean anon;
 
     /**
-     * Gets the base directory for all org storage
-     *
-     * @return the directory file object
-     */
-    protected static File getOrgsDir() {
-        File orgsDir = new File(SurveyorApplication.get().getFilesDir(), ORGS_DIR);
-        orgsDir.mkdirs();
-        return orgsDir;
-    }
-
-    /**
      * Loads all orgs that the current user has access to
      *
      * @return the org objects
@@ -62,7 +51,8 @@ public class Org {
      * @return the org
      */
     public static Org load(String uuid) throws IOException {
-        File orgDir = new File(getOrgsDir(), uuid);
+        File orgsDir = SurveyorApplication.get().getOrgsDirectory();
+        File orgDir = new File(orgsDir, uuid);
         if (orgDir.exists() && orgDir.isDirectory()) {
             Gson gson = new Gson();
             File detailsFile = new File(orgDir, DETAILS_FILE);
@@ -72,13 +62,6 @@ public class Org {
             return org;
         }
         throw new RuntimeException("no org directory for org " + uuid);
-    }
-
-    /**
-     * Clears all org storage
-     */
-    public static void clear() {
-        FileUtils.deleteQuietly(getOrgsDir());
     }
 
     /**
@@ -192,7 +175,7 @@ public class Org {
      * @return the directory file object
      */
     private File getOrgDir() {
-        File dir = new File(getOrgsDir(), this.uuid);
+        File dir = new File(SurveyorApplication.get().getOrgsDirectory(), this.uuid);
         dir.mkdirs();
         return dir;
     }

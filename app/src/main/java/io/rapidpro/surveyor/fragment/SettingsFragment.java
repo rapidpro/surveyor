@@ -25,7 +25,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Load the preferences from an XML resource
+        // make sure we're editing the correct preferences
+        getPreferenceManager().setSharedPreferencesName(getSurveyor().getPreferencesName());
+
+        // load the preference screen from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
         Preference pref = findPreference(SurveyorPreferences.HOST);
@@ -44,19 +47,21 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onResume() {
         super.onResume();
-        getSurveyor().getPreferences().registerOnSharedPreferenceChangeListener(this);
+
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onPause() {
-        getSurveyor().getPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+
         super.onPause();
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(SurveyorPreferences.HOST)) {
-            getSurveyor().onTembaHostChange();
+            getSurveyor().onTembaHostChanged();
         }
     }
 
