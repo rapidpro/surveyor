@@ -1,6 +1,9 @@
 package io.rapidpro.surveyor.net;
 
+import java.util.List;
+
 import io.rapidpro.surveyor.net.responses.Boundary;
+import io.rapidpro.surveyor.net.responses.Definitions;
 import io.rapidpro.surveyor.net.responses.Field;
 import io.rapidpro.surveyor.net.responses.Flow;
 import io.rapidpro.surveyor.net.responses.Group;
@@ -28,6 +31,13 @@ public interface TembaAPI {
     Call<PaginatedResults<Boundary>> getBoundaries(
             @Header("Authorization") String token,
             @Query("cursor") String cursor
+    );
+
+    @GET("/api/v2/definitions.json")
+    Call<Definitions> getDefinitions(
+            @Header("Authorization") String token,
+            @Query("flow") List<String> flowUUIDs,
+            @Query("dependencies") String dependencies
     );
 
     @GET("/api/v2/org.json")

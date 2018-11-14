@@ -15,6 +15,7 @@ import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -27,19 +28,31 @@ public class OrgActivityTest extends BaseApplicationTest {
     public ActivityTestRule<OrgActivity> rule = new ActivityTestRule<>(OrgActivity.class, true, false);
 
     @Before
-    public void setup() throws IOException {
+    public void setup() {
         login("bob@nyaruka.com", Collections.singleton(ORG_UUID));
-
-        installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details);
     }
 
     @Test
-    public void showDownloadConfirmationIfAssetsNotDownloaded() {
+    public void showDownloadConfirmationIfAssetsNotDownloaded() throws IOException {
+        installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details,0);
+
         Intent intent = new Intent();
         intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, ORG_UUID);
 
         rule.launchActivity(intent);
 
         onView(withText(R.string.confirm_org_download)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void dontShowDownloadConfirmationIfAssetsDownloaded() throws IOException {
+        installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details,io.rapidpro.surveyor.test.R.raw.org1_assets);
+
+        Intent intent = new Intent();
+        intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, ORG_UUID);
+
+        rule.launchActivity(intent);
+
+        onView(withText(R.string.confirm_org_download)).check(doesNotExist());
     }
 }

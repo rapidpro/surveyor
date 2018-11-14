@@ -76,7 +76,7 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.O
 
     private void showOrg(Org org) {
         Intent intent = new Intent(OrgChooseActivity.this, OrgActivity.class);
-        intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, org.getUUID());
+        intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, org.getUuid());
         startActivity(intent);
     }
 }

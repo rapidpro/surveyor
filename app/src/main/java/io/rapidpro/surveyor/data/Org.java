@@ -1,6 +1,7 @@
 package io.rapidpro.surveyor.data;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
@@ -15,6 +16,12 @@ import java.util.Set;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.net.TembaService;
+import io.rapidpro.surveyor.net.responses.Definitions;
+import io.rapidpro.surveyor.net.responses.Field;
+import io.rapidpro.surveyor.net.responses.Flow;
+import io.rapidpro.surveyor.net.responses.Group;
+import io.rapidpro.surveyor.task.RefreshOrgTask;
+import io.rapidpro.surveyor.utils.JsonUtils;
 
 public class Org {
     private static final String DETAILS_FILE = "details.json";
@@ -65,10 +72,9 @@ public class Org {
         File orgsDir = SurveyorApplication.get().getOrgsDirectory();
         File orgDir = new File(orgsDir, uuid);
         if (orgDir.exists() && orgDir.isDirectory()) {
-            Gson gson = new Gson();
             File detailsFile = new File(orgDir, DETAILS_FILE);
             String detailsJSON = FileUtils.readFileToString(detailsFile);
-            Org org = gson.fromJson(detailsJSON, Org.class);
+            Org org = JsonUtils.unmarshal(detailsJSON, Org.class);
             org.uuid = uuid;
             return org;
         }
@@ -84,7 +90,7 @@ public class Org {
     public static Org fetch(String token) throws IOException {
         Org org = new Org();
         org.token = token;
-        org.refresh(false);
+        org.refresh(false, null);
         return org;
     }
 
@@ -93,7 +99,7 @@ public class Org {
      *
      * @return the UUID
      */
-    public String getUUID() {
+    public String getUuid() {
         return uuid;
     }
 
@@ -150,10 +156,14 @@ public class Org {
         return assetsFile.exists();
     }
 
+    public interface RefreshProgress {
+        void reportProgress(int percent);
+    }
+
     /**
      * Refreshes this org from RapidPro
      */
-    public void refresh(boolean full) throws IOException {
+    public void refresh(boolean includeAssets, RefreshProgress progress) throws IOException {
         TembaService svc = SurveyorApplication.get().getTembaService();
         io.rapidpro.surveyor.net.responses.Org apiOrg = svc.getOrg(this.token);
 
@@ -165,24 +175,45 @@ public class Org {
         this.country = apiOrg.getCountry();
         this.dateStyle = apiOrg.getDateStyle();
         this.anon = apiOrg.isAnon();
-        this.save();
 
-        if (full) {
-            // TODO fetch assets
+        // write org fields to details.json
+        String detailsJSON = JsonUtils.marshal(this);
+        File detailsFile = new File(getDirectory(), DETAILS_FILE);
+        FileUtils.writeStringToFile(detailsFile, detailsJSON);
+
+        if (progress != null) {
+            progress.reportProgress(10);
+        }
+
+        if (includeAssets) {
+            refreshAssets(progress);
         }
     }
 
-    /**
-     * Saves this org to the filesystem
-     *
-     * @throws IOException
-     */
-    public void save() throws IOException {
-        Gson gson = new Gson();
-        String detailsJSON = gson.toJson(this);
-        File detailsFile = new File(getDirectory(), DETAILS_FILE);
+    private void refreshAssets(RefreshProgress progress) throws IOException {
+        List<Field> fields = SurveyorApplication.get().getTembaService().getFields(getToken());
 
-        FileUtils.writeStringToFile(detailsFile, detailsJSON);
+        progress.reportProgress(20);
+
+        List<Group> groups = SurveyorApplication.get().getTembaService().getGroups(getToken());
+
+        progress.reportProgress(30);
+
+        List<Flow> flows = SurveyorApplication.get().getTembaService().getFlows(getToken());
+
+        progress.reportProgress(40);
+
+        List<JsonObject> definitions = SurveyorApplication.get().getTembaService().getDefinitions(getToken(), flows);
+
+        progress.reportProgress(60);
+
+        OrgAssets assets = OrgAssets.fromTemba(fields, groups);
+        String assetsJSON = JsonUtils.marshal(assets);
+
+        File assetsFile = new File(getDirectory(), ASSETS_FILE);
+        FileUtils.writeStringToFile(assetsFile, assetsJSON);
+
+        progress.reportProgress(100);
     }
 
     /**

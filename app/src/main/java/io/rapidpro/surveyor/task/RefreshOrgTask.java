@@ -2,22 +2,17 @@ package io.rapidpro.surveyor.task;
 
 import android.os.AsyncTask;
 
-import java.util.List;
-
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Org;
-import io.rapidpro.surveyor.net.responses.Field;
-import io.rapidpro.surveyor.net.responses.Group;
 
 /**
- * Task to fetch all relevant assets for a single org
+ * Task to completely refresh a single org - details and assets
  */
-public class FetchOrgAssets extends AsyncTask<Org, Integer, Void> {
+public class RefreshOrgTask extends AsyncTask<Org, Integer, Void> {
 
-    private FetchOrgAssetsListener listener;
+    private RefreshOrgListener listener;
     private boolean failed;
 
-    public FetchOrgAssets(FetchOrgAssetsListener listener) {
+    public RefreshOrgTask(RefreshOrgListener listener) {
         this.listener = listener;
     }
 
@@ -26,20 +21,12 @@ public class FetchOrgAssets extends AsyncTask<Org, Integer, Void> {
         Org org = args[0];
 
         try {
-            // start by re-fetching the org details
-            Org.fetch(org.getToken());
-
-            publishProgress(10);
-
-            List<Field> fields = SurveyorApplication.get().getTembaService().getFields(org.getToken());
-
-            publishProgress(50);
-
-            List<Group> groups = SurveyorApplication.get().getTembaService().getGroups(org.getToken());
-
-            publishProgress(100);
-
-            // TODO
+            org.refresh(true, new Org.RefreshProgress() {
+                @Override
+                public void reportProgress(int percent) {
+                    publishProgress(percent);
+                }
+            });
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,7 +54,7 @@ public class FetchOrgAssets extends AsyncTask<Org, Integer, Void> {
         }
     }
 
-    public interface FetchOrgAssetsListener {
+    public interface RefreshOrgListener {
         void onProgress(int percent);
         void onComplete();
         void onFailure();

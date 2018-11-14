@@ -1,5 +1,7 @@
 package io.rapidpro.surveyor.net;
 
+import com.google.gson.JsonObject;
+
 import org.junit.Test;
 
 import java.io.IOException;
@@ -166,5 +168,19 @@ public class TembaServiceTest extends BaseApplicationTest {
         assertThat(groups.get(2).getUuid(), is("63867d07-c033-4ef1-957c-85fa9708c19c"));
         assertThat(groups.get(2).getName(), is("Youth"));
         assertThat(groups.get(2).getQuery(), is("age <= 18"));
+    }
+
+    /**
+     * @see TembaService#getDefinitions(String, List)
+     */
+    @Test
+    public void getDefinitions() throws IOException {
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_flows_get, "application/json", 200);
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get, "application/json", 200);
+
+        List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
+        List<JsonObject> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);
+
+        assertThat(definitions, hasSize(2));
     }
 }

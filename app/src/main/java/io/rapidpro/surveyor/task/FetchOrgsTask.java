@@ -27,9 +27,9 @@ public class FetchOrgsTask extends AsyncTask<String, Void, Set<String>> {
         for (String token : tokens) {
             try {
                 Org org = Org.fetch(token);
-                orgUUIDs.add(org.getUUID());
+                orgUUIDs.add(org.getUuid());
 
-                SurveyorApplication.LOG.d("Fetched org with UUID " + org.getUUID());
+                SurveyorApplication.LOG.d("Fetched org with UUID " + org.getUuid());
             } catch (IOException e) {
                 e.printStackTrace();
                 this.failed = true;

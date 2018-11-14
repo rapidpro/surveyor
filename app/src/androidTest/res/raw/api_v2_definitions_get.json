@@ -1,0 +1,16 @@
+{
+  "version": "11.6",
+  "site": "http://app.rapidpro.io",
+  "campaigns": [],
+  "triggers": [],
+  "flows": [
+    {
+      "uuid": "37560e1b-9271-41fc-8087-1ff37cb839d7",
+      "name": "My Survey"
+    },
+    {
+      "uuid": "01b4825a-1e6b-49a8-b7ad-2550ead74ec8",
+      "name": "Collect Age"
+    }
+  ]
+}

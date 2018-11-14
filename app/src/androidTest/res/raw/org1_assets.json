@@ -1,0 +1,37 @@
+{
+  "fields": [
+    {
+      "key": "gender",
+      "name": "Gender",
+      "type": "text"
+    },
+    {
+      "key": "age",
+      "name": "Age",
+      "type": "number"
+    },
+    {
+      "key": "join_date",
+      "name": "Join Date",
+      "type": "datetime"
+    }
+  ],
+  "groups": [
+    {
+      "uuid": "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06",
+      "name": "Testers",
+      "query": ""
+    },
+    {
+      "uuid": "372aba66-16e2-44ee-8486-fb5cedfe51d9",
+      "name": "Customers",
+      "query": ""
+    },
+    {
+      "uuid": "63867d07-c033-4ef1-957c-85fa9708c19c",
+      "name": "Youth",
+      "query": "age <= 18"
+    }
+  ],
+  "flows": []
+}

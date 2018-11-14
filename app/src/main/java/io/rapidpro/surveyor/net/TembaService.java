@@ -16,6 +16,7 @@ import io.rapidpro.surveyor.ResponseException;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.TembaException;
 import io.rapidpro.surveyor.net.responses.Boundary;
+import io.rapidpro.surveyor.net.responses.Definitions;
 import io.rapidpro.surveyor.net.responses.Field;
 import io.rapidpro.surveyor.net.responses.Flow;
 import io.rapidpro.surveyor.net.responses.Group;
@@ -64,6 +65,7 @@ public class TembaService {
         try {
             Response<Org> response = m_api.getOrg(asAuth(token)).execute();
             checkResponse(response);
+
             return response.body();
         } catch (IOException e) {
             throw new TembaException(e);
@@ -104,6 +106,27 @@ public class TembaService {
                 return m_api.getGroups(asAuth(token), cursor);
             }
         });
+    }
+
+    /**
+     * Gets full definitions for the given flows
+     */
+    public List<JsonObject> getDefinitions(final String token, final List<Flow> flows) {
+        // gather up flow UUIDs
+        final List<String> flowUUIDs = new ArrayList<>(flows.size());
+        for (Flow flow : flows) {
+            flowUUIDs.add(flow.getUuid());
+        }
+
+        try {
+            Response<Definitions> response = m_api.getDefinitions(asAuth(token), flowUUIDs, "none").execute();
+            checkResponse(response);
+
+            return response.body().getFlows();
+
+        } catch (IOException e) {
+            throw new TembaException(e);
+        }
     }
 
     /**

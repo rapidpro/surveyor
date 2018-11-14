@@ -14,7 +14,7 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
-import io.rapidpro.surveyor.task.FetchOrgAssets;
+import io.rapidpro.surveyor.task.RefreshOrgTask;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 
 
@@ -137,7 +137,7 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
         m_refreshProgress = new BlockingProgress(OrgActivity.this, R.string.one_moment, R.string.refresh_org, 3);
         m_refreshProgress.show();
 
-        new FetchOrgAssets(new FetchOrgAssets.FetchOrgAssetsListener() {
+        new RefreshOrgTask(new RefreshOrgTask.RefreshOrgListener() {
             @Override
             public void onProgress(int percent) {
                 m_refreshProgress.setProgress(percent);
