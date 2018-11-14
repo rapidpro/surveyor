@@ -3,11 +3,13 @@ package io.rapidpro.surveyor.test;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -59,14 +61,44 @@ public abstract class BaseApplicationTest {
         editor.apply();
     }
 
+    /**
+     * Clears the orgs directory after each test
+     */
+    @After
+    public void clearOrgsDirectory() {
+        FileUtils.deleteQuietly(getSurveyor().getOrgsDirectory());
+    }
+
     protected SurveyorApplication getSurveyor() {
         return SurveyorApplication.get();
     }
 
+    /**
+     * Utility to appear logged in as the given user
+     * @param email the email
+     * @param orgUUIDs the set of accessible org UUIDs
+     */
     protected void login(String email, Set<String> orgUUIDs) {
         getSurveyor().setPreference(SurveyorPreferences.AUTH_USERNAME, email);
         getSurveyor().setPreference(SurveyorPreferences.PREV_USERNAME, email);
         getSurveyor().setPreference(SurveyorPreferences.AUTH_ORGS, orgUUIDs);
+    }
+
+    /**
+     * Utility to create an org directory
+     * @param uuid the org UUID
+     * @param detailsResId the resource ID of the details file
+     */
+    protected void installOrg(String uuid, int detailsResId) throws IOException {
+        // create org directory
+        File dir = new File(getSurveyor().getOrgsDirectory(), uuid);
+        dir.mkdirs();
+
+        // install details.json
+        String detailsJSON = readRawResource(detailsResId);
+        File detailsFile = new File(dir, "details.json");
+
+        FileUtils.writeStringToFile(detailsFile, detailsJSON);
     }
 
     /**
@@ -86,11 +118,7 @@ public abstract class BaseApplicationTest {
      * Enqueues a response on the mock HTTP server from the given resource file and MIME type and status code
      */
     protected void mockServerResponse(int rawResId, String mimeType, int code) throws IOException {
-        Context context = InstrumentationRegistry.getInstrumentation().getContext();
-        InputStream input = context.getResources().openRawResource(rawResId);
-        String body = IOUtils.toString(input, StandardCharsets.UTF_8);
-
-        mockServerResponse(body, mimeType, code);
+        mockServerResponse(readRawResource(rawResId), mimeType, code);
     }
 
     /**
@@ -102,5 +130,11 @@ public abstract class BaseApplicationTest {
                 .setHeader("Location", location);
 
         mockServer.enqueue(response);
+    }
+
+    private String readRawResource(int rawResId) throws IOException {
+        Context context = InstrumentationRegistry.getInstrumentation().getContext();
+        InputStream input = context.getResources().openRawResource(rawResId);
+        return IOUtils.toString(input, StandardCharsets.UTF_8);
     }
 }

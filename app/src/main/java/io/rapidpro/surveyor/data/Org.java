@@ -1,6 +1,7 @@
 package io.rapidpro.surveyor.data;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
 
@@ -20,13 +21,23 @@ public class Org {
     private static final String ASSETS_FILE = "assets.json";
 
     private transient String uuid;
+
     private String token;
+
     private String name;
+
+    @SerializedName("primary_language")
     private String primaryLanguage;
+
     private String[] languages;
+
     private String timezone;
+
     private String country;
+
+    @SerializedName("date_style")
     private String dateStyle;
+
     private boolean anon;
 
     /**
