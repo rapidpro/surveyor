@@ -47,7 +47,7 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':goflow')
 
     // google services
     implementation 'com.android.support:appcompat-v7:26.1.0'
@@ -67,7 +67,7 @@ dependencies {
     implementation 'com.neovisionaries:nv-i18n:1.11'
 
     // apache commons io
-    implementation group: 'commons-io', name: 'commons-io', version: '2.4'
+    implementation 'commons-io:commons-io:2.4'
 
     // Android M permissions
     implementation 'com.greysonparrelli.permiso:permiso:0.1.3'

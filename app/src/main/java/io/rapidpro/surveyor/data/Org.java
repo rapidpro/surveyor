@@ -207,7 +207,7 @@ public class Org {
 
         progress.reportProgress(60);
 
-        OrgAssets assets = OrgAssets.fromTemba(fields, groups);
+        OrgAssets assets = OrgAssets.fromTemba(fields, groups, definitions);
         String assetsJSON = JsonUtils.marshal(assets);
 
         File assetsFile = new File(getDirectory(), ASSETS_FILE);

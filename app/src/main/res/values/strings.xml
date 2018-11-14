@@ -2,11 +2,11 @@
     <string name="app_name">Surveyor</string>
 
     <!-- activity titles -->
-    <string name="title_activity_org_list">Choose Organization</string>
-    <string name="title_activity_org">Organization</string>
-    <string name="title_activity_flow_list">Download Flow</string>
-    <string name="title_activity_flowrun">Flow Run</string>
+    <string name="title_activity_login">Sign in</string>
     <string name="title_activity_create_account">Create Account</string>
+    <string name="title_activity_org_choose">Choose Organization</string>
+    <string name="title_activity_org">Organization</string>
+    <string name="title_activity_flowrun">Flow Run</string>
 
     <!-- menu items -->
     <string name="action_settings">Settings</string>
