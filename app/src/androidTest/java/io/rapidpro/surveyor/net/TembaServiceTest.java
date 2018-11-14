@@ -1,7 +1,5 @@
 package io.rapidpro.surveyor.net;
 
-import com.google.gson.JsonObject;
-
 import org.junit.Test;
 
 import java.io.IOException;
@@ -17,6 +15,7 @@ import io.rapidpro.surveyor.net.responses.Org;
 import io.rapidpro.surveyor.net.responses.Token;
 import io.rapidpro.surveyor.net.responses.TokenResults;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
+import io.rapidpro.surveyor.utils.RawJson;
 import okhttp3.mockwebserver.RecordedRequest;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -24,6 +23,7 @@ import retrofit2.Response;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.hasSize;
@@ -141,13 +141,13 @@ public class TembaServiceTest extends BaseApplicationTest {
 
         List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
         assertThat(flows, hasSize(2));
-        assertThat(flows.get(0).getUuid(), is("37560e1b-9271-41fc-8087-1ff37cb839d7"));
-        assertThat(flows.get(0).getName(), is("My Survey"));
+        assertThat(flows.get(0).getUuid(), is("14ca824e-6607-4c11-82f5-18e298d0bd58"));
+        assertThat(flows.get(0).getName(), is("Two Questions"));
         assertThat(flows.get(0).getType(), is("survey"));
         assertThat(flows.get(0).isArchived(), is(false));
-        assertThat(flows.get(0).getExpires(), is(600));
-        assertThat(flows.get(1).getUuid(), is("01b4825a-1e6b-49a8-b7ad-2550ead74ec8"));
-        assertThat(flows.get(1).getName(), is("Collect Age"));
+        assertThat(flows.get(0).getExpires(), is(10080));
+        assertThat(flows.get(1).getUuid(), is("ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec"));
+        assertThat(flows.get(1).getName(), is("Ask Name"));
     }
 
     /**
@@ -179,8 +179,9 @@ public class TembaServiceTest extends BaseApplicationTest {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get, "application/json", 200);
 
         List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
-        List<JsonObject> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);
+        List<RawJson> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);
 
         assertThat(definitions, hasSize(2));
+        assertThat(definitions.get(0).toString(), startsWith("{\"entry\":\"c50f7200-2432-4912-897d-d809a2d2ad8d\""));
     }
 }

@@ -1,13 +1,13 @@
 package io.rapidpro.surveyor.net.responses;
 
-import com.google.gson.JsonObject;
-
 import java.util.List;
+
+import io.rapidpro.surveyor.utils.RawJson;
 
 public class Definitions {
     private String version;
     private String site;
-    private List<JsonObject> flows;
+    private List<RawJson> flows;
 
     public String getVersion() {
         return version;
@@ -17,7 +17,7 @@ public class Definitions {
         return site;
     }
 
-    public List<JsonObject> getFlows() {
+    public List<RawJson> getFlows() {
         return flows;
     }
 }

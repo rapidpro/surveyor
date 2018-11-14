@@ -1,7 +1,5 @@
 package io.rapidpro.surveyor.data;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
@@ -16,11 +14,10 @@ import java.util.Set;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.net.TembaService;
-import io.rapidpro.surveyor.net.responses.Definitions;
 import io.rapidpro.surveyor.net.responses.Field;
 import io.rapidpro.surveyor.net.responses.Flow;
 import io.rapidpro.surveyor.net.responses.Group;
-import io.rapidpro.surveyor.task.RefreshOrgTask;
+import io.rapidpro.surveyor.utils.RawJson;
 import io.rapidpro.surveyor.utils.JsonUtils;
 
 public class Org {
@@ -203,7 +200,7 @@ public class Org {
 
         progress.reportProgress(40);
 
-        List<JsonObject> definitions = SurveyorApplication.get().getTembaService().getDefinitions(getToken(), flows);
+        List<RawJson> definitions = SurveyorApplication.get().getTembaService().getDefinitions(getToken(), flows);
 
         progress.reportProgress(60);
 

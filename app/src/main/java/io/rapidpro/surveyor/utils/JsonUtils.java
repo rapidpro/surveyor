@@ -4,7 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class JsonUtils {
-    private static Gson s_gson = new GsonBuilder().create();
+    private static Gson s_gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(RawJson.class, new RawJson.Adapter())
+            .create();
+
+    public static Gson getGson() {
+        return s_gson;
+    }
 
     public static String marshal(Object src) {
         return s_gson.toJson(src);

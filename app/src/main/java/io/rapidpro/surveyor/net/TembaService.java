@@ -23,6 +23,8 @@ import io.rapidpro.surveyor.net.responses.Group;
 import io.rapidpro.surveyor.net.responses.Org;
 import io.rapidpro.surveyor.net.responses.PaginatedResults;
 import io.rapidpro.surveyor.net.responses.TokenResults;
+import io.rapidpro.surveyor.utils.JsonUtils;
+import io.rapidpro.surveyor.utils.RawJson;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -111,7 +113,7 @@ public class TembaService {
     /**
      * Gets full definitions for the given flows
      */
-    public List<JsonObject> getDefinitions(final String token, final List<Flow> flows) {
+    public List<RawJson> getDefinitions(final String token, final List<Flow> flows) {
         // gather up flow UUIDs
         final List<String> flowUUIDs = new ArrayList<>(flows.size());
         for (Flow flow : flows) {
@@ -205,7 +207,6 @@ public class TembaService {
 
     private static Retrofit createRetrofit(String host) {
 
-        Gson gson = new GsonBuilder().create();
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -223,7 +224,7 @@ public class TembaService {
         try {
             return new Retrofit.Builder()
                     .baseUrl(host)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .addConverterFactory(GsonConverterFactory.create(JsonUtils.getGson()))
                     .client(okHttpClient)
                     .build();
         } catch (IllegalArgumentException e) {
