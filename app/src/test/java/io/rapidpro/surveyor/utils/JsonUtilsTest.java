@@ -8,7 +8,7 @@ import static org.junit.Assert.assertThat;
 public class JsonUtilsTest {
 
     @Test
-    public void marshalAndUnmarshal() throws Exception {
+    public void marshalAndUnmarshal() {
         TestObject obj1 = new TestObject("Bob", 55, new RawJson("{\"street\":\"Calle Larga\"}"));
         String marshaled = JsonUtils.marshal(obj1);
 

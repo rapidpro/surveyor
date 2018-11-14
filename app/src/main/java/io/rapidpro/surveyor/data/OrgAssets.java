@@ -1,5 +1,7 @@
 package io.rapidpro.surveyor.data;
 
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,5 +39,13 @@ public class OrgAssets {
         }
 
         return new OrgAssets(fieldAssets, groupAssets, flowAssets);
+    }
+
+    public List<FlowSummary> getFlowSummaries() {
+        List<FlowSummary> summaries = new ArrayList<>(this.flows.size());
+        for (RawJson flow : this.flows) {
+            summaries.add(FlowSummary.extract(flow));
+        }
+        return summaries;
     }
 }

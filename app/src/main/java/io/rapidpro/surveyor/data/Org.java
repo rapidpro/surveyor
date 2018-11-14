@@ -21,8 +21,20 @@ import io.rapidpro.surveyor.utils.RawJson;
 import io.rapidpro.surveyor.utils.JsonUtils;
 
 public class Org {
+    /**
+     * Contains the JSON representation of this org
+     */
     private static final String DETAILS_FILE = "details.json";
+
+    /**
+     * Contains a goflow assets file with this org's flows, groups, fields etc
+     */
     private static final String ASSETS_FILE = "assets.json";
+
+    /**
+     * Contains summaries of each flow available in this org
+     */
+    private static final String FLOWS_FILE = "flows.json";
 
     private transient String uuid;
 
@@ -178,6 +190,10 @@ public class Org {
         File detailsFile = new File(getDirectory(), DETAILS_FILE);
         FileUtils.writeStringToFile(detailsFile, detailsJSON);
 
+        // write an empty flows file to be updated later when assets are fetched
+        File flowsFile = new File(getDirectory(), FLOWS_FILE);
+        FileUtils.writeStringToFile(flowsFile, "[]");
+
         if (progress != null) {
             progress.reportProgress(10);
         }
@@ -209,6 +225,14 @@ public class Org {
 
         File assetsFile = new File(getDirectory(), ASSETS_FILE);
         FileUtils.writeStringToFile(assetsFile, assetsJSON);
+
+        progress.reportProgress(80);
+
+        List<FlowSummary> summaries = assets.getFlowSummaries();
+        String summariesJSON = JsonUtils.marshal(summaries);
+
+        File flowsFile = new File(getDirectory(), FLOWS_FILE);
+        FileUtils.writeStringToFile(flowsFile, summariesJSON);
 
         progress.reportProgress(100);
     }

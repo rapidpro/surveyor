@@ -1,0 +1,210 @@
+{
+  "uuid": "14ca824e-6607-4c11-82f5-18e298d0bd58",
+  "name": "Two Questions",
+  "language": "base",
+  "type": "messaging_offline",
+  "revision": 24,
+  "expire_after_minutes": 10080,
+  "localization": {},
+  "nodes": [
+    {
+      "uuid": "6f26e808-c1a2-4e52-b6f3-4d2dd79ffb24",
+      "actions": [
+        {
+          "type": "send_msg",
+          "uuid": "450d2c77-a2d2-4cec-8a97-a96c5d7bf126",
+          "text": "What is your favorite beer?"
+        }
+      ],
+      "exits": [
+        {
+          "uuid": "bf56b8cc-3801-4a15-a307-73d277694896",
+          "destination_node_uuid": "e1dbee2c-17df-471d-9768-eec94a3343c0"
+        }
+      ]
+    },
+    {
+      "uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
+      "actions": [
+        {
+          "type": "send_msg",
+          "uuid": "4c3be4d2-c994-4e28-946c-5ea9ee33659a",
+          "text": "@results.beer.category_localized is a great beer! What is your favorite color?"
+        }
+      ],
+      "exits": [
+        {
+          "uuid": "99ac70fb-2d81-4d24-94a3-d031123e137b",
+          "destination_node_uuid": "7854b048-038c-44fe-88c5-f62fd599b556"
+        }
+      ]
+    },
+    {
+      "uuid": "6980dc8d-7787-4a83-a603-5b84fd8e87f9",
+      "actions": [
+        {
+          "type": "send_msg",
+          "uuid": "5e5b8b5a-b638-4a58-94a6-bb79814f4712",
+          "text": "I didn\u0027t recognize that beer. Please try again."
+        }
+      ],
+      "exits": [
+        {
+          "uuid": "9257e3e9-ff08-4707-ad86-398e8e34bb7c",
+          "destination_node_uuid": "e1dbee2c-17df-471d-9768-eec94a3343c0"
+        }
+      ]
+    },
+    {
+      "uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
+      "actions": [
+        {
+          "type": "send_msg",
+          "uuid": "a3ad6679-a32c-4af0-babc-2def65adc185",
+          "text": "Ok let\u0027s go get some @results.color.category_localized @results.beer.category_localized!"
+        }
+      ],
+      "exits": [
+        {
+          "uuid": "7b4ede52-3fa2-451c-955e-f5b0cb4c7030"
+        }
+      ]
+    },
+    {
+      "uuid": "504f5813-b500-431f-b7db-244606c9696b",
+      "actions": [
+        {
+          "type": "send_msg",
+          "uuid": "5ed80e3b-d6ec-4b25-bbbf-39ae8935ab00",
+          "text": "@results.color.input isn\u0027t a color I know. Please try again."
+        }
+      ],
+      "exits": [
+        {
+          "uuid": "91e8b04d-8412-419e-9062-1877a23e377a",
+          "destination_node_uuid": "7854b048-038c-44fe-88c5-f62fd599b556"
+        }
+      ]
+    },
+    {
+      "uuid": "e1dbee2c-17df-471d-9768-eec94a3343c0",
+      "wait": {
+        "type": "msg"
+      },
+      "router": {
+        "type": "switch",
+        "result_name": "Beer",
+        "default_exit_uuid": "c0d4fdd1-ec6c-4b6d-927d-c7f532989274",
+        "operand": "@input",
+        "cases": [
+          {
+            "uuid": "c46a301e-f4b7-4650-8e2a-05f92f9f929f",
+            "type": "has_any_word",
+            "arguments": [
+              "Club"
+            ],
+            "exit_uuid": "9f484724-9adb-40da-9da3-d99973591e27"
+          },
+          {
+            "uuid": "f740f2ee-56e2-4a2f-8cfb-73e20a4bb5f2",
+            "type": "has_any_word",
+            "arguments": [
+              "Pilsner"
+            ],
+            "exit_uuid": "7993051a-a2d9-4387-9cdb-bd0f48c288a3"
+          },
+          {
+            "uuid": "5d8b09f9-67ed-42c7-9e5e-2e4607ebd76f",
+            "type": "has_any_word",
+            "arguments": [
+              "Mutzig"
+            ],
+            "exit_uuid": "447b17a3-9f22-4267-b9bc-754036f842ce"
+          }
+        ]
+      },
+      "exits": [
+        {
+          "uuid": "9f484724-9adb-40da-9da3-d99973591e27",
+          "destination_node_uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
+          "name": "Club"
+        },
+        {
+          "uuid": "7993051a-a2d9-4387-9cdb-bd0f48c288a3",
+          "destination_node_uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
+          "name": "Pilsner"
+        },
+        {
+          "uuid": "447b17a3-9f22-4267-b9bc-754036f842ce",
+          "destination_node_uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
+          "name": "Mutzig"
+        },
+        {
+          "uuid": "c0d4fdd1-ec6c-4b6d-927d-c7f532989274",
+          "destination_node_uuid": "6980dc8d-7787-4a83-a603-5b84fd8e87f9",
+          "name": "Other"
+        }
+      ]
+    },
+    {
+      "uuid": "7854b048-038c-44fe-88c5-f62fd599b556",
+      "wait": {
+        "type": "msg"
+      },
+      "router": {
+        "type": "switch",
+        "result_name": "Color",
+        "default_exit_uuid": "a45d84cc-725b-4626-98fd-54c64eff0e20",
+        "operand": "@input",
+        "cases": [
+          {
+            "uuid": "c6285f5d-a0ee-4c6c-80d0-aaedf6f24c33",
+            "type": "has_any_word",
+            "arguments": [
+              "red"
+            ],
+            "exit_uuid": "46f73b0a-5845-4392-b5bf-f74c07bb1217"
+          },
+          {
+            "uuid": "15b1b6f1-2c4f-4e3f-aef0-79eb19c5a59f",
+            "type": "has_any_word",
+            "arguments": [
+              "blue"
+            ],
+            "exit_uuid": "26d3ec68-245c-49d9-b33f-35d590041827"
+          },
+          {
+            "uuid": "0802ebe3-6a39-413d-b3dd-1b6e232f3c24",
+            "type": "has_any_word",
+            "arguments": [
+              "green"
+            ],
+            "exit_uuid": "646d954d-9e6e-4e38-9a78-0df08b38b7ac"
+          }
+        ]
+      },
+      "exits": [
+        {
+          "uuid": "46f73b0a-5845-4392-b5bf-f74c07bb1217",
+          "destination_node_uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
+          "name": "Red"
+        },
+        {
+          "uuid": "26d3ec68-245c-49d9-b33f-35d590041827",
+          "destination_node_uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
+          "name": "Blue"
+        },
+        {
+          "uuid": "646d954d-9e6e-4e38-9a78-0df08b38b7ac",
+          "destination_node_uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
+          "name": "Green"
+        },
+        {
+          "uuid": "a45d84cc-725b-4626-98fd-54c64eff0e20",
+          "destination_node_uuid": "504f5813-b500-431f-b7db-244606c9696b",
+          "name": "Other"
+        }
+      ]
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import io.rapidpro.surveyor.test.BaseApplicationTest;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.PreferenceMatchers.withKey;
@@ -32,7 +33,9 @@ public class SettingsActivityTest extends BaseApplicationTest {
                 .check(matches(isDisplayed()))
                 .perform(click());
 
-        onView(withClassName(endsWith("EditText"))).perform(replaceText("http://test.com"));
+        onView(withClassName(endsWith("EditText")))
+                .perform(replaceText("http://test.com"))
+                .perform(closeSoftKeyboard());
         onView(withText("OK")).perform(click());
 
         assertThat(getSurveyor().getTembaHost(), is("http://test.com"));

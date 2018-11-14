@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 
 public class JsonUtils {
     private static Gson s_gson = new GsonBuilder()
-            .setPrettyPrinting()
+            //.setPrettyPrinting()
             .registerTypeAdapter(RawJson.class, new RawJson.Adapter())
             .create();
 
