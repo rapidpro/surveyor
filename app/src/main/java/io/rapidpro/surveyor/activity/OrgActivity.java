@@ -17,6 +17,7 @@ import java.util.List;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.FlowSummary;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
@@ -26,27 +27,23 @@ import io.rapidpro.surveyor.ui.BlockingProgress;
 
 public class OrgActivity extends BaseActivity implements FlowListFragment.Container {
 
-    // progress dialog while we are refreshing org details
-    private BlockingProgress m_refreshProgress;
-
-    private Org org;
+    private Org cachedOrg;
 
     private Org getOrg() {
-        if (this.org == null) {
+        if (this.cachedOrg == null) {
             String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
 
             try {
-                this.org = Org.load(orgUUID, true);
+                this.cachedOrg = Org.load(orgUUID, true);
 
                 SurveyorApplication.LOG.d("Loaded org " + orgUUID);
             } catch (IOException e) {
                 SurveyorApplication.LOG.e("Error loading org " + orgUUID, e);
 
-                e.printStackTrace();
                 finish();
             }
         }
-        return this.org;
+        return this.cachedOrg;
     }
 
     @Override
@@ -73,47 +70,25 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(R.id.fragment_container, fragment).commit();
         }
-
-        /*final DBOrg org = getDBOrg();
-
-        // if we don't know our timezone yet, fetch it
-        if (org.getTimezone() == null || org.getTimezone().trim().length() == 0) {
-            setContentView(R.layout.activity_pending);
-            new FetchOrgData().execute();
-        } else {
-
-            setTitle(org.getName());
-
-            if (savedInstanceState == null) {
-                Fragment listFragment = FlowListFragment.newInstance(org.getId());
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(R.id.activity_org_choose, listFragment).commit();
-
-                // if we don't have flows, start download activity
-                if (getRealm().where(DBFlow.class).equalTo("org.id", org.getId()).findFirst() == null) {
-                    startActivity(getIntent(OrgActivity.this, RapidFlowsActivity.class));
-                }
-            }
-        }*/
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         refresh();
     }
 
-    public void refresh() {
-        /*FlowListAdapter adapter = (FlowListAdapter) getViewCache().getListViewAdapter(android.R.id.list);
+    private void refresh() {
+        FlowListAdapter adapter = (FlowListAdapter) getViewCache().getListViewAdapter(android.R.id.list);
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
 
-        int pending = Submission.getPendingSubmissions(getDBOrg().getId()).length;
+        /*int pending = Submission.getPendingSubmissions(getDBOrg().getId()).length;
         ViewCache cache = getViewCache();
         cache.setVisible(R.id.container_pending, pending > 0);
         cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));*/
-
     }
 
     @Override
@@ -153,25 +128,25 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
     }
 
     protected void doRefresh() {
-        m_refreshProgress = new BlockingProgress(OrgActivity.this, R.string.one_moment, R.string.refresh_org, 3);
-        m_refreshProgress.show();
+        final BlockingProgress progressModal = new BlockingProgress(OrgActivity.this, R.string.one_moment, R.string.refresh_org, 3);
+        progressModal.show();
 
         new RefreshOrgTask(new RefreshOrgTask.RefreshOrgListener() {
             @Override
             public void onProgress(int percent) {
-                m_refreshProgress.setProgress(percent);
+                progressModal.setProgress(percent);
             }
 
             @Override
             public void onComplete() {
-                m_refreshProgress.dismiss();
-                m_refreshProgress = null;
+                refresh();
+
+                progressModal.dismiss();
             }
 
             @Override
             public void onFailure() {
-                m_refreshProgress.dismiss();
-                m_refreshProgress = null;
+                progressModal.dismiss();
 
                 Toast.makeText(OrgActivity.this, getString(R.string.error_org_refresh), Toast.LENGTH_SHORT).show();
             }
@@ -205,15 +180,22 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
                 .show();
     }
 
+    /**
+     * @see FlowListFragment.Container#getListItems()
+     */
     @Override
-    public List<FlowSummary> getFlowItems() {
+    public List<FlowSummary> getListItems() {
         return getOrg().getFlows();
     }
 
+    /**
+     * @see FlowListFragment.Container#onItemClick(FlowSummary)
+     */
     @Override
-    public void onFlowClick(FlowSummary flow) {
-        //Intent intent = new Intent(this, FlowActivity.class);
-        //intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
-        //startActivity(intent);
+    public void onItemClick(FlowSummary flow) {
+        Intent intent = new Intent(this, FlowActivity.class);
+        intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, getOrg().getUuid());
+        intent.putExtra(SurveyorIntent.EXTRA_FLOW_UUID, flow.getUuid());
+        startActivity(intent);
     }
 }

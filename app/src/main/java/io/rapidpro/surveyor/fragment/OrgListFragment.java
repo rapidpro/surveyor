@@ -23,8 +23,8 @@ import io.rapidpro.surveyor.data.Org;
  */
 public class OrgListFragment extends Fragment implements AbsListView.OnItemClickListener {
 
-    private Listener m_listener;
-    private ListAdapter m_adapter;
+    private Container container;
+    private ListAdapter adapter;
 
     public OrgListFragment() {
     }
@@ -33,20 +33,16 @@ public class OrgListFragment extends Fragment implements AbsListView.OnItemClick
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        List<Org> items = null;
-        try {
-            items = Org.loadAll();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        m_adapter = new OrgListAdapter(getActivity(), R.layout.item_org, items);
+        List<Org> items = container.getListItems();
+
+        adapter = new OrgListAdapter(getActivity(), R.layout.item_org, items);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         ListView m_listView = view.findViewById(android.R.id.list);
-        m_listView.setAdapter(m_adapter);
+        m_listView.setAdapter(adapter);
         m_listView.setOnItemClickListener(this);
         return view;
     }
@@ -55,29 +51,28 @@ public class OrgListFragment extends Fragment implements AbsListView.OnItemClick
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            m_listener = (Listener) activity;
+            container = (Container) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OrgListFragment.Listener");
+            throw new ClassCastException(activity.toString() + " must implement OrgListFragment.Container");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        m_listener = null;
+        container = null;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != m_listener) {
-            m_listener.onOrgClick((Org) m_adapter.getItem(position));
-        }
+        container.onItemClick((Org) adapter.getItem(position));
     }
 
     /**
      * Container activity should implement this to be notified when an org is clicked
      */
-    public interface Listener {
-        void onOrgClick(Org org);
+    public interface Container {
+        List<Org> getListItems();
+        void onItemClick(Org org);
     }
 }

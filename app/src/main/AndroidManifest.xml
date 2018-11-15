@@ -51,6 +51,11 @@
             android:label="@string/title_activity_org" >
         </activity>
         <activity
+            android:name=".activity.FlowActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_flow" >
+        </activity>
+        <activity
             android:name=".activity.AudioCaptureActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_audio_activity">

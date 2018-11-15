@@ -20,24 +20,31 @@ import io.rapidpro.surveyor.fragment.OrgListFragment;
 /**
  * Let's the user select one of the orgs they have access to
  */
-public class OrgChooseActivity extends BaseActivity implements OrgListFragment.Listener {
+public class OrgChooseActivity extends BaseActivity implements OrgListFragment.Container {
+
+    private List<Org> cachedOrgs;
+
+    private List<Org> getOrgs() {
+        if (this.cachedOrgs == null) {
+            try {
+                this.cachedOrgs = Org.loadAll();
+
+                SurveyorApplication.LOG.d("Loaded " + cachedOrgs.size() + " orgs");
+            } catch (IOException e) {
+                SurveyorApplication.LOG.e("Error loading orgs", e);
+            }
+        }
+        return cachedOrgs;
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        List<Org> orgs = new ArrayList<>();
-        try {
-            orgs = Org.loadAll();
-        } catch (IOException e) {
-            // TODO
-            e.printStackTrace();
-        }
-
-        SurveyorApplication.LOG.d("Loaded " + orgs.size() + " orgs");
+        List<Org> orgs = getOrgs();
 
         // if we don't have any orgs, take us back to the login screen
-        if (orgs.size() == 0) {
+        if (orgs == null || orgs.size() == 0) {
             logout();
 
             overridePendingTransition(0, 0);
@@ -73,10 +80,18 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.L
     }
 
     /**
-     * @see OrgListFragment.Listener#onOrgClick(Org)
+     * @see OrgListFragment.Container#getListItems()
      */
     @Override
-    public void onOrgClick(Org org) {
+    public List<Org> getListItems() {
+        return getOrgs();
+    }
+
+    /**
+     * @see OrgListFragment.Container#onItemClick(Org)
+     */
+    @Override
+    public void onItemClick(Org org) {
         showOrg(org);
     }
 

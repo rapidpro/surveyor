@@ -28,7 +28,7 @@ public class FlowListAdapter extends ArrayAdapter<FlowSummary> {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
         if (row == null) {
-            row = inflater.inflate(R.layout.item_flow_downloaded, parent, false);
+            row = inflater.inflate(R.layout.item_flow, parent, false);
 
             cache = new ViewCache();
             cache.titleView = (TextView) row.findViewById(R.id.text_flow_name);

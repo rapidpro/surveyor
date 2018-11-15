@@ -13,22 +13,11 @@ public class BlockingProgress extends ProgressDialog {
 
         setTitle(title);
         setMessage(getContext().getString(message));
-
         setIndeterminate(false);
         setMax(total);
         setCancelable(false);
         setCanceledOnTouchOutside(false);
         setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         setProgress(0);
-    }
-
-    @Override
-    public void incrementProgressBy(int diff) {
-        super.incrementProgressBy(diff);
-
-        // check if we are ready to dismiss
-        if (getProgress() == getMax()) {
-            dismiss();
-        }
     }
 }

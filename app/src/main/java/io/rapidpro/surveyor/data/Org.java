@@ -203,14 +203,15 @@ public class Org {
         this.dateStyle = apiOrg.getDateStyle();
         this.anon = apiOrg.isAnon();
 
-        // write org fields to details.json
+        // (re)write org fields to details.json
         String detailsJSON = JsonUtils.marshal(this);
-        File detailsFile = new File(getDirectory(), DETAILS_FILE);
-        FileUtils.writeStringToFile(detailsFile, detailsJSON);
+        FileUtils.writeStringToFile(new File(getDirectory(), DETAILS_FILE), detailsJSON);
 
         // write an empty flows file to be updated later when assets are fetched
         File flowsFile = new File(getDirectory(), FLOWS_FILE);
-        FileUtils.writeStringToFile(flowsFile, "[]");
+        if (!flowsFile.exists()) {
+            FileUtils.writeStringToFile(flowsFile, "[]");
+        }
 
         if (progress != null) {
             progress.reportProgress(10);
@@ -241,18 +242,21 @@ public class Org {
         OrgAssets assets = OrgAssets.fromTemba(fields, groups, definitions);
         String assetsJSON = JsonUtils.marshal(assets);
 
-        File assetsFile = new File(getDirectory(), ASSETS_FILE);
-        FileUtils.writeStringToFile(assetsFile, assetsJSON);
+        FileUtils.writeStringToFile(new File(getDirectory(), ASSETS_FILE), assetsJSON);
 
         progress.reportProgress(80);
 
-        List<FlowSummary> summaries = assets.getFlowSummaries();
-        String summariesJSON = JsonUtils.marshal(summaries);
+        // update the flow summaries
+        this.flows.clear();
+        this.flows.addAll(assets.getFlowSummaries());
 
-        File flowsFile = new File(getDirectory(), FLOWS_FILE);
-        FileUtils.writeStringToFile(flowsFile, summariesJSON);
+        // and write that to flows.json as well
+        String summariesJSON = JsonUtils.marshal(this.flows);
+        FileUtils.writeStringToFile(new File(getDirectory(), FLOWS_FILE), summariesJSON);
 
         progress.reportProgress(100);
+
+        SurveyorApplication.LOG.d("Refreshed assets for org " + uuid + " (flows=" + flows.size() + ", fields=" + fields.size() + ", groups=" + groups.size() + ")");
     }
 
     /**

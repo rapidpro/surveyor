@@ -11,23 +11,19 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import java.io.IOException;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
-import io.rapidpro.surveyor.adapter.OrgListAdapter;
 import io.rapidpro.surveyor.data.FlowSummary;
-import io.rapidpro.surveyor.data.Org;
 
 /**
  * A list of flows than can be selected from
  */
 public class FlowListFragment extends Fragment implements AbsListView.OnItemClickListener {
 
-    private Container m_container;
-    private ListAdapter m_adapter;
+    private Container container;
+    private ListAdapter adapter;
 
     public FlowListFragment() {
     }
@@ -36,18 +32,16 @@ public class FlowListFragment extends Fragment implements AbsListView.OnItemClic
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        List<FlowSummary> items = m_container.getFlowItems();
+        List<FlowSummary> items = container.getListItems();
 
-        SurveyorApplication.LOG.d("FlowListFragment.onCreate items=" + items.size());
-
-        m_adapter = new FlowListAdapter(getActivity(), R.layout.item_flow_downloaded, items);
+        adapter = new FlowListAdapter(getActivity(), R.layout.item_flow, items);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         ListView m_listView = view.findViewById(android.R.id.list);
-        m_listView.setAdapter(m_adapter);
+        m_listView.setAdapter(adapter);
         m_listView.setOnItemClickListener(this);
         return view;
     }
@@ -56,7 +50,7 @@ public class FlowListFragment extends Fragment implements AbsListView.OnItemClic
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            m_container = (Container) activity;
+            container = (Container) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement FlowListFragment.Container");
         }
@@ -65,21 +59,19 @@ public class FlowListFragment extends Fragment implements AbsListView.OnItemClic
     @Override
     public void onDetach() {
         super.onDetach();
-        m_container = null;
+        container = null;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != m_container) {
-            m_container.onFlowClick((FlowSummary) m_adapter.getItem(position));
-        }
+        container.onItemClick((FlowSummary) adapter.getItem(position));
     }
 
     /**
      * Container activity should implement this to be notified when a flow is clicked
      */
     public interface Container {
-        List<FlowSummary> getFlowItems();
-        void onFlowClick(FlowSummary flow);
+        List<FlowSummary> getListItems();
+        void onItemClick(FlowSummary flow);
     }
 }
