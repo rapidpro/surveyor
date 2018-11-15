@@ -34,7 +34,7 @@ public class OrgActivityTest extends BaseApplicationTest {
 
     @Test
     public void showDownloadConfirmationIfAssetsNotDownloaded() throws IOException {
-        installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details,0);
+        installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details,0, 0);
 
         Intent intent = new Intent();
         intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, ORG_UUID);
@@ -46,7 +46,7 @@ public class OrgActivityTest extends BaseApplicationTest {
 
     @Test
     public void dontShowDownloadConfirmationIfAssetsDownloaded() throws IOException {
-        installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details,io.rapidpro.surveyor.test.R.raw.org1_assets);
+        installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows, io.rapidpro.surveyor.test.R.raw.org1_assets);
 
         Intent intent = new Intent();
         intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, ORG_UUID);

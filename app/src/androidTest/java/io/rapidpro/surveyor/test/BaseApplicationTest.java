@@ -89,21 +89,28 @@ public abstract class BaseApplicationTest {
      * @param uuid the org UUID
      * @param detailsResId the resource ID of the details file
      */
-    protected void installOrg(String uuid, int detailsResId, int assetsResId) throws IOException {
+    protected void installOrg(String uuid, int detailsResId, int flowsResId, int assetsResId) throws IOException {
         // create org directory
         File dir = new File(getSurveyor().getOrgsDirectory(), uuid);
         dir.mkdirs();
 
         // install details.json
         String detailsJSON = readRawResource(detailsResId);
-        File detailsFile = new File(dir, "details.json");
-        FileUtils.writeStringToFile(detailsFile, detailsJSON);
+        FileUtils.writeStringToFile(new File(dir, "details.json"), detailsJSON);
+
+        if (flowsResId > 0) {
+            // install flows.json
+            String flowsJSON = readRawResource(flowsResId);
+            FileUtils.writeStringToFile(new File(dir, "flows.json"), flowsJSON);
+        } else {
+            // a valid org must have details.json and flows.json
+            FileUtils.writeStringToFile(new File(dir, "flows.json"), "[]");
+        }
 
         if (assetsResId > 0) {
             // install assets.json
             String assetsJSON = readRawResource(assetsResId);
-            File assetsFile = new File(dir, "assets.json");
-            FileUtils.writeStringToFile(assetsFile, assetsJSON);
+            FileUtils.writeStringToFile(new File(dir, "assets.json"), assetsJSON);
         }
     }
 

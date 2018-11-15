@@ -15,31 +15,32 @@ import java.io.IOException;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.adapter.OrgListAdapter;
+import io.rapidpro.surveyor.data.FlowSummary;
 import io.rapidpro.surveyor.data.Org;
 
 /**
- * A list of orgs than can be selected from
+ * A list of flows than can be selected from
  */
-public class OrgListFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class FlowListFragment extends Fragment implements AbsListView.OnItemClickListener {
 
-    private Listener m_listener;
+    private Container m_container;
     private ListAdapter m_adapter;
 
-    public OrgListFragment() {
+    public FlowListFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        List<Org> items = null;
-        try {
-            items = Org.loadAll();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        m_adapter = new OrgListAdapter(getActivity(), R.layout.item_org, items);
+        List<FlowSummary> items = m_container.getFlowItems();
+
+        SurveyorApplication.LOG.d("FlowListFragment.onCreate items=" + items.size());
+
+        m_adapter = new FlowListAdapter(getActivity(), R.layout.item_flow_downloaded, items);
     }
 
     @Override
@@ -55,29 +56,30 @@ public class OrgListFragment extends Fragment implements AbsListView.OnItemClick
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            m_listener = (Listener) activity;
+            m_container = (Container) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OrgListFragment.Listener");
+            throw new ClassCastException(activity.toString() + " must implement FlowListFragment.Container");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        m_listener = null;
+        m_container = null;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != m_listener) {
-            m_listener.onOrgClick((Org) m_adapter.getItem(position));
+        if (null != m_container) {
+            m_container.onFlowClick((FlowSummary) m_adapter.getItem(position));
         }
     }
 
     /**
-     * Container activity should implement this to be notified when an org is clicked
+     * Container activity should implement this to be notified when a flow is clicked
      */
-    public interface Listener {
-        void onOrgClick(Org org);
+    public interface Container {
+        List<FlowSummary> getFlowItems();
+        void onFlowClick(FlowSummary flow);
     }
 }

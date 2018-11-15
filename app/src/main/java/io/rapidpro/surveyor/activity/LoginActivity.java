@@ -62,6 +62,8 @@ public class LoginActivity extends BaseActivity {
             }
         }, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
+        // usually new activities come in from the right, but make this one opposite as we're going
+        // "back" to a clean activity stack
         overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
 
         setContentView(R.layout.activity_login);
@@ -114,11 +116,6 @@ public class LoginActivity extends BaseActivity {
         } else {
             errorBox.setVisibility(View.GONE);
         }
-    }
-
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
     }
 
     /**

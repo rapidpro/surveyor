@@ -1,11 +1,13 @@
 package io.rapidpro.surveyor.data;
 
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +40,8 @@ public class Org {
 
     private transient String uuid;
 
+    private transient List<FlowSummary> flows;
+
     private String token;
 
     private String name;
@@ -66,7 +70,7 @@ public class Org {
 
         List<Org> all = new ArrayList<>();
         for (String orgUUID : orgUUIDs) {
-            all.add(load(orgUUID));
+            all.add(load(orgUUID, false));
         }
         return all;
     }
@@ -77,14 +81,24 @@ public class Org {
      * @param uuid the org UUID
      * @return the org
      */
-    public static Org load(String uuid) throws IOException {
+    public static Org load(String uuid, boolean flows) throws IOException {
         File orgsDir = SurveyorApplication.get().getOrgsDirectory();
         File orgDir = new File(orgsDir, uuid);
+
         if (orgDir.exists() && orgDir.isDirectory()) {
-            File detailsFile = new File(orgDir, DETAILS_FILE);
-            String detailsJSON = FileUtils.readFileToString(detailsFile);
+            // read details.json
+            String detailsJSON = FileUtils.readFileToString(new File(orgDir, DETAILS_FILE));
             Org org = JsonUtils.unmarshal(detailsJSON, Org.class);
             org.uuid = uuid;
+
+            // read flows.json
+            if (flows) {
+                String flowsJson = FileUtils.readFileToString(new File(org.getDirectory(), FLOWS_FILE));
+
+                TypeToken type = new TypeToken<List<FlowSummary>>() {};
+                org.flows = JsonUtils.unmarshal(flowsJson, type);
+            }
+
             return org;
         }
         throw new RuntimeException("no org directory for org " + uuid);
@@ -149,6 +163,10 @@ public class Org {
 
     public boolean isAnon() {
         return anon;
+    }
+
+    public List<FlowSummary> getFlows() {
+        return flows;
     }
 
     /**

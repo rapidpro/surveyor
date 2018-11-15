@@ -1,7 +1,10 @@
 package io.rapidpro.surveyor.activity;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,17 +12,19 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.List;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.data.FlowSummary;
 import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.fragment.FlowListFragment;
 import io.rapidpro.surveyor.task.RefreshOrgTask;
 import io.rapidpro.surveyor.ui.BlockingProgress;
-import io.rapidpro.surveyor.utils.EngineUtils;
 
 
-public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFragmentInteractionListener*/ {
+public class OrgActivity extends BaseActivity implements FlowListFragment.Container {
 
     // progress dialog while we are refreshing org details
     private BlockingProgress m_refreshProgress;
@@ -28,11 +33,17 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
 
     private Org getOrg() {
         if (this.org == null) {
+            String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
+
             try {
-                String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
-                this.org = Org.load(orgUUID);
+                this.org = Org.load(orgUUID, true);
+
+                SurveyorApplication.LOG.d("Loaded org " + orgUUID);
             } catch (IOException e) {
+                SurveyorApplication.LOG.e("Error loading org " + orgUUID, e);
+
                 e.printStackTrace();
+                finish();
             }
         }
         return this.org;
@@ -43,10 +54,24 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
         super.onCreate(savedInstanceState);
 
         Org org = getOrg();
+        if (org == null) {
+            finish();
+            return;
+        }
+
         setTitle(org.getName());
 
         if (!org.hasAssets()) {
             confirmRefreshOrg(true);
+        }
+
+        // this holds our flow list fragment which shows all available flows
+        setContentView(R.layout.activity_org);
+
+        if (savedInstanceState == null) {
+            Fragment fragment = new FlowListFragment();
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(R.id.fragment_container, fragment).commit();
         }
 
         /*final DBOrg org = getDBOrg();
@@ -56,13 +81,13 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
             setContentView(R.layout.activity_pending);
             new FetchOrgData().execute();
         } else {
-            setContentView(R.layout.activity_org);
+
             setTitle(org.getName());
 
             if (savedInstanceState == null) {
                 Fragment listFragment = FlowListFragment.newInstance(org.getId());
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(R.id.fragment_container, listFragment).commit();
+                ft.add(R.id.activity_org_choose, listFragment).commit();
 
                 // if we don't have flows, start download activity
                 if (getRealm().where(DBFlow.class).equalTo("org.id", org.getId()).findFirst() == null) {
@@ -102,13 +127,6 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
-
-    /*@Override
-    public void onFragmentInteraction(DBFlow flow) {
-        Intent intent = new Intent(this, FlowActivity.class);
-        intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
-        startActivity(intent);
-    }*/
 
     public void onActionRefresh(MenuItem item) {
         confirmRefreshOrg(false);
@@ -185,5 +203,17 @@ public class OrgActivity extends BaseActivity /*implements FlowListFragment.OnFr
                     }
                 })
                 .show();
+    }
+
+    @Override
+    public List<FlowSummary> getFlowItems() {
+        return getOrg().getFlows();
+    }
+
+    @Override
+    public void onFlowClick(FlowSummary flow) {
+        //Intent intent = new Intent(this, FlowActivity.class);
+        //intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
+        //startActivity(intent);
     }
 }

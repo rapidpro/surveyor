@@ -15,8 +15,7 @@ import io.rapidpro.surveyor.data.Org;
 
 public class OrgListAdapter extends ArrayAdapter<Org> {
 
-    public OrgListAdapter(Context context, int resourceId,
-                          List<Org> orgs) {
+    public OrgListAdapter(Context context, int resourceId, List<Org> orgs) {
         super(context, resourceId, orgs);
     }
 

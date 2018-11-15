@@ -68,6 +68,8 @@ public abstract class BaseActivity extends PermisoActivity {
 
         // let the user pick an org...
         startActivity(new Intent(this, OrgChooseActivity.class));
+
+        // we don't want to go back to the view that sent us here (i.e. login or create account)
         finish();
     }
 
@@ -88,12 +90,14 @@ public abstract class BaseActivity extends PermisoActivity {
         getSurveyor().setPreference(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet());
 
         Intent intent = new Intent(this, LoginActivity.class);
+
+        // clear the activity stack
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
         if (errorResId != -1) {
             intent.putExtra(SurveyorIntent.EXTRA_ERROR, getString(errorResId));
         }
         startActivity(intent);
-
-        finish();
     }
 
     /**
@@ -105,6 +109,7 @@ public abstract class BaseActivity extends PermisoActivity {
 
         super.onCreate(bundle);
 
+        // make new activity come in from right
         overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
 
         // if we're on an activity that requires a logged in user, and we aren't, redirect to login activity
@@ -114,17 +119,8 @@ public abstract class BaseActivity extends PermisoActivity {
     }
 
     /**
-     * @see android.app.Activity#finish()
+     * @see android.app.Activity#onCreateOptionsMenu(Menu)
      */
-    @Override
-    public void finish() {
-        SurveyorApplication.LOG.d(getClass().getSimpleName() + ".finish");
-
-        super.finish();
-
-        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);

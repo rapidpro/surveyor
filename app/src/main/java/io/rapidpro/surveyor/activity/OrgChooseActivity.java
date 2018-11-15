@@ -17,7 +17,10 @@ import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.fragment.OrgListFragment;
 
-public class OrgChooseActivity extends BaseActivity implements OrgListFragment.OnFragmentInteractionListener {
+/**
+ * Let's the user select one of the orgs they have access to
+ */
+public class OrgChooseActivity extends BaseActivity implements OrgListFragment.Listener {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -39,7 +42,7 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.O
 
             overridePendingTransition(0, 0);
         }
-        // if we have access to a single org, then skip choosing
+        // if we have access to a single org, then skip this entire activity
         else if (orgs.size() == 1) {
             SurveyorApplication.LOG.d("One org found, shortcutting chooser to: " + orgs.get(0).getName());
             showOrg(orgs.get(0));
@@ -48,7 +51,7 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.O
         } else {
 
             // this holds our org list fragment which shows all available orgs
-            setContentView(R.layout.fragment_container);
+            setContentView(R.layout.activity_org_choose);
 
             if (savedInstanceState == null) {
                 Fragment fragment = new OrgListFragment();
@@ -69,8 +72,11 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.O
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * @see OrgListFragment.Listener#onOrgClick(Org)
+     */
     @Override
-    public void onFragmentInteraction(Org org) {
+    public void onOrgClick(Org org) {
         showOrg(org);
     }
 

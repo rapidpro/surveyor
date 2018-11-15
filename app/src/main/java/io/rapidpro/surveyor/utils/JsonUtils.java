@@ -2,6 +2,7 @@ package io.rapidpro.surveyor.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 public class JsonUtils {
     private static Gson s_gson = new GsonBuilder()
@@ -19,5 +20,9 @@ public class JsonUtils {
 
     public static <T> T unmarshal(String json, Class<T> clazz) {
         return s_gson.fromJson(json, clazz);
+    }
+
+    public static <T> T unmarshal(String json, TypeToken type) {
+        return s_gson.fromJson(json, type.getType());
     }
 }
