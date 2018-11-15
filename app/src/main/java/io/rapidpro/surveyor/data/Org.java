@@ -7,7 +7,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,8 +18,8 @@ import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.net.responses.Field;
 import io.rapidpro.surveyor.net.responses.Flow;
 import io.rapidpro.surveyor.net.responses.Group;
-import io.rapidpro.surveyor.utils.RawJson;
 import io.rapidpro.surveyor.utils.JsonUtils;
+import io.rapidpro.surveyor.utils.RawJson;
 
 public class Org {
     /**
@@ -95,7 +94,8 @@ public class Org {
             if (flows) {
                 String flowsJson = FileUtils.readFileToString(new File(org.getDirectory(), FLOWS_FILE));
 
-                TypeToken type = new TypeToken<List<FlowSummary>>() {};
+                TypeToken type = new TypeToken<List<FlowSummary>>() {
+                };
                 org.flows = JsonUtils.unmarshal(flowsJson, type);
             }
 
@@ -108,7 +108,6 @@ public class Org {
      * Fetches an org using the given API token and saves it to the org storage
      *
      * @param token the API token
-     * @throws IOException
      */
     public static Org fetch(String token) throws IOException {
         Org org = new Org();
@@ -135,7 +134,6 @@ public class Org {
         return token;
     }
 
-
     /**
      * Gets the name of this org
      *
@@ -143,6 +141,15 @@ public class Org {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Gets the country code of this org
+     *
+     * @return the country code
+     */
+    public String getCountry() {
+        return country;
     }
 
     public String getPrimaryLanguage() {
@@ -170,21 +177,28 @@ public class Org {
     }
 
     /**
-     * Gets the country code of this org
+     * Gets the flow with the given UUID
      *
-     * @return the country code
+     * @param uuid the flow UUID
+     * @return the flow or null if no such flow exists
      */
-    public String getCountry() {
-        return country;
+    public FlowSummary getFlow(String uuid) {
+        for (FlowSummary flow : flows) {
+            if (flow.getUuid().equals(uuid)) {
+                return flow;
+            }
+        }
+        return null;
     }
 
+    /**
+     * Gets whether this org has downloaded assets
+     *
+     * @return true if org has assets
+     */
     public boolean hasAssets() {
         File assetsFile = new File(getDirectory(), ASSETS_FILE);
         return assetsFile.exists();
-    }
-
-    public interface RefreshProgress {
-        void reportProgress(int percent);
     }
 
     /**
@@ -268,5 +282,9 @@ public class Org {
         File dir = new File(SurveyorApplication.get().getOrgsDirectory(), this.uuid);
         dir.mkdirs();
         return dir;
+    }
+
+    public interface RefreshProgress {
+        void reportProgress(int percent);
     }
 }

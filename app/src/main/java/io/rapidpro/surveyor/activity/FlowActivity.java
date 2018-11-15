@@ -12,6 +12,7 @@ public class FlowActivity extends BaseActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
         String flowUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_FLOW_UUID);
 
         setContentView(R.layout.activity_flow);

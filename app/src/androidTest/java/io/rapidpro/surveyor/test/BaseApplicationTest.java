@@ -7,7 +7,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorPreferences;
@@ -27,7 +25,6 @@ import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
 /**
  * Base for all the instrumented tests
  */
-@RunWith(AndroidJUnit4.class)
 public abstract class BaseApplicationTest {
 
     protected MockWebServer mockServer;
@@ -75,7 +72,8 @@ public abstract class BaseApplicationTest {
 
     /**
      * Utility to appear logged in as the given user
-     * @param email the email
+     *
+     * @param email    the email
      * @param orgUUIDs the set of accessible org UUIDs
      */
     protected void login(String email, Set<String> orgUUIDs) {
@@ -86,7 +84,8 @@ public abstract class BaseApplicationTest {
 
     /**
      * Utility to create an org directory
-     * @param uuid the org UUID
+     *
+     * @param uuid         the org UUID
      * @param detailsResId the resource ID of the details file
      */
     protected void installOrg(String uuid, int detailsResId, int flowsResId, int assetsResId) throws IOException {
