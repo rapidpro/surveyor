@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import java.io.File;
 import java.util.Set;
 
+import io.rapidpro.surveyor.data.OrgService;
 import io.rapidpro.surveyor.net.TembaService;
 
 /**
@@ -21,7 +22,15 @@ public class SurveyorApplication extends Application {
      */
     private static SurveyorApplication s_this;
 
-    private TembaService m_tembaService = null;
+    /**
+     * Service for network operations
+     */
+    private TembaService tembaService = null;
+
+    /**
+     * Service for local org operations
+     */
+    private OrgService orgService = null;
 
     /**
      * Gets the singleton instance of this application
@@ -39,7 +48,8 @@ public class SurveyorApplication extends Application {
         super.onCreate();
 
         s_this = this;
-        m_tembaService = new TembaService(getTembaHost());
+        tembaService = new TembaService(getTembaHost(), LOG);
+        orgService = new OrgService(getOrgsDirectory(), LOG);
     }
 
     /**
@@ -112,7 +122,7 @@ public class SurveyorApplication extends Application {
         clearPreference(SurveyorPreferences.AUTH_USERNAME);
         clearPreference(SurveyorPreferences.AUTH_ORGS);
 
-        m_tembaService = new TembaService(getTembaHost());
+        tembaService = new TembaService(getTembaHost(), LOG);
     }
 
     /**
@@ -126,10 +136,18 @@ public class SurveyorApplication extends Application {
     }
 
     /**
+     * Returns the local orgs service
+     * @return the service
+     */
+    public OrgService getOrgService() {
+        return orgService;
+    }
+
+    /**
      * Returns the Temba API service
      * @return the service
      */
     public TembaService getTembaService() {
-        return m_tembaService;
+        return tembaService;
     }
 }

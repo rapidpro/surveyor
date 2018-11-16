@@ -5,6 +5,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Collections;
 
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.net.TembaException;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -13,16 +15,18 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
 import static org.junit.Assert.assertThat;
 
-public class OrgTest extends BaseApplicationTest {
+public class OrgServiceTest extends BaseApplicationTest {
     private static final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
 
     @Test
-    public void load() throws IOException {
+    public void get() throws IOException {
         // install an org without downloaded assets
         installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, 0, 0);
 
-        // load without flows
-        Org org = Org.load(ORG_UUID, false);
+        OrgService svc = new OrgService(getSurveyor().getOrgsDirectory(), SurveyorApplication.LOG);
+
+        // load single org by UUID
+        Org org = svc.get(ORG_UUID);
         assertThat(org.getUuid(), is("b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06"));
         assertThat(org.getName(), is("Nyaruka"));
         assertThat(org.getCountry(), is("RW"));
@@ -32,24 +36,32 @@ public class OrgTest extends BaseApplicationTest {
         assertThat(org.getDateStyle(), is("day_first"));
         assertThat(org.isAnon(), is(false));
         assertThat(org.getToken(), is("67537873784848322fghsaf3g"));
-
+        assertThat(org.getFlows(), is(Collections.<Flow>emptyList()));
         assertThat(org.hasAssets(), is(false));
-        assertThat(org.getFlows(), is(nullValue()));
-
-        // load with flows
-        org = Org.load(ORG_UUID, true);
-
-        assertThat(org.hasAssets(), is(false));
-        assertThat(org.getFlows(), is(Collections.<FlowSummary>emptyList()));
 
         // install same org with downloaded assets
         installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows, io.rapidpro.surveyor.test.R.raw.org1_assets);
 
-        org = Org.load(ORG_UUID, true);
+        svc.clearCache();
+        org = svc.get(ORG_UUID);
 
         assertThat(org.hasAssets(), is(true));
         assertThat(org.getFlows(), hasSize(2));
         assertThat(org.getFlow("ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec").getName(), is("Ask Name"));
         assertThat(org.getFlow("???"), is(nullValue()));
+    }
+
+    @Test
+    public void getOrFetch() throws IOException, TembaException {
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_org_get, "application/json", 200);
+
+        OrgService svc = new OrgService(getSurveyor().getOrgsDirectory(), SurveyorApplication.LOG);
+
+        Org org = svc.getOrFetch(ORG_UUID, "Nyaruka", "67537873784848322fghsaf3g");
+        assertThat(org.getUuid(), is("b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06"));
+        assertThat(org.getName(), is("Nyaruka"));
+        assertThat(org.getCountry(), is("RW"));
+        assertThat(org.getFlows(), is(Collections.<Flow>emptyList()));
+        assertThat(org.hasAssets(), is(false));
     }
 }

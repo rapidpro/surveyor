@@ -1,10 +1,9 @@
-package io.rapidpro.surveyor.data;
-
-import com.google.gson.JsonObject;
+package io.rapidpro.surveyor.data.engine;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.net.responses.Field;
 import io.rapidpro.surveyor.net.responses.Group;
 import io.rapidpro.surveyor.utils.EngineUtils;
@@ -41,10 +40,10 @@ public class OrgAssets {
         return new OrgAssets(fieldAssets, groupAssets, flowAssets);
     }
 
-    public List<FlowSummary> getFlowSummaries() {
-        List<FlowSummary> summaries = new ArrayList<>(this.flows.size());
+    public List<Flow> getFlows() {
+        List<Flow> summaries = new ArrayList<>(this.flows.size());
         for (RawJson flow : this.flows) {
-            summaries.add(FlowSummary.extract(flow));
+            summaries.add(Flow.extract(flow));
         }
         return summaries;
     }

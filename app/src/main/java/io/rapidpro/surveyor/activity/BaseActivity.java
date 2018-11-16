@@ -158,7 +158,25 @@ public abstract class BaseActivity extends PermisoActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void sendBugReport() {
+    public void showBugReportDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.confirm_bug_report))
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        sendBugReport();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
+    }
+
+    private void sendBugReport() {
 
         // Log our build and device details
         StringBuilder info = new StringBuilder();
@@ -185,24 +203,6 @@ public abstract class BaseActivity extends PermisoActivity {
                 .setStream(outputUri)
                 .setChooserTitle("Send Email")
                 .startChooser();
-    }
-
-    public void showSendBugReport() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.confirm_bug_report))
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        sendBugReport();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
-                .show();
     }
 
     public ViewCache getViewCache() {

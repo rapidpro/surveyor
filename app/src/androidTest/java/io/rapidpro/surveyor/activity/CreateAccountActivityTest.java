@@ -150,7 +150,7 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
 
         // step 2
 
-        mockServerRedirect("/org/surveyor/?org=Nyaruka&token=abc123&user=bob@nyaruka.com");
+        mockServerRedirect("/org/surveyor/?org=Nyaruka&token=abc123&user=bob@nyaruka.com&uuid=dc8123a1-168c-4962-ab9e-f784f3d804a2");
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_get, "text/html", 200);
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_org_get, "text/html", 200);
 
@@ -173,7 +173,7 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
         RecordedRequest request4 = mockServer.takeRequest();
         assertThat(request4.getPath(), is("/org/surveyor/"));
         RecordedRequest request5 = mockServer.takeRequest();
-        assertThat(request5.getPath(), is("/org/surveyor/?org=Nyaruka&token=abc123&user=bob@nyaruka.com"));
+        assertThat(request5.getPath(), is("/org/surveyor/?org=Nyaruka&token=abc123&user=bob@nyaruka.com&uuid=dc8123a1-168c-4962-ab9e-f784f3d804a2"));
         RecordedRequest request6 = mockServer.takeRequest();
         assertThat(request6.getPath(), is("/api/v2/org.json"));
 

@@ -69,7 +69,7 @@ public class TembaServiceTest extends BaseApplicationTest {
      * @see TembaService#getBoundaries(String)
      */
     @Test
-    public void getBoundaries() throws IOException {
+    public void getBoundaries() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_boundaries_get, "application/json", 200);
 
         List<Boundary> boundaries = getSurveyor().getTembaService().getBoundaries("abc123");
@@ -90,7 +90,7 @@ public class TembaServiceTest extends BaseApplicationTest {
      * @see TembaService#getOrg(String)
      */
     @Test
-    public void getOrg() throws IOException {
+    public void getOrg() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_org_get, "application/json", 200);
 
         Org org = getSurveyor().getTembaService().getOrg("abc123");
@@ -108,7 +108,7 @@ public class TembaServiceTest extends BaseApplicationTest {
      * @see TembaService#getFields(String)
      */
     @Test
-    public void getFields() throws IOException, InterruptedException {
+    public void getFields() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_fields_get_page_1, "application/json", 200);
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_fields_get_page_2, "application/json", 200);
 
@@ -136,7 +136,7 @@ public class TembaServiceTest extends BaseApplicationTest {
      * @see TembaService#getFlows(String)
      */
     @Test
-    public void getFlows() throws IOException {
+    public void getFlows() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_flows_get, "application/json", 200);
 
         List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
@@ -154,7 +154,7 @@ public class TembaServiceTest extends BaseApplicationTest {
      * @see TembaService#getGroups(String)
      */
     @Test
-    public void getGroups() throws IOException {
+    public void getGroups() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_groups_get, "application/json", 200);
 
         List<Group> groups = getSurveyor().getTembaService().getGroups("abc123");
@@ -174,7 +174,7 @@ public class TembaServiceTest extends BaseApplicationTest {
      * @see TembaService#getDefinitions(String, List)
      */
     @Test
-    public void getDefinitions() throws IOException {
+    public void getDefinitions() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_flows_get, "application/json", 200);
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get, "application/json", 200);
 

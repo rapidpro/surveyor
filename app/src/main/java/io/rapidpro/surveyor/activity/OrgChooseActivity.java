@@ -7,13 +7,15 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.fragment.OrgListFragment;
 
@@ -22,19 +24,19 @@ import io.rapidpro.surveyor.fragment.OrgListFragment;
  */
 public class OrgChooseActivity extends BaseActivity implements OrgListFragment.Container {
 
-    private List<Org> cachedOrgs;
-
     private List<Org> getOrgs() {
-        if (this.cachedOrgs == null) {
-            try {
-                this.cachedOrgs = Org.loadAll();
+        Set<String> orgUUIDs = SurveyorApplication.get().getPreferences().getStringSet(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet());
+        List<Org> orgs = new ArrayList<>(orgUUIDs.size());
 
-                SurveyorApplication.LOG.d("Loaded " + cachedOrgs.size() + " orgs");
-            } catch (IOException e) {
-                SurveyorApplication.LOG.e("Error loading orgs", e);
+        for (String uuid : orgUUIDs) {
+            try {
+                orgs.add(getSurveyor().getOrgService().get(uuid));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        return cachedOrgs;
+
+        return orgs;
     }
 
     @Override

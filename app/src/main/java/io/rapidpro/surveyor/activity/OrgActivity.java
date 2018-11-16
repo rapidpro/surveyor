@@ -11,14 +11,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
-import io.rapidpro.surveyor.data.FlowSummary;
+import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
 import io.rapidpro.surveyor.task.RefreshOrgTask;
@@ -27,23 +26,15 @@ import io.rapidpro.surveyor.ui.BlockingProgress;
 
 public class OrgActivity extends BaseActivity implements FlowListFragment.Container {
 
-    private Org cachedOrg;
-
     private Org getOrg() {
-        if (this.cachedOrg == null) {
-            String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
+        String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
 
-            try {
-                this.cachedOrg = Org.load(orgUUID, true);
-
-                SurveyorApplication.LOG.d("Loaded org " + orgUUID);
-            } catch (IOException e) {
-                SurveyorApplication.LOG.e("Error loading org " + orgUUID, e);
-
-                finish();
-            }
+        try {
+            return getSurveyor().getOrgService().get(orgUUID);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        return this.cachedOrg;
     }
 
     @Override
@@ -52,6 +43,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
 
         Org org = getOrg();
         if (org == null) {
+            showBugReportDialog();
             finish();
             return;
         }
@@ -184,15 +176,15 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
      * @see FlowListFragment.Container#getListItems()
      */
     @Override
-    public List<FlowSummary> getListItems() {
+    public List<Flow> getListItems() {
         return getOrg().getFlows();
     }
 
     /**
-     * @see FlowListFragment.Container#onItemClick(FlowSummary)
+     * @see FlowListFragment.Container#onItemClick(Flow)
      */
     @Override
-    public void onItemClick(FlowSummary flow) {
+    public void onItemClick(Flow flow) {
         Intent intent = new Intent(this, FlowActivity.class);
         intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, getOrg().getUuid());
         intent.putExtra(SurveyorIntent.EXTRA_FLOW_UUID, flow.getUuid());

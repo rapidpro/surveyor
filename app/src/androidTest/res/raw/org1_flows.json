@@ -3,12 +3,12 @@
     "uuid": "14ca824e-6607-4c11-82f5-18e298d0bd58",
     "name": "Two Questions",
     "revision": 24,
-    "questions": 2
+    "question_count": 2
   },
   {
     "uuid": "ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec",
     "name": "Ask Name",
     "revision": 7,
-    "questions": 1
+    "question_count": 1
   }
 ]

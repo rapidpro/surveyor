@@ -12,11 +12,11 @@ import java.text.NumberFormat;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.data.FlowSummary;
+import io.rapidpro.surveyor.data.Flow;
 
-public class FlowListAdapter extends ArrayAdapter<FlowSummary> {
+public class FlowListAdapter extends ArrayAdapter<Flow> {
 
-    public FlowListAdapter(Context context, int resourceId, List<FlowSummary> flows) {
+    public FlowListAdapter(Context context, int resourceId, List<Flow> flows) {
         super(context, resourceId, flows);
     }
 
@@ -40,7 +40,7 @@ public class FlowListAdapter extends ArrayAdapter<FlowSummary> {
             cache = (ViewCache) row.getTag();
         }
 
-        FlowSummary flow = getItem(position);
+        Flow flow = getItem(position);
         cache.titleView.setText(flow.getName());
 
         NumberFormat nf = NumberFormat.getInstance();
@@ -55,11 +55,11 @@ public class FlowListAdapter extends ArrayAdapter<FlowSummary> {
         }
 
         String questionString = "Questions";
-        if (flow.getQuestions() == 1) {
+        if (flow.getQuestionCount() == 1) {
             questionString = "Question";
         }
 
-        cache.questionView.setText(nf.format(flow.getQuestions()) + " " + questionString + " (v" + nf.format(flow.getRevision()) + ")");
+        cache.questionView.setText(nf.format(flow.getQuestionCount()) + " " + questionString + " (v" + nf.format(flow.getRevision()) + ")");
         return row;
     }
 

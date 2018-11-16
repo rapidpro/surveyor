@@ -3,18 +3,15 @@ package io.rapidpro.surveyor.activity;
 import android.app.Activity;
 import android.net.UrlQuerySanitizer;
 import android.os.Bundle;
-import android.view.Menu;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.Set;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
-import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.net.responses.Token;
 import io.rapidpro.surveyor.task.FetchOrgsTask;
 
 /**
@@ -46,13 +43,11 @@ public class CreateAccountActivity extends BaseActivity {
             }
 
             public void onPageFinished(WebView view, String url) {
-
                 UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(url);
                 String email = sanitizer.getValue("user");
-                String token = sanitizer.getValue("token");
-                String orgName = sanitizer.getValue("org");
+                Token token = Token.fromUrl(url);
 
-                if (email != null && token != null && orgName != null) {
+                if (email != null && token.getToken() != null) {
                     fetchOrgAndLogin(email, token);
                 }
 
@@ -75,7 +70,7 @@ public class CreateAccountActivity extends BaseActivity {
         web.loadUrl(createAccountURL);
     }
 
-    protected void fetchOrgAndLogin(final String email, final String token) {
+    protected void fetchOrgAndLogin(final String email, final Token token) {
 
         new FetchOrgsTask(new FetchOrgsTask.FetchOrgsListener() {
             @Override

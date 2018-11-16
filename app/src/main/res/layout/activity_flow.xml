@@ -57,7 +57,7 @@
             android:id="@+id/text_flow_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2015 new mother registration flow for reminder campaign"
+            android:text=""
             android:textSize="22dp"
             android:textStyle="normal|bold" />
 
@@ -71,14 +71,14 @@
                 android:id="@+id/text_flow_questions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="6 Questions" />
+                android:text="" />
 
             <TextView
                 android:id="@+id/text_flow_revision"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="(v28)" />
+                android:text="" />
 
         </LinearLayout>
 

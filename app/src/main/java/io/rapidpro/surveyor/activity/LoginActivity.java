@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.greysonparrelli.permiso.Permiso;
 
+import java.util.List;
 import java.util.Set;
 
 import io.rapidpro.surveyor.R;
@@ -26,6 +27,7 @@ import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.net.TembaService;
+import io.rapidpro.surveyor.net.responses.Token;
 import io.rapidpro.surveyor.net.responses.TokenResults;
 import io.rapidpro.surveyor.task.FetchOrgsTask;
 import retrofit2.Call;
@@ -169,9 +171,9 @@ public class LoginActivity extends BaseActivity {
                 public void onResponse(Call<TokenResults> call, Response<TokenResults> response) {
 
                     if (response.isSuccessful()) {
-                        String[] tokens = response.body().toRawTokens();
+                        List<Token> tokens = response.body().getTokens();
 
-                        SurveyorApplication.LOG.d("Authentication returned " + tokens.length + " tokens");
+                        SurveyorApplication.LOG.d("Authentication returned " + tokens.size() + " tokens");
 
                         fetchOrgsAndLogin(email, tokens);
 
@@ -211,7 +213,7 @@ public class LoginActivity extends BaseActivity {
         return password.length() >= 8;
     }
 
-    protected void fetchOrgsAndLogin(final String email, final String[] tokens) {
+    protected void fetchOrgsAndLogin(final String email, final List<Token> tokens) {
         new FetchOrgsTask(new FetchOrgsTask.FetchOrgsListener() {
             @Override
             public void onComplete(Set<String> orgUUIDs) {
@@ -223,7 +225,7 @@ public class LoginActivity extends BaseActivity {
                 setErrorMessage(getString(R.string.error_fetching_org));
                 showProgress(false);
             }
-        }).execute(tokens);
+        }).execute(tokens.toArray(new Token[0]));
     }
 
     /**

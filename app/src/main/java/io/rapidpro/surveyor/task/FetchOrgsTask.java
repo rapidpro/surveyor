@@ -2,17 +2,18 @@ package io.rapidpro.surveyor.task;
 
 import android.os.AsyncTask;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.data.OrgService;
+import io.rapidpro.surveyor.net.responses.Token;
 
 /**
  * Task to fetch orgs from RapidPro, create their directories, save their details, and return their UUIDs
  */
-public class FetchOrgsTask extends AsyncTask<String, Void, Set<String>> {
+public class FetchOrgsTask extends AsyncTask<Token, Void, Set<String>> {
 
     private FetchOrgsListener listener;
     private boolean failed;
@@ -22,15 +23,17 @@ public class FetchOrgsTask extends AsyncTask<String, Void, Set<String>> {
     }
 
     @Override
-    protected Set<String> doInBackground(String... tokens) {
+    protected Set<String> doInBackground(Token... tokens) {
+        OrgService svc = SurveyorApplication.get().getOrgService();
+
         Set<String> orgUUIDs = new HashSet<>();
-        for (String token : tokens) {
+        for (Token token : tokens) {
             try {
-                Org org = Org.fetch(token);
+                Org org = svc.getOrFetch(token.getOrg().getUuid(), token.getOrg().getName(), token.getToken());
                 orgUUIDs.add(org.getUuid());
 
                 SurveyorApplication.LOG.d("Fetched org with UUID " + org.getUuid());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 this.failed = true;
                 break;
