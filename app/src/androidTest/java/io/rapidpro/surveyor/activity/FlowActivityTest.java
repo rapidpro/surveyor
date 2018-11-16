@@ -15,9 +15,14 @@ import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.CoreMatchers.allOf;
 
 public class FlowActivityTest extends BaseApplicationTest {
 
@@ -45,5 +50,16 @@ public class FlowActivityTest extends BaseApplicationTest {
         onView(withId(R.id.text_flow_name)).check(matches(withText("Two Questions")));
         onView(withId(R.id.text_flow_revision)).check(matches(withText("(v24)")));
         onView(withId(R.id.text_flow_questions)).check(matches(withText("2 Questions")));
+
+        // check that clicking start launches the run activity
+        onView(withText("Start Flow")).perform(click());
+
+        intended(
+                allOf(
+                        hasComponent(RunActivity.class.getName()),
+                        hasExtra(SurveyorIntent.EXTRA_ORG_UUID, ORG_UUID),
+                        hasExtra(SurveyorIntent.EXTRA_FLOW_UUID, FLOW_UUID)
+                )
+        );
     }
 }

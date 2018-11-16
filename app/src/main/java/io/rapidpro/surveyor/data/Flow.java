@@ -13,6 +13,9 @@ public class Flow {
 
     private String name;
 
+    @SerializedName("spec_version")
+    private String specVersion;
+
     private int revision;
 
     @SerializedName("question_count")
@@ -23,12 +26,14 @@ public class Flow {
      *
      * @param uuid          the flow UUID
      * @param name          the flow name
+     * @param specVersion   the flow spec version number
      * @param revision      the flow revision number
      * @param questionCount the number of questions
      */
-    public Flow(String uuid, String name, int revision, int questionCount) {
+    public Flow(String uuid, String name, String specVersion, int revision, int questionCount) {
         this.uuid = uuid;
         this.name = name;
+        this.specVersion = specVersion;
         this.revision = revision;
         this.questionCount = questionCount;
     }
@@ -46,6 +51,7 @@ public class Flow {
 
         String uuid = definition.get("uuid").getAsString();
         String name = definition.get("name").getAsString();
+        String specVersion = definition.get("spec_version").getAsString();
         int revision = definition.get("revision").getAsInt();
         int questionCount = 0;
 
@@ -57,7 +63,7 @@ public class Flow {
             }
         }
 
-        return new Flow(uuid, name, revision, questionCount);
+        return new Flow(uuid, name, specVersion, revision, questionCount);
     }
 
     public String getUuid() {
@@ -66,6 +72,10 @@ public class Flow {
 
     public String getName() {
         return name;
+    }
+
+    public String getSpecVersion() {
+        return specVersion;
     }
 
     public int getRevision() {

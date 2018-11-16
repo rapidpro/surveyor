@@ -144,7 +144,7 @@ public abstract class BaseApplicationTest {
         mockServer.enqueue(response);
     }
 
-    private String readRawResource(int rawResId) throws IOException {
+    protected String readRawResource(int rawResId) throws IOException {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
         InputStream input = context.getResources().openRawResource(rawResId);
         return IOUtils.toString(input, StandardCharsets.UTF_8);
