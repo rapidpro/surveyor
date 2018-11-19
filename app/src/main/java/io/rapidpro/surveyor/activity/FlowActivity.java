@@ -14,7 +14,7 @@ import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.ui.ViewCache;
-import io.rapidpro.surveyor.utils.EngineUtils;
+import io.rapidpro.surveyor.utils.Engine;
 
 public class FlowActivity extends BaseActivity {
 
@@ -69,7 +69,7 @@ public class FlowActivity extends BaseActivity {
     }
 
     public void onActionStart(View view) {
-        if (!EngineUtils.isSpecVersionSupported(flow.getSpecVersion())) {
+        if (!Engine.isSpecVersionSupported(flow.getSpecVersion())) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(getString(R.string.unsupported_version))
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {

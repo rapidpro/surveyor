@@ -6,7 +6,7 @@ import java.util.List;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.net.responses.Field;
 import io.rapidpro.surveyor.net.responses.Group;
-import io.rapidpro.surveyor.utils.EngineUtils;
+import io.rapidpro.surveyor.utils.Engine;
 import io.rapidpro.surveyor.utils.RawJson;
 
 public class OrgAssets {
@@ -33,7 +33,7 @@ public class OrgAssets {
 
         List<RawJson> flowAssets = new ArrayList<>(legacyFlows.size());
         for (RawJson legacyJSON : legacyFlows) {
-            String migratedJSON = EngineUtils.migrateFlow(legacyJSON.toString());
+            String migratedJSON = Engine.migrateFlow(legacyJSON.toString());
             flowAssets.add(new RawJson(migratedJSON));
         }
 
