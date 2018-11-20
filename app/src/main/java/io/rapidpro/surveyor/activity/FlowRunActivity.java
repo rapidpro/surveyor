@@ -189,6 +189,11 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
             StringBuilder sb = new StringBuilder();
             List<Flow> flows = new ArrayList<>();
             for (FlowDefinition def : definitions.flows) {
+                // ignore other flow types
+                if (!def.flow_type.equals("S")) {
+                    continue;
+                }
+
                 sb.append(def.metadata.revision).append('-');
                 flows.add(Flow.fromJson(def.toString()));
             }
