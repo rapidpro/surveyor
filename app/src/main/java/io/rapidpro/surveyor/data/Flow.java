@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
+import com.nyaruka.goflow.mobile.FlowReference;
 
 import io.rapidpro.surveyor.utils.JsonUtils;
 import io.rapidpro.surveyor.utils.RawJson;
@@ -84,5 +85,9 @@ public class Flow {
 
     public int getQuestionCount() {
         return questionCount;
+    }
+
+    public FlowReference toReference() {
+        return new FlowReference(uuid, name);
     }
 }

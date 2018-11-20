@@ -106,7 +106,7 @@
                 android:text="@string/icon_send"
                 android:textColor="@color/light_gray"
                 android:clickable="true"
-                android:onClick="sendMessage"
+                android:onClick="onActionSend"
                 android:textSize="36sp"/>
 
             <EditText

@@ -10,8 +10,10 @@ import io.rapidpro.surveyor.net.TembaException;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.collection.IsArrayContainingInOrder.arrayContaining;
 import static org.junit.Assert.assertThat;
 
@@ -45,10 +47,12 @@ public class OrgServiceTest extends BaseApplicationTest {
         svc.clearCache();
         org = svc.get(ORG_UUID);
 
-        assertThat(org.hasAssets(), is(true));
         assertThat(org.getFlows(), hasSize(2));
         assertThat(org.getFlow("ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec").getName(), is("Ask Name"));
         assertThat(org.getFlow("???"), is(nullValue()));
+
+        assertThat(org.hasAssets(), is(true));
+        assertThat(org.getAssets(), not(isEmptyString()));
     }
 
     @Test

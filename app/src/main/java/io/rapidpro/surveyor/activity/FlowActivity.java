@@ -14,7 +14,7 @@ import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.ui.ViewCache;
-import io.rapidpro.surveyor.utils.Engine;
+import io.rapidpro.surveyor.engine.Engine;
 
 public class FlowActivity extends BaseActivity {
 

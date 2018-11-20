@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.rapidpro.surveyor.SurveyorApplication;
-import io.rapidpro.surveyor.data.engine.OrgAssets;
+import io.rapidpro.surveyor.engine.OrgAssets;
 import io.rapidpro.surveyor.net.TembaException;
 import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.net.responses.Field;
@@ -182,8 +182,16 @@ public class Org {
      * @return true if org has assets
      */
     public boolean hasAssets() {
-        File assetsFile = new File(directory, ASSETS_FILE);
-        return assetsFile.exists();
+        return new File(directory, ASSETS_FILE).exists();
+    }
+
+    /**
+     * Gets this org's downloaded assets
+     *
+     * @return the assets JSON
+     */
+    public String getAssets() throws IOException {
+        return FileUtils.readFileToString(new File(directory, ASSETS_FILE));
     }
 
     /**
