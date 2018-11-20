@@ -11,9 +11,9 @@ android {
     defaultConfig {
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 17
-        targetSdkVersion 23
-        versionCode 1150
-        versionName "11.5.0"
+        targetSdkVersion 26
+        versionCode 1152
+        versionName "11.5.2"
         multiDexEnabled = true
     }
     buildTypes {
@@ -28,6 +28,12 @@ android {
     }
     dexOptions {
         javaMaxHeapSize "4g"
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
     }
 }
 
