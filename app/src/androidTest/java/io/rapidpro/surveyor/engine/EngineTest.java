@@ -71,8 +71,8 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(session.getStatus(), is("waiting"));
         assertThat(session.isWaiting(), is(true));
         assertThat(events, hasSize(2));
-        assertThat(events.get(0).type(), is("msg_created"));
-        assertThat(events.get(1).type(), is("msg_wait"));
+        assertThat(events.get(0).getType(), is("msg_created"));
+        assertThat(events.get(1).getType(), is("msg_wait"));
 
         MsgIn msg1 = Engine.createMsgIn("8e68adc6-9602-4969-b077-9b25c3b1e7b5", "I like club", null);
         Resume resume1 = Engine.createMsgResume(null, null, msg1);
@@ -82,10 +82,10 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(session.getStatus(), is("waiting"));
         assertThat(session.isWaiting(), is(true));
         assertThat(events, hasSize(4));
-        assertThat(events.get(0).type(), is("msg_received"));
-        assertThat(events.get(1).type(), is("run_result_changed"));
-        assertThat(events.get(2).type(), is("msg_created"));
-        assertThat(events.get(3).type(), is("msg_wait"));
+        assertThat(events.get(0).getType(), is("msg_received"));
+        assertThat(events.get(1).getType(), is("run_result_changed"));
+        assertThat(events.get(2).getType(), is("msg_created"));
+        assertThat(events.get(3).getType(), is("msg_wait"));
 
         MsgIn msg2 = Engine.createMsgIn("8e68adc6-9602-4969-b077-9b25c3b1e7b5", "RED", null);
         Resume resume2 = Engine.createMsgResume(null, null, msg2);
@@ -95,9 +95,9 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(session.getStatus(), is("completed"));
         assertThat(session.isWaiting(), is(false));
         assertThat(events, hasSize(3));
-        assertThat(events.get(0).type(), is("msg_received"));
-        assertThat(events.get(1).type(), is("run_result_changed"));
-        assertThat(events.get(2).type(), is("msg_created"));
+        assertThat(events.get(0).getType(), is("msg_received"));
+        assertThat(events.get(1).getType(), is("run_result_changed"));
+        assertThat(events.get(2).getType(), is("msg_created"));
 
         // try to marshal to JSON
         String marshaled = session.toJSON();

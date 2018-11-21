@@ -5,6 +5,7 @@ import com.nyaruka.goflow.mobile.Mobile;
 import com.nyaruka.goflow.mobile.Resume;
 import com.nyaruka.goflow.mobile.SessionAssets;
 import com.nyaruka.goflow.mobile.Trigger;
+import com.nyaruka.goflow.mobile.Wait;
 
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class Session {
      * @return the status
      */
     public String getStatus() {
-        return target.status();
+        return target.getStatus();
     }
 
     /**
@@ -82,6 +83,10 @@ public class Session {
      */
     public boolean isWaiting() {
         return getStatus().equals("waiting");
+    }
+
+    public Wait getWait() {
+        return target.getWait();
     }
 
     /**
