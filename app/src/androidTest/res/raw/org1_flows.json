@@ -8,9 +8,16 @@
   },
   {
     "uuid": "ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec",
-    "name": "Ask Name",
+    "name": "Contact Details",
     "spec_version": "12.0",
     "revision": 7,
     "question_count": 1
+  },
+  {
+    "uuid": "585958f3-ee7a-4f81-b4c2-fda374155681",
+    "name": "Multimedia",
+    "spec_version": "12.0",
+    "revision": 22,
+    "question_count": 4
   }
 ]

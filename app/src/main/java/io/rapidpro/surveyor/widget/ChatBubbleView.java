@@ -20,8 +20,6 @@ import io.rapidpro.surveyor.ui.IconTextView;
  */
 public class ChatBubbleView extends CachedLinearLayout {
 
-    private ViewGroup m_root;
-
     public ChatBubbleView(Context context) {
         super(context);
         init();
@@ -35,11 +33,6 @@ public class ChatBubbleView extends CachedLinearLayout {
     public ChatBubbleView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
-    }
-
-    protected void init() {
-        super.init();
-        // m_root = (ViewGroup) findViewById(R.id.chat_bubble);
     }
 
     /**

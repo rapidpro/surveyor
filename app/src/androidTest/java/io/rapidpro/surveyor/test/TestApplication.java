@@ -1,5 +1,7 @@
 package io.rapidpro.surveyor.test;
 
+import android.os.Environment;
+
 import java.io.File;
 
 import io.rapidpro.surveyor.SurveyorApplication;
@@ -23,6 +25,15 @@ public class TestApplication extends SurveyorApplication {
      */
     public File getOrgsDirectory() {
         File dir = new File(getFilesDir(), "test_orgs");
+        dir.mkdirs();
+        return dir;
+    }
+
+    /**
+     * @see SurveyorApplication#getSubmissionsDirectory()
+     */
+    public File getSubmissionsDirectory() {
+        File dir = new File(Environment.getExternalStorageDirectory(), "Surveyor.test");
         dir.mkdirs();
         return dir;
     }

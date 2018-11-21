@@ -45,7 +45,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -60,18 +59,19 @@ import io.rapidpro.surveyor.engine.EngineException;
 import io.rapidpro.surveyor.engine.Session;
 import io.rapidpro.surveyor.ui.IconTextView;
 import io.rapidpro.surveyor.ui.ViewCache;
+import io.rapidpro.surveyor.utils.ImageUtils;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
 import io.rapidpro.surveyor.widget.IconLinkView;
 
 public class RunActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    public static final String MSG_TEXT = "text";
-    public static final String MSG_PHOTO = "photo";
-    public static final String MSG_AUDIO = "audio";
-    public static final String MSG_VIDEO = "video";
-    public static final String MSG_GPS = "geo";
-    public static final List<String> MSG_RESOLVED = Arrays.asList(MSG_TEXT, MSG_GPS);
+    // the different types of requests for media
+    public static final String REQUEST_IMAGE = "image";
+    public static final String REQUEST_AUDIO = "audio";
+    public static final String REQUEST_VIDEO = "video";
+    public static final String REQUEST_GPS = "geo";
 
+    // custom request codes passed to media capture activities
     private static final int RESULT_IMAGE = 1;
     private static final int RESULT_VIDEO = 2;
     private static final int RESULT_AUDIO = 3;
@@ -125,7 +125,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
                 waitForInput(session.getWait().getMediaHint());
             }
 
-        } catch (EngineException|IOException e) {
+        } catch (EngineException | IOException e) {
             e.printStackTrace();
             showBugReportDialog();
             finish();
@@ -143,8 +143,8 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     }
 
     private void initUI() {
-        chatHistory = findViewById(R.id.chats);
-        chatCompose = findViewById(R.id.text_chat);
+        chatHistory = findViewById(R.id.chat_history);
+        chatCompose = findViewById(R.id.chat_compose);
         sendButtom = findViewById(R.id.button_send);
         scrollView = findViewById(R.id.scroll);
 
@@ -175,7 +175,8 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         chatCompose.setOnKeyListener(new View.OnKeyListener() {
@@ -217,7 +218,26 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     @Override
     public void onPause() {
         super.onPause();
+
         stopLocationUpdates();
+    }
+
+    /**
+     * User pressed the media request button
+     */
+    public void onActionMedia(View view) {
+        View media = getViewCache().getView(R.id.media_icon);
+        if (session.isWaiting()) {
+            if (REQUEST_IMAGE.equals(media.getTag())) {
+                requestImage();
+            } else if (REQUEST_VIDEO.equals(media.getTag())) {
+                requestVideo();
+            } else if (REQUEST_AUDIO.equals(media.getTag())) {
+                requestAudio();
+            } else if (REQUEST_GPS.equals(media.getTag())) {
+                requestLocation();
+            }
+        }
     }
 
     private void requestMedia(Intent intent, int resultType) {
@@ -229,10 +249,9 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(m_lastMediaFile));
             startActivityForResult(intent, resultType);
         }
-
     }
 
-    private void requestPhoto() {
+    private void requestImage() {
 
         Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
             @Override
@@ -259,7 +278,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
 
         // TODO
         //intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, m_submission.createMediaFile("mp4").getAbsolutePath());
-        //startActivityForResult(intent, RESULT_VIDEO);
+        startActivityForResult(intent, RESULT_VIDEO);
     }
 
     private void requestAudio() {
@@ -272,18 +291,17 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
 
                     // TODO
                     //intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, m_submission.createMediaFile("m4a").getAbsolutePath());
-                    //startActivityForResult(intent, RESULT_AUDIO);
+                    startActivityForResult(intent, RESULT_AUDIO);
                 }
             }
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                RunActivity.this.showRationaleDialog(R.string.permission_camera, callback);
+                RunActivity.this.showRationaleDialog(R.string.permission_record, callback);
             }
 
         }, Manifest.permission.RECORD_AUDIO);
     }
-
 
     /**
      * Get the current location
@@ -344,7 +362,6 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         return m_locationRequest;
     }
 
-
     /**
      * Start updating location until they exit this run
      */
@@ -372,38 +389,23 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         }
     }
 
-    protected Bitmap scaleToWidth(Bitmap bitmap, int width) {
-        double ratio = (double) width / (double) bitmap.getWidth();
-        return Bitmap.createScaledBitmap(bitmap, width, (int) ((double) bitmap.getHeight() * ratio), false);
-    }
-
     /**
-     * Scales a bitmap so that it's longest dimension is provided value
+     * @see android.app.Activity#onActivityResult(int, int, Intent)
      */
-    protected Bitmap scaleToMax(Bitmap bitmap, int max) {
-
-        // landscape photos
-        if (bitmap.getWidth() > bitmap.getHeight()) {
-            double ratio = (double) max / (double) bitmap.getWidth();
-            return Bitmap.createScaledBitmap(bitmap, max, (int) ((double) bitmap.getHeight() * ratio), false);
-
-        } else {
-            double ratio = (double) max / (double) bitmap.getHeight();
-            return Bitmap.createScaledBitmap(bitmap, (int) ((double) bitmap.getWidth() * ratio), max, false);
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RESULT_IMAGE && resultCode == RESULT_OK) {
+        if (resultCode != RESULT_OK) {
+            return;
+        }
 
+        if (requestCode == RESULT_IMAGE) {
             if (m_lastMediaFile != null && m_lastMediaFile.exists()) {
 
                 Bitmap full = BitmapFactory.decodeFile(m_lastMediaFile.getAbsolutePath());
-                Bitmap scaled = scaleToMax(full, 1024);
-                Bitmap thumb = scaleToMax(scaled, 600);
+                Bitmap scaled = ImageUtils.scaleToMax(full, 1024);
+                Bitmap thumb = ImageUtils.scaleToMax(scaled, 600);
 
-                byte[] bytes = convertToJPEG(scaled);
+                byte[] bytes = ImageUtils.convertToJPEG(scaled);
 
                 try {
                     FileUtils.writeByteArrayToFile(m_lastMediaFile, bytes);
@@ -423,7 +425,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             }
         }
 
-        if (requestCode == RESULT_VIDEO && resultCode == RESULT_OK) {
+        if (requestCode == RESULT_VIDEO) {
 
             String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
             if (file != null) {
@@ -446,7 +448,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             }
         }
 
-        if (requestCode == RESULT_AUDIO && resultCode == RESULT_OK) {
+        if (requestCode == RESULT_AUDIO) {
             String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
             if (file != null) {
                 try {
@@ -466,39 +468,15 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         }
     }
 
-    private void createMediaFile() throws IOException {
-
-        m_lastMediaFile = null;
-
-        // Create a unique file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "MEDIA_" + timeStamp + "_";
-
-        // create a hidden temporary directory if we don't have one
-        File temp = android.os.Environment.getExternalStorageDirectory();
-        temp = new File(temp.getAbsolutePath() + "/.temp/");
-        if (!temp.exists()) {
-            temp.mkdir();
-        }
-
-        m_lastMediaFile = File.createTempFile(imageFileName, ".media", temp);
-    }
-
-    public static byte[] convertToJPEG(Bitmap bm) {
-        // int iBytes = bm.getWidth() * bm.getHeight() * 4;
-        // ByteBuffer buffer = ByteBuffer.allocate(iBytes);
-        // bm.copyPixelsToBuffer(buffer);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-        return baos.toByteArray();
-    }
-
+    /**
+     * User pressed the send button
+     */
     public void onActionSend(View sendButton) {
         if (!session.getStatus().equals("waiting")) {
             return;
         }
 
-        EditText chatBox = findViewById(R.id.text_chat);
+        EditText chatBox = findViewById(R.id.chat_compose);
         String message = chatBox.getText().toString();
 
         if (message.trim().length() > 0) {
@@ -564,29 +542,29 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         switch (mediaType) {
             case "image":
                 mediaButton.setText(getString(R.string.icon_photo_camera));
-                mediaButton.setTag(MSG_PHOTO);
-                mediaText.setText(getString(R.string.request_photo));
+                mediaButton.setTag(REQUEST_IMAGE);
+                mediaText.setText(getString(R.string.request_image));
                 vc.hide(R.id.chat_box, true);
                 vc.show(R.id.container_request_media);
                 break;
             case "video":
                 mediaButton.setText(getString(R.string.icon_videocam));
-                mediaButton.setTag(MSG_VIDEO);
+                mediaButton.setTag(REQUEST_VIDEO);
                 mediaText.setText(getString(R.string.request_video));
                 vc.hide(R.id.chat_box, true);
                 vc.show(R.id.container_request_media);
                 break;
             case "audio":
                 mediaButton.setText(getString(R.string.icon_mic));
-                mediaButton.setTag(MSG_AUDIO);
+                mediaButton.setTag(REQUEST_AUDIO);
                 mediaText.setText(getString(R.string.request_audio));
                 vc.hide(R.id.chat_box, true);
                 vc.show(R.id.container_request_media);
                 break;
             case "gps":
                 mediaButton.setText(getString(R.string.icon_place));
-                mediaButton.setTag(MSG_GPS);
-                mediaText.setText(getString(R.string.request_location));
+                mediaButton.setTag(REQUEST_GPS);
+                mediaText.setText(getString(R.string.request_gps));
                 vc.hide(R.id.chat_box, true);
                 vc.show(R.id.container_request_media);
                 break;

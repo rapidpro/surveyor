@@ -23,6 +23,21 @@
     <!-- error messages -->
     <string name="error_org_missing">Org couldn\'t be found</string>
 
+    <!-- chat log messages -->
+    <string name="log_flow_complete">Flow complete</string>
+
+    <!-- chat media -->
+    <string name="request_image">Take a Photo</string>
+    <string name="request_video">Record a Video</string>
+    <string name="request_audio">Make a Recording</string>
+    <string name="request_gps">Share Location</string>
+
+    <!-- permission requests -->
+    <string name="permission_camera">We need permission to access your camera in order to collect photos and videos.</string>
+    <string name="permission_record">We need permission to record audio to in order to collect audio recordings.</string>
+    <string name="permission_location">We need permission to access your location in order to collect GPS data.</string>
+    <string name="permission_contacts">Surveyor can access your contacts to help you fill out the login form. This permission is not required.</string>
+
     <!-- miscellaneous -->
     <string name="token">token</string>
     <string name="yes">Yes</string>
@@ -835,7 +850,6 @@
     <string name="prompt_contact_name">Contact Name</string>
     <string name="action_start_flow">Start Flow</string>
     <string name="prompt_phone">Phone Number</string>
-    <string name="log_flow_complete">Flow complete</string>
     <string name="action_save_run">Save</string>
     <string name="confirm_run_removal">This survey is not complete. Are you sure you want to discard it?</string>
     <string name="action_cancel">Cancel</string>
@@ -886,17 +900,10 @@
     <string name="settings">Settings</string>
     <string name="permission_storage">We need access to your storage in order to save your surveys that are in progress.</string>
     <string name="title_permissions">Permission</string>
-    <string name="permission_camera">We need permission to access to the camera in order for you to record videos for your surveys.</string>
-    <string name="permission_contacts">Surveyor can access your contacts to help you fill out the login form. This permission is not required.</string>
-    <string name="permission_location">This survey requires access to your location to continue.</string>
     <string name="location_unavailable">Your location is not currently available. Please try again.</string>
     <string name="media_location">media_location</string>
     <string name="made_recording">Made Recording</string>
     <string name="error_invalid_host">Sorry, that is not a valid host. Try again.</string>
-    <string name="request_photo">Take a Photo</string>
-    <string name="request_video">Record a Video</string>
-    <string name="request_audio">Make a Recording</string>
-    <string name="request_location">Share Location</string>
     <string name="web_load_failure">Check your network connection and try again.</string>
     <string name="error_network">Could not contact server. Check your network connection and try again.</string>
 

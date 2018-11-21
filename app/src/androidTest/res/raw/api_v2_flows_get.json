@@ -20,7 +20,7 @@
     },
     {
       "uuid": "ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec",
-      "name": "Ask Name",
+      "name": "Contact Details",
       "type": "survey",
       "archived": false,
       "labels": [],
@@ -28,6 +28,22 @@
       "runs": {
         "active": 0,
         "completed": 3,
+        "interrupted": 0,
+        "expired": 0
+      },
+      "created_on": "2018-10-25T19:56:36.626539Z",
+      "modified_on": "2018-11-14T21:12:10.148865Z"
+    },
+    {
+      "uuid": "585958f3-ee7a-4f81-b4c2-fda374155681",
+      "name": "Multimedia",
+      "type": "survey",
+      "archived": false,
+      "labels": [],
+      "expires": 10080,
+      "runs": {
+        "active": 1,
+        "completed": 2,
         "interrupted": 0,
         "expired": 0
       },

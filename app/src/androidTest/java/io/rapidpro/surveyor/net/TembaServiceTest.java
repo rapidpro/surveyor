@@ -140,14 +140,16 @@ public class TembaServiceTest extends BaseApplicationTest {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_flows_get, "application/json", 200);
 
         List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
-        assertThat(flows, hasSize(2));
+        assertThat(flows, hasSize(3));
         assertThat(flows.get(0).getUuid(), is("14ca824e-6607-4c11-82f5-18e298d0bd58"));
         assertThat(flows.get(0).getName(), is("Two Questions"));
         assertThat(flows.get(0).getType(), is("survey"));
         assertThat(flows.get(0).isArchived(), is(false));
         assertThat(flows.get(0).getExpires(), is(10080));
         assertThat(flows.get(1).getUuid(), is("ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec"));
-        assertThat(flows.get(1).getName(), is("Ask Name"));
+        assertThat(flows.get(1).getName(), is("Contact Details"));
+        assertThat(flows.get(2).getUuid(), is("585958f3-ee7a-4f81-b4c2-fda374155681"));
+        assertThat(flows.get(2).getName(), is("Multimedia"));
     }
 
     /**
@@ -159,7 +161,7 @@ public class TembaServiceTest extends BaseApplicationTest {
 
         List<Group> groups = getSurveyor().getTembaService().getGroups("abc123");
         assertThat(groups, hasSize(3));
-        assertThat(groups.get(0).getUuid(), is("b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06"));
+        assertThat(groups.get(0).getUuid(), is("11f83067-7c40-49e8-8a35-a1a4e8dd3b69"));
         assertThat(groups.get(0).getName(), is("Testers"));
         assertThat(groups.get(0).getQuery(), is(""));
         assertThat(groups.get(1).getUuid(), is("372aba66-16e2-44ee-8486-fb5cedfe51d9"));
@@ -181,7 +183,7 @@ public class TembaServiceTest extends BaseApplicationTest {
         List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
         List<RawJson> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);
 
-        assertThat(definitions, hasSize(2));
+        assertThat(definitions, hasSize(3));
         assertThat(definitions.get(0).toString(), startsWith("{\"entry\":\"c50f7200-2432-4912-897d-d809a2d2ad8d\""));
     }
 }

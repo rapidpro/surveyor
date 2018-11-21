@@ -47,8 +47,8 @@ public class OrgServiceTest extends BaseApplicationTest {
         svc.clearCache();
         org = svc.get(ORG_UUID);
 
-        assertThat(org.getFlows(), hasSize(2));
-        assertThat(org.getFlow("ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec").getName(), is("Ask Name"));
+        assertThat(org.getFlows(), hasSize(3));
+        assertThat(org.getFlow("ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec").getName(), is("Contact Details"));
         assertThat(org.getFlow("???"), is(nullValue()));
 
         assertThat(org.hasAssets(), is(true));

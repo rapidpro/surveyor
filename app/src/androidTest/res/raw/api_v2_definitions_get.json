@@ -26,9 +26,9 @@
         },
         {
           "uuid": "dc72d0fd-c918-44e9-a833-31a58f066df5",
-          "x": 90,
-          "y": 239,
-          "destination": null,
+          "x": 100,
+          "y": 175,
+          "destination": "260710c6-f7eb-4dfb-a297-9736b65e7a95",
           "actions": [
             {
               "type": "save",
@@ -41,7 +41,7 @@
               "type": "reply",
               "uuid": "a5141d43-14a1-4e40-914c-f2b33b3645de",
               "msg": {
-                "base": "Thanks @contact.name"
+                "base": "Thanks @contact.name. What's your phone number?"
               },
               "media": {},
               "quick_replies": [],
@@ -49,13 +49,58 @@
             }
           ],
           "exit_uuid": "3c09be15-46a0-4e29-bdbd-e512bf454012"
+        },
+        {
+          "uuid": "b09ed9b4-0d44-4096-bc2d-263e9e3dec93",
+          "x": 102,
+          "y": 464,
+          "destination": null,
+          "actions": [
+            {
+              "type": "save",
+              "uuid": "a3bea28b-b1b0-4db1-af75-090973f9eb63",
+              "label": "Phone Number",
+              "field": "tel_e164",
+              "value": "@flow.phone"
+            },
+            {
+              "type": "add_group",
+              "uuid": "5126bb19-6ca1-4a9c-a9ef-30f4dd3761f4",
+              "groups": [
+                {
+                  "uuid": "11f83067-7c40-49e8-8a35-a1a4e8dd3b69",
+                  "name": "Testers"
+                }
+              ]
+            }
+          ],
+          "exit_uuid": "242eb71a-704a-4de5-bbff-e2bcca10d888"
+        },
+        {
+          "uuid": "76a47c79-bae6-46f7-a43e-89fb67191a7b",
+          "x": 542,
+          "y": 281,
+          "destination": "260710c6-f7eb-4dfb-a297-9736b65e7a95",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "bde2299b-7f35-4ad9-98c3-7e8db18c34ac",
+              "msg": {
+                "base": "Sorry that doesn't look like a phone number. Try again."
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "aa6517e2-c06c-49c1-8a6a-acea0a474ecb"
         }
       ],
       "rule_sets": [
         {
           "uuid": "dcd9295d-7a25-4a77-abc2-7d692ca6cc1f",
-          "x": 232,
-          "y": 153,
+          "x": 237,
+          "y": 93,
           "label": "Name",
           "rules": [
             {
@@ -76,15 +121,52 @@
           "response_type": "",
           "operand": "@step.value",
           "config": {}
+        },
+        {
+          "uuid": "260710c6-f7eb-4dfb-a297-9736b65e7a95",
+          "x": 237,
+          "y": 361,
+          "label": "Phone",
+          "rules": [
+            {
+              "uuid": "eb2138cb-90a9-4824-ad92-147d59aaa71a",
+              "category": {
+                "base": "phone"
+              },
+              "destination": "b09ed9b4-0d44-4096-bc2d-263e9e3dec93",
+              "destination_type": "A",
+              "test": {
+                "type": "phone"
+              },
+              "label": null
+            },
+            {
+              "uuid": "ca4748f3-439a-49f6-a3b7-5868653fceb4",
+              "category": {
+                "base": "Other"
+              },
+              "destination": "76a47c79-bae6-46f7-a43e-89fb67191a7b",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_message",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
         }
       ],
       "base_language": "base",
       "flow_type": "S",
       "version": "11.6",
       "metadata": {
-        "name": "Ask Name",
-        "saved_on": "2018-10-25T19:57:30.156950Z",
-        "revision": 7,
+        "name": "Contact Details",
+        "saved_on": "2018-11-21T16:37:58.273902Z",
+        "revision": 20,
         "uuid": "ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec",
         "expires": 10080,
         "contact_creation": "run",
@@ -343,6 +425,218 @@
         "expires": 10080,
         "contact_creation": "run",
         "ivr_retry_failed_events": null
+      }
+    },
+    {
+      "entry": "3d02c74d-e5c2-4590-b679-03f988592013",
+      "action_sets": [
+        {
+          "uuid": "3d02c74d-e5c2-4590-b679-03f988592013",
+          "x": 100,
+          "y": 0,
+          "destination": "6ab79191-da91-4096-a589-6f3c7f5ecf0c",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "58f8384d-92b3-41d2-804f-8c4c6240924e",
+              "msg": {
+                "base": "Hi there, please send a selfie"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "d7de8701-2c58-4108-89a9-ec74e9ea619b"
+        },
+        {
+          "uuid": "8befaab2-63cb-4fdc-b44b-62d4a00a40e9",
+          "x": 103,
+          "y": 164,
+          "destination": "f5ba9174-ed8c-41cd-898a-d7449f72b916",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "dce3e627-65f5-4396-b5d3-67ed6f0b95ef",
+              "msg": {
+                "base": "Now send a video"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "7ec846f0-a0f1-48c5-bf8f-5f941558c673"
+        },
+        {
+          "uuid": "8de09049-f474-4fed-a079-b0e559a8ac59",
+          "x": 101,
+          "y": 334,
+          "destination": "1250d717-bcef-45ed-b63e-e2e8eae953b1",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "6c21c268-759e-4156-b074-e4a3fed0dda3",
+              "msg": {
+                "base": "Now send an audio recording"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "1b3972b7-e926-46c5-ae30-017038be36c4"
+        },
+        {
+          "uuid": "68829693-c442-4c16-9b77-ed384fd607b5",
+          "x": 101,
+          "y": 516,
+          "destination": "78d1b543-e774-4040-b6dc-53139b5edb60",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "f210c97b-9020-43d6-99e2-631e2e62e97b",
+              "msg": {
+                "base": "Finally please send your location"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "ad0699ae-d489-4a63-96eb-716c42669321"
+        },
+        {
+          "uuid": "a2d7e973-4499-48d2-852a-cf46f6c69405",
+          "x": 102,
+          "y": 709,
+          "destination": null,
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "1f30ac69-69d6-41bb-8e53-56d380704e37",
+              "msg": {
+                "base": "Thanks!"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "68ab09e3-3522-4411-87af-f444e00f033d"
+        }
+      ],
+      "rule_sets": [
+        {
+          "uuid": "6ab79191-da91-4096-a589-6f3c7f5ecf0c",
+          "x": 231,
+          "y": 88,
+          "label": "Selfie",
+          "rules": [
+            {
+              "uuid": "5736d5b0-8ded-4755-a6a3-83bf593af87d",
+              "category": {
+                "base": "All Responses"
+              },
+              "destination": "8befaab2-63cb-4fdc-b44b-62d4a00a40e9",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_photo",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        },
+        {
+          "uuid": "f5ba9174-ed8c-41cd-898a-d7449f72b916",
+          "x": 234,
+          "y": 255,
+          "label": "Vlog",
+          "rules": [
+            {
+              "uuid": "79ab9eb5-1d5d-4c8b-9e7d-7b02f624fa23",
+              "category": {
+                "base": "All Responses"
+              },
+              "destination": "8de09049-f474-4fed-a079-b0e559a8ac59",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_video",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        },
+        {
+          "uuid": "1250d717-bcef-45ed-b63e-e2e8eae953b1",
+          "x": 232,
+          "y": 436,
+          "label": "Recording",
+          "rules": [
+            {
+              "uuid": "07662cfe-1270-40ee-b593-c93b4e0a2949",
+              "category": {
+                "base": "All Responses"
+              },
+              "destination": "68829693-c442-4c16-9b77-ed384fd607b5",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_audio",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        },
+        {
+          "uuid": "78d1b543-e774-4040-b6dc-53139b5edb60",
+          "x": 226,
+          "y": 626,
+          "label": "Location",
+          "rules": [
+            {
+              "uuid": "88836f88-82f0-405c-a2f7-dac7b950e198",
+              "category": {
+                "base": "All Responses"
+              },
+              "destination": "a2d7e973-4499-48d2-852a-cf46f6c69405",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_gps",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        }
+      ],
+      "base_language": "base",
+      "flow_type": "S",
+      "version": "11.6",
+      "metadata": {
+        "name": "Multimedia",
+        "saved_on": "2018-11-21T16:32:02.741357Z",
+        "revision": 24,
+        "uuid": "585958f3-ee7a-4f81-b4c2-fda374155681",
+        "expires": 10080
       }
     }
   ],

@@ -18,7 +18,7 @@
   ],
   "groups": [
     {
-      "uuid": "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06",
+      "uuid": "11f83067-7c40-49e8-8a35-a1a4e8dd3b69",
       "name": "Testers",
       "query": ""
     },
@@ -36,11 +36,11 @@
   "flows": [
     {
       "uuid": "ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec",
-      "name": "Ask Name",
+      "name": "Contact Details",
       "spec_version": "12.0",
       "language": "base",
       "type": "messaging_offline",
-      "revision": 7,
+      "revision": 20,
       "expire_after_minutes": 10080,
       "localization": {},
       "nodes": [
@@ -50,7 +50,7 @@
             {
               "type": "send_msg",
               "uuid": "67aafaf6-b375-461c-8357-fd760423f96c",
-              "text": "Hi there. What\u0027s your name?"
+              "text": "Hi there. What's your name?"
             }
           ],
           "exits": [
@@ -71,12 +71,55 @@
             {
               "type": "send_msg",
               "uuid": "a5141d43-14a1-4e40-914c-f2b33b3645de",
-              "text": "Thanks @contact.name"
+              "text": "Thanks @contact.name. What's your phone number?"
             }
           ],
           "exits": [
             {
-              "uuid": "3c09be15-46a0-4e29-bdbd-e512bf454012"
+              "uuid": "3c09be15-46a0-4e29-bdbd-e512bf454012",
+              "destination_node_uuid": "260710c6-f7eb-4dfb-a297-9736b65e7a95"
+            }
+          ]
+        },
+        {
+          "uuid": "b09ed9b4-0d44-4096-bc2d-263e9e3dec93",
+          "actions": [
+            {
+              "type": "add_contact_urn",
+              "uuid": "a3bea28b-b1b0-4db1-af75-090973f9eb63",
+              "scheme": "tel",
+              "path": "@results.phone"
+            },
+            {
+              "type": "add_contact_groups",
+              "uuid": "5126bb19-6ca1-4a9c-a9ef-30f4dd3761f4",
+              "groups": [
+                {
+                  "uuid": "11f83067-7c40-49e8-8a35-a1a4e8dd3b69",
+                  "name": "Testers"
+                }
+              ]
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "242eb71a-704a-4de5-bbff-e2bcca10d888"
+            }
+          ]
+        },
+        {
+          "uuid": "76a47c79-bae6-46f7-a43e-89fb67191a7b",
+          "actions": [
+            {
+              "type": "send_msg",
+              "uuid": "bde2299b-7f35-4ad9-98c3-7e8db18c34ac",
+              "text": "Sorry that doesn't look like a phone number. Try again."
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "aa6517e2-c06c-49c1-8a6a-acea0a474ecb",
+              "destination_node_uuid": "260710c6-f7eb-4dfb-a297-9736b65e7a95"
             }
           ]
         },
@@ -97,6 +140,37 @@
               "uuid": "acd7c0cc-bf92-458e-a03c-d563f397e70c",
               "destination_node_uuid": "dc72d0fd-c918-44e9-a833-31a58f066df5",
               "name": "All Responses"
+            }
+          ]
+        },
+        {
+          "uuid": "260710c6-f7eb-4dfb-a297-9736b65e7a95",
+          "wait": {
+            "type": "msg"
+          },
+          "router": {
+            "type": "switch",
+            "result_name": "Phone",
+            "default_exit_uuid": "ca4748f3-439a-49f6-a3b7-5868653fceb4",
+            "operand": "@input",
+            "cases": [
+              {
+                "uuid": "4cf95d5c-a29a-4ddf-81b6-dede56f506ab",
+                "type": "has_phone",
+                "exit_uuid": "eb2138cb-90a9-4824-ad92-147d59aaa71a"
+              }
+            ]
+          },
+          "exits": [
+            {
+              "uuid": "eb2138cb-90a9-4824-ad92-147d59aaa71a",
+              "destination_node_uuid": "b09ed9b4-0d44-4096-bc2d-263e9e3dec93",
+              "name": "phone"
+            },
+            {
+              "uuid": "ca4748f3-439a-49f6-a3b7-5868653fceb4",
+              "destination_node_uuid": "76a47c79-bae6-46f7-a43e-89fb67191a7b",
+              "name": "Other"
             }
           ]
         }
@@ -150,7 +224,7 @@
             {
               "type": "send_msg",
               "uuid": "5e5b8b5a-b638-4a58-94a6-bb79814f4712",
-              "text": "I didn\u0027t recognize that beer. Please try again."
+              "text": "I didn't recognize that beer. Please try again."
             }
           ],
           "exits": [
@@ -166,7 +240,7 @@
             {
               "type": "send_msg",
               "uuid": "a3ad6679-a32c-4af0-babc-2def65adc185",
-              "text": "Ok let\u0027s go get some @results.color.category_localized @results.beer.category_localized!"
+              "text": "Ok let's go get some @results.color.category_localized @results.beer.category_localized!"
             }
           ],
           "exits": [
@@ -181,7 +255,7 @@
             {
               "type": "send_msg",
               "uuid": "5ed80e3b-d6ec-4b25-bbbf-39ae8935ab00",
-              "text": "@results.color.input isn\u0027t a color I know. Please try again."
+              "text": "@results.color.input isn't a color I know. Please try again."
             }
           ],
           "exits": [
@@ -203,7 +277,7 @@
             "operand": "@input",
             "cases": [
               {
-                "uuid": "c46a301e-f4b7-4650-8e2a-05f92f9f929f",
+                "uuid": "b7a531c0-6cda-4163-906f-b61eaa1fb12c",
                 "type": "has_any_word",
                 "arguments": [
                   "Club"
@@ -211,7 +285,7 @@
                 "exit_uuid": "9f484724-9adb-40da-9da3-d99973591e27"
               },
               {
-                "uuid": "f740f2ee-56e2-4a2f-8cfb-73e20a4bb5f2",
+                "uuid": "a8d6f1ab-b84f-4ea0-8fc4-27b2a9283e86",
                 "type": "has_any_word",
                 "arguments": [
                   "Pilsner"
@@ -219,7 +293,7 @@
                 "exit_uuid": "7993051a-a2d9-4387-9cdb-bd0f48c288a3"
               },
               {
-                "uuid": "5d8b09f9-67ed-42c7-9e5e-2e4607ebd76f",
+                "uuid": "501ae89b-1a31-472f-a1ef-7dd583630202",
                 "type": "has_any_word",
                 "arguments": [
                   "Mutzig"
@@ -263,7 +337,7 @@
             "operand": "@input",
             "cases": [
               {
-                "uuid": "c6285f5d-a0ee-4c6c-80d0-aaedf6f24c33",
+                "uuid": "b8da3fdd-1209-4666-b409-dadac67fc2a7",
                 "type": "has_any_word",
                 "arguments": [
                   "red"
@@ -271,7 +345,7 @@
                 "exit_uuid": "46f73b0a-5845-4392-b5bf-f74c07bb1217"
               },
               {
-                "uuid": "15b1b6f1-2c4f-4e3f-aef0-79eb19c5a59f",
+                "uuid": "912171a6-0afd-469b-8653-80fb50d9d1dc",
                 "type": "has_any_word",
                 "arguments": [
                   "blue"
@@ -279,7 +353,7 @@
                 "exit_uuid": "26d3ec68-245c-49d9-b33f-35d590041827"
               },
               {
-                "uuid": "0802ebe3-6a39-413d-b3dd-1b6e232f3c24",
+                "uuid": "df03e346-102b-4962-9629-b127cdf0dffe",
                 "type": "has_any_word",
                 "arguments": [
                   "green"
@@ -308,6 +382,181 @@
               "uuid": "a45d84cc-725b-4626-98fd-54c64eff0e20",
               "destination_node_uuid": "504f5813-b500-431f-b7db-244606c9696b",
               "name": "Other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uuid": "585958f3-ee7a-4f81-b4c2-fda374155681",
+      "name": "Multimedia",
+      "spec_version": "12.0",
+      "language": "base",
+      "type": "messaging_offline",
+      "revision": 24,
+      "expire_after_minutes": 10080,
+      "localization": {},
+      "nodes": [
+        {
+          "uuid": "3d02c74d-e5c2-4590-b679-03f988592013",
+          "actions": [
+            {
+              "type": "send_msg",
+              "uuid": "58f8384d-92b3-41d2-804f-8c4c6240924e",
+              "text": "Hi there, please send a selfie"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "d7de8701-2c58-4108-89a9-ec74e9ea619b",
+              "destination_node_uuid": "6ab79191-da91-4096-a589-6f3c7f5ecf0c"
+            }
+          ]
+        },
+        {
+          "uuid": "8befaab2-63cb-4fdc-b44b-62d4a00a40e9",
+          "actions": [
+            {
+              "type": "send_msg",
+              "uuid": "dce3e627-65f5-4396-b5d3-67ed6f0b95ef",
+              "text": "Now send a video"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "7ec846f0-a0f1-48c5-bf8f-5f941558c673",
+              "destination_node_uuid": "f5ba9174-ed8c-41cd-898a-d7449f72b916"
+            }
+          ]
+        },
+        {
+          "uuid": "8de09049-f474-4fed-a079-b0e559a8ac59",
+          "actions": [
+            {
+              "type": "send_msg",
+              "uuid": "6c21c268-759e-4156-b074-e4a3fed0dda3",
+              "text": "Now send an audio recording"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "1b3972b7-e926-46c5-ae30-017038be36c4",
+              "destination_node_uuid": "1250d717-bcef-45ed-b63e-e2e8eae953b1"
+            }
+          ]
+        },
+        {
+          "uuid": "68829693-c442-4c16-9b77-ed384fd607b5",
+          "actions": [
+            {
+              "type": "send_msg",
+              "uuid": "f210c97b-9020-43d6-99e2-631e2e62e97b",
+              "text": "Finally please send your location"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "ad0699ae-d489-4a63-96eb-716c42669321",
+              "destination_node_uuid": "78d1b543-e774-4040-b6dc-53139b5edb60"
+            }
+          ]
+        },
+        {
+          "uuid": "a2d7e973-4499-48d2-852a-cf46f6c69405",
+          "actions": [
+            {
+              "type": "send_msg",
+              "uuid": "1f30ac69-69d6-41bb-8e53-56d380704e37",
+              "text": "Thanks!"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "68ab09e3-3522-4411-87af-f444e00f033d"
+            }
+          ]
+        },
+        {
+          "uuid": "6ab79191-da91-4096-a589-6f3c7f5ecf0c",
+          "wait": {
+            "type": "msg",
+            "media_hint": "image"
+          },
+          "router": {
+            "type": "switch",
+            "result_name": "Selfie",
+            "default_exit_uuid": "5736d5b0-8ded-4755-a6a3-83bf593af87d",
+            "operand": "@input",
+            "cases": []
+          },
+          "exits": [
+            {
+              "uuid": "5736d5b0-8ded-4755-a6a3-83bf593af87d",
+              "destination_node_uuid": "8befaab2-63cb-4fdc-b44b-62d4a00a40e9",
+              "name": "All Responses"
+            }
+          ]
+        },
+        {
+          "uuid": "f5ba9174-ed8c-41cd-898a-d7449f72b916",
+          "wait": {
+            "type": "msg",
+            "media_hint": "video"
+          },
+          "router": {
+            "type": "switch",
+            "result_name": "Vlog",
+            "default_exit_uuid": "79ab9eb5-1d5d-4c8b-9e7d-7b02f624fa23",
+            "operand": "@input",
+            "cases": []
+          },
+          "exits": [
+            {
+              "uuid": "79ab9eb5-1d5d-4c8b-9e7d-7b02f624fa23",
+              "destination_node_uuid": "8de09049-f474-4fed-a079-b0e559a8ac59",
+              "name": "All Responses"
+            }
+          ]
+        },
+        {
+          "uuid": "1250d717-bcef-45ed-b63e-e2e8eae953b1",
+          "wait": {
+            "type": "msg",
+            "media_hint": "audio"
+          },
+          "router": {
+            "type": "switch",
+            "result_name": "Recording",
+            "default_exit_uuid": "07662cfe-1270-40ee-b593-c93b4e0a2949",
+            "operand": "@input",
+            "cases": []
+          },
+          "exits": [
+            {
+              "uuid": "07662cfe-1270-40ee-b593-c93b4e0a2949",
+              "destination_node_uuid": "68829693-c442-4c16-9b77-ed384fd607b5",
+              "name": "All Responses"
+            }
+          ]
+        },
+        {
+          "uuid": "78d1b543-e774-4040-b6dc-53139b5edb60",
+          "wait": {
+            "type": "msg",
+            "media_hint": "gps"
+          },
+          "router": {
+            "type": "switch",
+            "result_name": "Location",
+            "default_exit_uuid": "88836f88-82f0-405c-a2f7-dac7b950e198",
+            "operand": "@input",
+            "cases": []
+          },
+          "exits": [
+            {
+              "uuid": "88836f88-82f0-405c-a2f7-dac7b950e198",
+              "destination_node_uuid": "a2d7e973-4499-48d2-852a-cf46f6c69405",
+              "name": "All Responses"
             }
           ]
         }

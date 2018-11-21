@@ -3,11 +3,13 @@ package io.rapidpro.surveyor;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 
 import java.io.File;
 import java.util.Set;
 
 import io.rapidpro.surveyor.data.OrgService;
+import io.rapidpro.surveyor.data.SubmissionService;
 import io.rapidpro.surveyor.net.TembaService;
 
 /**
@@ -33,6 +35,11 @@ public class SurveyorApplication extends Application {
     private OrgService orgService = null;
 
     /**
+     * Service for local submission operations
+     */
+    private SubmissionService submissionService = null;
+
+    /**
      * Gets the singleton instance of this application
      *
      * @return the instance
@@ -48,8 +55,10 @@ public class SurveyorApplication extends Application {
         super.onCreate();
 
         s_this = this;
+
         tembaService = new TembaService(getTembaHost(), LOG);
         orgService = new OrgService(getOrgsDirectory(), LOG);
+        submissionService = new SubmissionService(getSubmissionsDirectory(), LOG);
     }
 
     /**
@@ -126,13 +135,11 @@ public class SurveyorApplication extends Application {
     }
 
     /**
-     * Gets the org storage directory
-     * @return the directory
+     * Returns the Temba API service
+     * @return the service
      */
-    public File getOrgsDirectory() {
-        File dir = new File(getFilesDir(), "orgs");
-        dir.mkdirs();
-        return dir;
+    public TembaService getTembaService() {
+        return tembaService;
     }
 
     /**
@@ -144,10 +151,30 @@ public class SurveyorApplication extends Application {
     }
 
     /**
-     * Returns the Temba API service
+     * Returns the local submissions service
      * @return the service
      */
-    public TembaService getTembaService() {
-        return tembaService;
+    public SubmissionService getSubmissionService() {
+        return submissionService;
+    }
+
+    /**
+     * Gets the org storage directory
+     * @return the directory
+     */
+    public File getOrgsDirectory() {
+        File dir = new File(getFilesDir(), "orgs");
+        dir.mkdirs();
+        return dir;
+    }
+
+    /**
+     * Gets the submissions storage directory
+     * @return the directory
+     */
+    public File getSubmissionsDirectory() {
+        File dir = new File(Environment.getExternalStorageDirectory(), "Surveyor");
+        dir.mkdirs();
+        return dir;
     }
 }

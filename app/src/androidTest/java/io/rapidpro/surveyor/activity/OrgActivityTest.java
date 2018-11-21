@@ -76,9 +76,10 @@ public class OrgActivityTest extends BaseApplicationTest {
 
         onView(withText(R.string.confirm_org_download)).check(doesNotExist());
 
-        // check the two flows are already listed
-        onView(withText("Ask Name")).check(matches(isDisplayed()));
+        // check the flows are already listed
+        onView(withText("Contact Details")).check(matches(isDisplayed()));
         onView(withText("Two Questions")).check(matches(isDisplayed()));
+        onView(withText("Multimedia")).check(matches(isDisplayed()));
 
         // check that clicking a flow launches the flow activity
         onView(withText("Two Questions")).perform(click());
