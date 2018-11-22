@@ -16,6 +16,7 @@ import java.util.UUID;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.engine.EngineException;
 import io.rapidpro.surveyor.engine.Session;
+import io.rapidpro.surveyor.utils.SurveyUtils;
 
 public class Submission {
 
@@ -80,7 +81,7 @@ public class Submission {
     }
 
     /**
-     * Deletes this submission
+     * Deletes this submission from the file system
      */
     public void delete() {
         try {
@@ -91,8 +92,6 @@ public class Submission {
     }
 
     private File getMediaDirectory() {
-        File dir = new File(directory, MEDIA_DIR);
-        dir.mkdirs();
-        return dir;
+        return SurveyUtils.mkdir(directory, MEDIA_DIR);
     }
 }

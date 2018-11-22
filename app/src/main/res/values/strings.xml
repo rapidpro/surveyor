@@ -14,11 +14,15 @@
     <string name="action_logout">Logout</string>
     <string name="action_download">Download</string>
     <string name="action_bug_report">Bug Report</string>
+    <string name="action_save">Save</string>
+    <string name="action_discard">Discard</string>
+    <string name="action_cancel">Cancel</string>
 
     <!-- confirmation prompts -->
     <string name="confirm_org_download">Flows for this organization haven\'t been downloaded yet. Download all flows now?</string>
     <string name="confirm_org_refresh">Refresh all flows for this organization?</string>
     <string name="confirm_bug_report">Oops, it looks like Surveyor is having difficulty. Would you like to send a bug report so we can look into it?</string>
+    <string name="confirm_submission_discard">Are you sure you want to discard the data collected?</string>
 
     <!-- error messages -->
     <string name="error_org_missing">Org couldn\'t be found</string>
@@ -850,10 +854,6 @@
     <string name="prompt_contact_name">Contact Name</string>
     <string name="action_start_flow">Start Flow</string>
     <string name="prompt_phone">Phone Number</string>
-    <string name="action_save_run">Save</string>
-    <string name="confirm_run_removal">This survey is not complete. Are you sure you want to discard it?</string>
-    <string name="action_cancel">Cancel</string>
-    <string name="action_discard_run">Discard</string>
     <string name="confirm_send_submissions">Are you sure you want to send all pending submissions for this flow?</string>
     <string name="confirm_send_all_submissions">Are you sure you want to send all pending submissions?</string>
     <string name="error_no_orgs">Sorry, your account doesn\'t have access to submit surveys. Check with your system administrator.</string>

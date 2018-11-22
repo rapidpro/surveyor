@@ -22,8 +22,10 @@ import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.not;
 
 public class OrgActivityTest extends BaseApplicationTest {
 
@@ -80,6 +82,9 @@ public class OrgActivityTest extends BaseApplicationTest {
         onView(withText("Contact Details")).check(matches(isDisplayed()));
         onView(withText("Two Questions")).check(matches(isDisplayed()));
         onView(withText("Multimedia")).check(matches(isDisplayed()));
+
+        // we have no pending submissions at this point so no submit button
+        onView(withId(R.id.button_pending)).check(matches(not(isDisplayed())));
 
         // check that clicking a flow launches the flow activity
         onView(withText("Two Questions")).perform(click());

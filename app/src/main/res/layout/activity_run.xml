@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
                 android:onClick="onActionDiscard"
-                android:text="@string/action_discard_run"
+                android:text="@string/action_discard"
                 android:textStyle="bold" />
 
             <Button
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
                 android:onClick="onActionSave"
-                android:text="@string/action_save_run"
+                android:text="@string/action_save"
                 android:textStyle="bold" />
 
         </LinearLayout>

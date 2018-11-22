@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
@@ -22,6 +23,7 @@ import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
 import io.rapidpro.surveyor.task.RefreshOrgTask;
 import io.rapidpro.surveyor.ui.BlockingProgress;
+import io.rapidpro.surveyor.ui.ViewCache;
 
 
 public class OrgActivity extends BaseActivity implements FlowListFragment.Container {
@@ -77,10 +79,10 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
             adapter.notifyDataSetChanged();
         }
 
-        /*int pending = Submission.getPendingSubmissions(getDBOrg().getId()).length;
+        int pending = getSurveyor().getSubmissionService().getPendingCount(getOrg());
         ViewCache cache = getViewCache();
         cache.setVisible(R.id.container_pending, pending > 0);
-        cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));*/
+        cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
     }
 
     @Override

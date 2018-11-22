@@ -133,6 +133,18 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         scrollView = findViewById(R.id.scroll);
 
         // allow messages to be sent with the enter key
+        chatCompose.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
+                    onActionSend(sendButtom);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        // or the send button on the keyboard
         chatCompose.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -144,6 +156,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             }
         });
 
+        // change the color of the send button when there is text in the compose box
         chatCompose.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -162,17 +175,6 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             public void afterTextChanged(Editable s) {
             }
         });
-
-        chatCompose.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
-                    onActionSend(sendButtom);
-                    return true;
-                }
-                return false;
-            }
-        });
     }
 
     @Override
@@ -184,19 +186,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_run, menu);
-        // TODO
-        //menu.findItem(R.id.action_cancel).setVisible(m_submission != null && !m_submission.isCompleted());
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_cancel) {
-            confirmDiscardRun();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -635,17 +625,21 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         confirmDiscardRun();
     }
 
+    public void onActionCancel(MenuItem item) {
+        confirmDiscardRun();
+    }
+
     private void confirmDiscardRun() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.confirm_run_removal))
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        builder.setMessage(getString(R.string.confirm_submission_discard))
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         submission.delete();
                         finish();
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
