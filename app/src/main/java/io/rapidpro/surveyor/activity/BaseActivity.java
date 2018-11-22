@@ -193,7 +193,7 @@ public abstract class BaseActivity extends PermisoActivity {
             SurveyorApplication.LOG.e("Failed to generate report", t);
         }
 
-        Uri outputUri = FileProvider.getUriForFile(BaseActivity.this, BuildConfig.APPLICATION_ID + ".provider", outputFile);
+        Uri outputUri = getSurveyor().getUriForFile(outputFile);
 
         ShareCompat.IntentBuilder.from(this)
                 .setType("message/rfc822")

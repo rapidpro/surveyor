@@ -59,11 +59,12 @@ public abstract class BaseApplicationTest {
     }
 
     /**
-     * Clears the orgs directory after each test
+     * Clears the file system after each test
      */
     @After
-    public void clearOrgsDirectory() {
+    public void clearFiles() {
         FileUtils.deleteQuietly(getSurveyor().getOrgsDirectory());
+        FileUtils.deleteQuietly(getSurveyor().getStorageDirectory());
     }
 
     protected SurveyorApplication getSurveyor() {

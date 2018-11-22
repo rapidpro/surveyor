@@ -5,6 +5,7 @@ import android.os.Environment;
 import java.io.File;
 
 import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.utils.SurveyUtils;
 
 /**
  * Custom application class for tests which overrides some stuff to avoid clashing will real
@@ -23,18 +24,16 @@ public class TestApplication extends SurveyorApplication {
     /**
      * @see SurveyorApplication#getOrgsDirectory()
      */
+    @Override
     public File getOrgsDirectory() {
-        File dir = new File(getFilesDir(), "test_orgs");
-        dir.mkdirs();
-        return dir;
+        return SurveyUtils.mkdir(getFilesDir(), "test_orgs");
     }
 
     /**
-     * @see SurveyorApplication#getSubmissionsDirectory()
+     * @see SurveyorApplication#getStorageDirectory()
      */
-    public File getSubmissionsDirectory() {
-        File dir = new File(Environment.getExternalStorageDirectory(), "Surveyor.test");
-        dir.mkdirs();
-        return dir;
+    @Override
+    public File getStorageDirectory() {
+        return SurveyUtils.mkdir(Environment.getExternalStorageDirectory(), "Surveyor.test");
     }
 }

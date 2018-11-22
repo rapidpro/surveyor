@@ -15,7 +15,9 @@ import com.nyaruka.goflow.mobile.Trigger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import io.rapidpro.surveyor.data.Org;
 
@@ -112,13 +114,22 @@ public class Engine {
     /**
      * Creates a new incoming message
      *
-     * @param uuid        the message UUID
      * @param text        the message text
-     * @param attachments the message attachments
      * @return the message
      */
-    public static MsgIn createMsgIn(String uuid, String text, List<String> attachments) {
-        return new MsgIn(uuid, text, listToSlice(attachments));
+    public static MsgIn createMsgIn(String text) {
+        return new MsgIn(UUID.randomUUID().toString(), text, null);
+    }
+
+    /**
+     * Creates a new incoming message with an attachment
+     *
+     * @param text       the message text
+     * @param attachment the message attachment
+     * @return the message
+     */
+    public static MsgIn createMsgIn(String text, String attachment) {
+        return new MsgIn(UUID.randomUUID().toString(), text, listToSlice(Collections.singletonList(attachment)));
     }
 
     /**

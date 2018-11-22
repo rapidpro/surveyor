@@ -74,7 +74,7 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(events.get(0).getType(), is("msg_created"));
         assertThat(events.get(1).getType(), is("msg_wait"));
 
-        MsgIn msg1 = Engine.createMsgIn("8e68adc6-9602-4969-b077-9b25c3b1e7b5", "I like club", null);
+        MsgIn msg1 = Engine.createMsgIn("I like club");
         Resume resume1 = Engine.createMsgResume(null, null, msg1);
 
         events = session.resume(resume1);
@@ -87,7 +87,7 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(events.get(2).getType(), is("msg_created"));
         assertThat(events.get(3).getType(), is("msg_wait"));
 
-        MsgIn msg2 = Engine.createMsgIn("8e68adc6-9602-4969-b077-9b25c3b1e7b5", "RED", null);
+        MsgIn msg2 = Engine.createMsgIn("RED");
         Resume resume2 = Engine.createMsgResume(null, null, msg2);
 
         events = session.resume(resume2);

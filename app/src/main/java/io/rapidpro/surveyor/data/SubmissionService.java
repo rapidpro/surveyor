@@ -1,13 +1,12 @@
 package io.rapidpro.surveyor.data;
 
 import java.io.File;
+import java.util.UUID;
 
 import io.rapidpro.surveyor.Logger;
+import io.rapidpro.surveyor.utils.SurveyUtils;
 
 public class SubmissionService {
-
-    private static final String MEDIA_DIR = "Media";
-    private static final String SUBMISSIONS_DIR = "Submissions";
 
     private File rootDir;
     private Logger log;
@@ -17,16 +16,8 @@ public class SubmissionService {
         this.log = log;
     }
 
-    public File createMediaFile(String extension) {
-        //File dir = new File(rootDir, MEDIA_DIR);
-        //dir.mkdirs();
-        //return dir;
-        return null;
-    }
-
-    private File getMediaDir() {
-        File dir = new File(rootDir, MEDIA_DIR);
-        dir.mkdirs();
-        return dir;
+    public Submission newSubmission(Org org, Flow flow) {
+        File directory = SurveyUtils.mkdir(rootDir, org.getUuid(), flow.getUuid(), UUID.randomUUID().toString());
+        return new Submission(directory);
     }
 }

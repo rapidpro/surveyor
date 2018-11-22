@@ -3,7 +3,9 @@ package io.rapidpro.surveyor;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.content.FileProvider;
 
 import java.io.File;
 import java.util.Set;
@@ -11,6 +13,7 @@ import java.util.Set;
 import io.rapidpro.surveyor.data.OrgService;
 import io.rapidpro.surveyor.data.SubmissionService;
 import io.rapidpro.surveyor.net.TembaService;
+import io.rapidpro.surveyor.utils.SurveyUtils;
 
 /**
  * Main application
@@ -169,12 +172,27 @@ public class SurveyorApplication extends Application {
     }
 
     /**
+     * Gets the external storage directory
+     * @return the directory
+     */
+    public File getStorageDirectory() {
+        return SurveyUtils.mkdir(Environment.getExternalStorageDirectory(), "Surveyor");
+    }
+
+    /**
      * Gets the submissions storage directory
      * @return the directory
      */
-    public File getSubmissionsDirectory() {
-        File dir = new File(Environment.getExternalStorageDirectory(), "Surveyor");
-        dir.mkdirs();
-        return dir;
+    private File getSubmissionsDirectory() {
+        return SurveyUtils.mkdir(getStorageDirectory(), "submissions");
+    }
+
+    /**
+     * Gets the URI for the given file using our application's file provider
+     * @param file the file
+     * @return the URI
+     */
+    public Uri getUriForFile(File file) {
+        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file);
     }
 }

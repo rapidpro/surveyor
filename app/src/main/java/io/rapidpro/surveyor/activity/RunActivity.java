@@ -39,21 +39,16 @@ import com.nyaruka.goflow.mobile.Resume;
 import com.nyaruka.goflow.mobile.SessionAssets;
 import com.nyaruka.goflow.mobile.Trigger;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.engine.Engine;
 import io.rapidpro.surveyor.engine.EngineException;
 import io.rapidpro.surveyor.engine.Session;
@@ -83,11 +78,9 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
 
     private Org org;
     private Session session;
+    private Submission submission;
 
-    //private Submission m_submission;
-    private File m_lastMediaFile;
     private GoogleApiClient m_googleApi;
-
     private android.location.Location m_lastLocation;
     private boolean m_connected;
     private LocationRequest m_locationRequest;
@@ -102,6 +95,16 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         setContentView(R.layout.activity_run);
         initUI();
 
+        if (m_googleApi == null) {
+            m_googleApi = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+
+            m_googleApi.connect();
+        }
+
         try {
             org = getSurveyor().getOrgService().get(orgUUID);
             SessionAssets assets = Engine.createSessionAssets(Engine.loadAssets(org.getAssets()));
@@ -113,32 +116,13 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             Trigger trigger = Engine.createManualTrigger(environment, Engine.createEmptyContact(), flow.toReference());
 
             session = new Session(assets);
+            submission = getSurveyor().getSubmissionService().newSubmission(org, flow);
 
             List<Event> events = session.start(trigger);
-
-            // show any initial messages
-            renderEvents(events);
-
-            if (!session.isWaiting()) {
-                sessionEnded();
-            } else {
-                waitForInput(session.getWait().getMediaHint());
-            }
+            handleEngineOutput(events);
 
         } catch (EngineException | IOException e) {
-            e.printStackTrace();
-            showBugReportDialog();
-            finish();
-        }
-
-        if (m_googleApi == null) {
-            m_googleApi = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-
-            m_googleApi.connect();
+            handleProblem("Unable to start flow", e);
         }
     }
 
@@ -229,7 +213,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         View media = getViewCache().getView(R.id.media_icon);
         if (session.isWaiting()) {
             if (REQUEST_IMAGE.equals(media.getTag())) {
-                requestImage();
+                captureImage();
             } else if (REQUEST_VIDEO.equals(media.getTag())) {
                 requestVideo();
             } else if (REQUEST_AUDIO.equals(media.getTag())) {
@@ -240,28 +224,25 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         }
     }
 
-    private void requestMedia(Intent intent, int resultType) {
-        // TODO
-        //m_lastMediaFile = m_submission.createMediaFile("jpg");
-
-        // Continue only if the File was successfully created
-        if (m_lastMediaFile != null) {
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(m_lastMediaFile));
-            startActivityForResult(intent, resultType);
-        }
-    }
-
-    private void requestImage() {
+    /**
+     * Captures an image from the camera
+     */
+    private void captureImage() {
 
         Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
             @Override
             @SuppressWarnings("ResourceType")
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.areAllPermissionsGranted()) {
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                        requestMedia(takePictureIntent, RESULT_IMAGE);
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                    if (intent.resolveActivity(getPackageManager()) == null) {
+                        handleProblem("Can't find camera device", null);
+                        return;
                     }
+                    File cameraOutput = getCameraOutput();
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, getSurveyor().getUriForFile(cameraOutput));
+                    startActivityForResult(intent, RESULT_IMAGE);
                 }
             }
 
@@ -389,6 +370,10 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         }
     }
 
+    private File getCameraOutput() {
+        return new File(getSurveyor().getStorageDirectory(), "camera.jpg");
+    }
+
     /**
      * @see android.app.Activity#onActivityResult(int, int, Intent)
      */
@@ -399,28 +384,26 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         }
 
         if (requestCode == RESULT_IMAGE) {
-            if (m_lastMediaFile != null && m_lastMediaFile.exists()) {
+            File cameraOutput = getCameraOutput();
+            if (cameraOutput.exists()) {
 
-                Bitmap full = BitmapFactory.decodeFile(m_lastMediaFile.getAbsolutePath());
+                Bitmap full = BitmapFactory.decodeFile(cameraOutput.getAbsolutePath());
                 Bitmap scaled = ImageUtils.scaleToMax(full, 1024);
                 Bitmap thumb = ImageUtils.scaleToMax(scaled, 600);
 
-                byte[] bytes = ImageUtils.convertToJPEG(scaled);
+                byte[] asJpg = ImageUtils.convertToJPEG(scaled);
 
                 try {
-                    FileUtils.writeByteArrayToFile(m_lastMediaFile, bytes);
-                    String url = "file:" + m_lastMediaFile.getAbsolutePath();
+                    Uri uri = submission.saveMedia(asJpg, "jpg");
 
-                    // TODO
-                    //m_runner.resume(m_runState, Input.of("image/jpeg", url));
-                    addMedia(thumb, url, R.string.media_image);
-                    //addMessages(m_runState);
-                    //saveSteps();
+                    addMedia(thumb, uri.toString(), R.string.media_image);
+
+                    SurveyorApplication.LOG.d("Saved image capture to " + uri);
+
+                    MsgIn msg = Engine.createMsgIn("", "image/jpeg:" + uri);
+                    resumeSession(msg);
                 } catch (Exception e) {
-                    Toast.makeText(this, "Couldn't handle message", Toast.LENGTH_SHORT).show();
-                    SurveyorApplication.LOG.e("Error running flow", e);
-
-                    showBugReportDialog();
+                    handleProblem("Couldn't handle message", e);
                 }
             }
         }
@@ -441,9 +424,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
                     //addMessages(m_runState);
                     //saveSteps();
                 } catch (Exception e) {
-                    Toast.makeText(this, "Couldn't handle message", Toast.LENGTH_SHORT).show();
-                    SurveyorApplication.LOG.e("Error running flow", e);
-                    showBugReportDialog();
+                    handleProblem("Couldn't handle message", e);
                 }
             }
         }
@@ -460,12 +441,51 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
                     //saveSteps();
 
                 } catch (Exception e) {
-                    Toast.makeText(this, "Couldn't handle message", Toast.LENGTH_SHORT).show();
-                    SurveyorApplication.LOG.e("Error running flow", e);
-                    showBugReportDialog();
+                    handleProblem("Couldn't handle message", e);
                 }
             }
         }
+    }
+
+    /**
+     * Something has gone wrong... show the user the big report dialog
+     */
+    private void handleProblem(String toastMsg, Throwable e) {
+        Toast.makeText(this, toastMsg, Toast.LENGTH_SHORT).show();
+
+        if (e != null) {
+            SurveyorApplication.LOG.e("Error running flow", e);
+            showBugReportDialog();
+        }
+
+        finish();
+    }
+
+    private void resumeSession(MsgIn msg) {
+        try {
+            Resume resume = Engine.createMsgResume(null, null, msg);
+            List<Event> events = session.resume(resume);
+
+            handleEngineOutput(events);
+
+        } catch (EngineException | IOException e) {
+            handleProblem("Couldn't handle message", e);
+        }
+
+        // scroll us to the bottom
+        scrollView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.setSmoothScrollingEnabled(true);
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+
+                // put the focus back on the chat box
+                chatCompose.requestFocus();
+            }
+        }, 100);
+
+        // refresh our menu
+        invalidateOptionsMenu();
     }
 
     /**
@@ -482,44 +502,20 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         if (message.trim().length() > 0) {
             chatBox.setText("");
 
-            try {
-                MsgIn msg = Engine.createMsgIn(UUID.randomUUID().toString(), message, null);
-                Resume resume = Engine.createMsgResume(null, null, msg);
-                List<Event> events = session.resume(resume);
+            MsgIn msg = Engine.createMsgIn(message);
 
-                renderEvents(events);
+            addMessage(message, true);
 
-                if (!session.isWaiting()) {
-                    sessionEnded();
-                } else {
-                    waitForInput(session.getWait().getMediaHint());
-                }
-
-            } catch (Throwable t) {
-                Toast.makeText(this, "Couldn't handle message", Toast.LENGTH_SHORT).show();
-                SurveyorApplication.LOG.e("Error running flow", t);
-                showBugReportDialog();
-                finish();
-            }
-
-            // scroll us to the bottom
-            scrollView.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    scrollView.setSmoothScrollingEnabled(true);
-                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-
-                    // put the focus back on the chat box
-                    chatCompose.requestFocus();
-                }
-            }, 100);
+            resumeSession(msg);
         }
-
-        // refresh our menu
-        invalidateOptionsMenu();
     }
 
-    private void renderEvents(List<Event> events) {
+    /**
+     * Handles new session state and events after interaction with the flow engine
+     *
+     * @param events the new events
+     */
+    private void handleEngineOutput(List<Event> events) throws IOException, EngineException {
         for (Event event : events) {
             SurveyorApplication.LOG.d("Event: " + event.getPayload());
             JsonObject asObj = new JsonParser().parse(event.getPayload()).getAsJsonObject();
@@ -527,11 +523,21 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             if (event.getType().equals("msg_created")) {
                 JsonObject msg = asObj.get("msg").getAsJsonObject();
                 addMessage(msg.get("text").getAsString(), false);
-            } else if (event.getType().equals("msg_received")) {
-                JsonObject msg = asObj.get("msg").getAsJsonObject();
-                addMessage(msg.get("text").getAsString(), true);
             }
         }
+
+        if (!session.isWaiting()) {
+            addLogMessage(R.string.log_flow_complete);
+
+            ViewCache cache = getViewCache();
+            cache.hide(R.id.chat_box, true);
+            cache.show(R.id.completion_buttons);
+        } else {
+            waitForInput(session.getWait().getMediaHint());
+        }
+
+        submission.saveSession(session);
+        submission.saveNewEvents(events);
     }
 
     private void waitForInput(String mediaType) {
@@ -575,21 +581,13 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         }
     }
 
-    private void sessionEnded() {
-        addLogMessage(R.string.log_flow_complete);
-
-        ViewCache cache = getViewCache();
-        cache.hide(R.id.chat_box, true);
-        cache.show(R.id.completion_buttons);
-    }
-
     private void addLogMessage(int message) {
         getLayoutInflater().inflate(R.layout.item_log_message, chatHistory);
         TextView view = (TextView) chatHistory.getChildAt(chatHistory.getChildCount() - 1);
         view.setText(getString(message));
     }
 
-    private void addMessage(String message, boolean inbound) {
+    private void addMessage(String text, boolean inbound) {
         getLayoutInflater().inflate(R.layout.item_chat_bubble, chatHistory);
         ChatBubbleView bubble = (ChatBubbleView) chatHistory.getChildAt(chatHistory.getChildCount() - 1);
 
@@ -597,7 +595,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             bubble.setTransitionName(getString(R.string.transition_chat));
         }
 
-        bubble.setMessage(message, inbound);
+        bubble.setMessage(text, inbound);
         scrollToBottom();
     }
 
@@ -624,16 +622,26 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         });
     }
 
+    /**
+     * User pressed the save button - session is already saved so all we have to do is finish the activity
+     *
+     * @param view the save button
+     */
+    public void onActionSave(View view) {
+        finish();
+    }
+
+    public void onActionDiscard(View view) {
+        confirmDiscardRun();
+    }
+
     private void confirmDiscardRun() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirm_run_removal))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        // delete our run file
-                        // TODO
-                        //m_submission.delete();
-
+                        submission.delete();
                         finish();
                     }
                 })
@@ -646,25 +654,6 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
                 .show();
     }
 
-    public void saveRunButton(View view) {
-
-        // update the time of our last run
-        /*Realm realm = getRealm();
-        realm.beginTransaction();
-        DBFlow flow = getDBFlow();
-        flow.setLastRunDate(new Date());
-        realm.copyToRealmOrUpdate(flow);
-        realm.commitTransaction();
-
-        m_submission.complete();*/
-
-        finish();
-    }
-
-    public void onActionDiscard(View view) {
-        confirmDiscardRun();
-    }
-
     public void onClickMedia(View view) {
 
         String url = (String) view.getTag(R.string.tag_url);
@@ -672,6 +661,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
 
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         switch (mediaType) {
             case R.string.media_image:
