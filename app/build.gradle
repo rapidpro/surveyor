@@ -9,8 +9,8 @@ android {
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 1152
-        versionName "11.5.2"
+        versionCode 1153
+        versionName "11.5.3"
         multiDexEnabled = true
 
         testInstrumentationRunner "io.rapidpro.surveyor.test.TestRunner"
