@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.threeten.bp.Instant;
 
 import java.io.File;
@@ -432,7 +433,7 @@ public class Submission implements Jsonizable {
                     String type = media.substring(0, split);
                     String fileUrl = media.substring(split + 1, media.length());
                     // don't attempt resolved types
-                    if (!FlowRunActivity.MSG_RESOLVED.contains(type) && fileUrl.startsWith("file:")) {
+                    if (!FlowRunActivity.MSG_RESOLVED.contains(type) && fileUrl.startsWith("content:")) {
                         localResults.add(result);
                     }
                 }
@@ -445,7 +446,7 @@ public class Submission implements Jsonizable {
     /**
      * Submits all local media and updates with remote urls
      */
-    private void resolveMedia() {
+    private void resolveMedia() throws IOException {
 
         final TembaService rapid = Surveyor.get().getRapidProService();
 
@@ -456,13 +457,16 @@ public class Submission implements Jsonizable {
             for (RuleSet.Result result : results) {
                 String media = result.getMedia();
                 if (media != null) {
+                    Surveyor.LOG.d("Resolving media result: " + media);
                     int split = media.indexOf(":");
 
                     String type = media.substring(0, split);
                     String fileUrl = media.substring(split + 1, media.length());
+                    String extension = FilenameUtils.getExtension(fileUrl);
+                    
+                    Uri mediaUri = Uri.parse(fileUrl);
 
-                    String extension = fileUrl.substring(fileUrl.lastIndexOf("."));
-                    String newUrl = rapid.uploadMedia(new File(Uri.parse(fileUrl).getPath()), extension);
+                    String newUrl = rapid.uploadMedia(mediaUri, extension);
                     result.setMedia(type + ":" + newUrl);
                 }
             }
@@ -483,7 +487,7 @@ public class Submission implements Jsonizable {
         }
     }
 
-    public void submit() {
+    public void submit() throws IOException {
         final TembaService rapid = Surveyor.get().getRapidProService();
         final Submission submission = this;
 

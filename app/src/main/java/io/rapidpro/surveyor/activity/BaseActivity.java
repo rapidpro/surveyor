@@ -203,7 +203,7 @@ public class BaseActivity extends PermisoActivity {
                 .addEmailTo("support@rapidpro.io")
                 .setSubject("Surveyor Bug Report")
                 .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
-                .setStream(Uri.fromFile(outputFile))
+                .setStream(getSurveyor().getUriForFile(outputFile))
                 .setChooserTitle("Send Email")
                 .startChooser();
     }
