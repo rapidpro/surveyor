@@ -424,7 +424,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
 
         // Continue only if the File was successfully created
         if (m_lastMediaFile != null) {
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(m_lastMediaFile));
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, getSurveyor().getUriForFile(m_lastMediaFile));
             startActivityForResult(intent, resultType);
         }
 
@@ -603,7 +603,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
 
                 try {
                     FileUtils.writeByteArrayToFile(m_lastMediaFile, bytes);
-                    String url = "file:" + m_lastMediaFile.getAbsolutePath();
+                    String url = getSurveyor().getUriForFile(m_lastMediaFile).toString();
                     m_runner.resume(m_runState, Input.of("image/jpeg", url));
                     addMedia(thumb, url, R.string.media_image);
                     addMessages(m_runState);
@@ -624,7 +624,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
                 Bitmap thumb = ThumbnailUtils.createVideoThumbnail(file, MediaStore.Images.Thumbnails.MINI_KIND);
 
                 try {
-                    String url = "file:" + file;
+                    String url = getSurveyor().getUriForFile(new File(file)).toString();
                     m_runner.resume(m_runState, Input.of("video/mp4", url));
                     addMedia(thumb, url, R.string.media_video);
                     addMessages(m_runState);
@@ -641,7 +641,7 @@ public class FlowRunActivity extends BaseActivity implements GoogleApiClient.Con
             String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
             if (file != null) {
                 try {
-                    String url = "file:" + file;
+                    String url = getSurveyor().getUriForFile(new File(file)).toString();
                     m_runner.resume(m_runState, Input.of("audio/mp4", url));
                     addMediaLink(getString(R.string.made_recording), url, R.string.media_audio);
                     addMessages(m_runState);

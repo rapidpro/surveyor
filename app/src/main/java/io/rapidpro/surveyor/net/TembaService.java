@@ -1,5 +1,7 @@
 package io.rapidpro.surveyor.net;
 
+import android.net.Uri;
+
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -9,8 +11,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -199,15 +206,18 @@ public class TembaService {
 
     /**
      * Uploads a media file and returns the remove URL
-     * @param file the local file to upload
+     * @param uri the local file to upload
      * @return the relative path to media
      */
-    public String uploadMedia(File file, String extension) {
+    public String uploadMedia(Uri uri, String extension) throws IOException {
 
         Map<String, RequestBody> map = new HashMap<>();
 
-        RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-        map.put("media_file\"; filename=\"" + file.getName(), fileBody);
+        InputStream stream = Surveyor.get().getContentResolver().openInputStream(uri);
+        byte[] bytes = IOUtils.toByteArray(stream);
+
+        RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), bytes);
+        map.put("media_file\"; filename=\"" + FilenameUtils.getBaseName(uri.toString()), fileBody);
 
         RequestBody extBody = RequestBody.create(MediaType.parse("text/plain"), extension);
         map.put("extension", extBody);

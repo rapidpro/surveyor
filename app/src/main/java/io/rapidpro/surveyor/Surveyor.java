@@ -2,9 +2,13 @@ package io.rapidpro.surveyor;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v4.content.FileProvider;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
+
+import java.io.File;
 
 import io.rapidpro.surveyor.net.TembaService;
 import io.realm.Realm;
@@ -88,5 +92,14 @@ public class Surveyor extends Application {
             m_tembaService = getRapidProService(Surveyor.BASE_URL);
         }
         return m_tembaService;
+    }
+
+    /**
+     * Gets the URI for the given file using our application's file provider
+     * @param file the file
+     * @return the URI
+     */
+    public Uri getUriForFile(File file) {
+        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file);
     }
 }
