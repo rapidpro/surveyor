@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
@@ -70,20 +71,20 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     private static final int RESULT_IMAGE = 1;
     private static final int RESULT_VIDEO = 2;
     private static final int RESULT_AUDIO = 3;
+    private static final int RESULT_GPS = 4;
 
     private LinearLayout chatHistory;
     private IconTextView sendButtom;
     private EditText chatCompose;
     private ScrollView scrollView;
 
-    private Org org;
     private Session session;
     private Submission submission;
 
-    private GoogleApiClient m_googleApi;
-    private android.location.Location m_lastLocation;
-    private boolean m_connected;
-    private LocationRequest m_locationRequest;
+    private GoogleApiClient googleApi;
+    private android.location.Location lastLocation;
+    private boolean connected;
+    private LocationRequest locationRequest;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -95,18 +96,18 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         setContentView(R.layout.activity_run);
         initUI();
 
-        if (m_googleApi == null) {
-            m_googleApi = new GoogleApiClient.Builder(this)
+        if (googleApi == null) {
+            googleApi = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
 
-            m_googleApi.connect();
+            googleApi.connect();
         }
 
         try {
-            org = getSurveyor().getOrgService().get(orgUUID);
+            Org org = getSurveyor().getOrgService().get(orgUUID);
             SessionAssets assets = Engine.createSessionAssets(Engine.loadAssets(org.getAssets()));
             Environment environment = Engine.createEnvironment(org);
 
@@ -205,11 +206,11 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             if (REQUEST_IMAGE.equals(media.getTag())) {
                 captureImage();
             } else if (REQUEST_VIDEO.equals(media.getTag())) {
-                requestVideo();
+                captureVideo();
             } else if (REQUEST_AUDIO.equals(media.getTag())) {
-                requestAudio();
+                captureAudio();
             } else if (REQUEST_GPS.equals(media.getTag())) {
-                requestLocation();
+                captureLocation();
             }
         }
     }
@@ -244,24 +245,28 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         }, Manifest.permission.CAMERA);
     }
 
-    private void requestVideo() {
+    /**
+     * Captures a video from the camera
+     */
+    private void captureVideo() {
         Intent intent = new Intent(this, VideoCaptureActivity.class);
+        intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getVideoOutput().getAbsolutePath());
 
-        // TODO
-        //intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, m_submission.createMediaFile("mp4").getAbsolutePath());
         startActivityForResult(intent, RESULT_VIDEO);
     }
 
-    private void requestAudio() {
+    /**
+     * Captures an audio recording from the microphone
+     */
+    private void captureAudio() {
         Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
             @Override
             @SuppressWarnings("ResourceType")
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.areAllPermissionsGranted()) {
                     Intent intent = new Intent(RunActivity.this, AudioCaptureActivity.class);
+                    intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getAudioOutput().getAbsolutePath());
 
-                    // TODO
-                    //intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, m_submission.createMediaFile("m4a").getAbsolutePath());
                     startActivityForResult(intent, RESULT_AUDIO);
                 }
             }
@@ -275,9 +280,9 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     }
 
     /**
-     * Get the current location
+     * Captures the current location
      */
-    private void requestLocation() {
+    private void captureLocation() {
         Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
             @Override
             @SuppressWarnings("ResourceType")
@@ -285,28 +290,19 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
 
                 if (resultSet.areAllPermissionsGranted()) {
 
-                    if (m_connected) {
-                        m_lastLocation = LocationServices.FusedLocationApi.getLastLocation(m_googleApi);
+                    if (connected) {
+                        lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApi);
                         startLocationUpdates();
-                        if (m_lastLocation != null) {
-                            try {
+                        if (lastLocation != null) {
+                            double latitude = lastLocation.getLatitude();
+                            double longitude = lastLocation.getLongitude();
+                            String coords = "geo:" + latitude + "," + longitude;
 
-                                double latitude = m_lastLocation.getLatitude();
-                                double longitude = m_lastLocation.getLongitude();
+                            String url = coords + "?q=" + latitude + "," + longitude + "(Location)";
+                            addMediaLink(latitude + "," + longitude, url, R.string.media_location);
 
-                                String location = latitude + "," + longitude;
-
-                                // TODO
-                                //m_runner.resume(m_runState, Input.of("geo", location));
-
-                                String url = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude + "(Location)";
-                                addMediaLink(latitude + "," + longitude, url, R.string.media_location);
-                                //addMessages(m_runState);
-                                //saveSteps();
-
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
+                            MsgIn msg = Engine.createMsgIn("", coords);
+                            resumeSession(msg);
                         } else {
                             Toast.makeText(RunActivity.this, R.string.location_unavailable, Toast.LENGTH_SHORT).show();
                         }
@@ -324,13 +320,13 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     }
 
     protected LocationRequest getLocationRequest() {
-        if (m_locationRequest == null) {
-            m_locationRequest = new LocationRequest();
-            m_locationRequest.setInterval(10000);
-            m_locationRequest.setFastestInterval(5000);
-            m_locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        if (locationRequest == null) {
+            locationRequest = new LocationRequest();
+            locationRequest.setInterval(10000);
+            locationRequest.setFastestInterval(5000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         }
-        return m_locationRequest;
+        return locationRequest;
     }
 
     /**
@@ -338,10 +334,10 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
      */
     @SuppressWarnings("ResourceType")
     protected void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(m_googleApi, getLocationRequest(), new LocationListener() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApi, getLocationRequest(), new LocationListener() {
             @Override
             public void onLocationChanged(android.location.Location location) {
-                m_lastLocation = location;
+                lastLocation = location;
             }
         });
     }
@@ -350,8 +346,8 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
      * Stop getting location updates
      */
     protected void stopLocationUpdates() {
-        if (m_googleApi.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(m_googleApi, new LocationListener() {
+        if (googleApi.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApi, new LocationListener() {
                 @Override
                 public void onLocationChanged(android.location.Location location) {
 
@@ -364,6 +360,14 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         return new File(getSurveyor().getStorageDirectory(), "camera.jpg");
     }
 
+    private File getVideoOutput() {
+        return new File(getSurveyor().getStorageDirectory(), "video.mp4");
+    }
+
+    private File getAudioOutput() {
+        return new File(getSurveyor().getStorageDirectory(), "audio.m4a");
+    }
+
     /**
      * @see android.app.Activity#onActivityResult(int, int, Intent)
      */
@@ -373,11 +377,13 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             return;
         }
 
-        if (requestCode == RESULT_IMAGE) {
-            File cameraOutput = getCameraOutput();
-            if (cameraOutput.exists()) {
+        MsgIn msg = null;
 
-                Bitmap full = BitmapFactory.decodeFile(cameraOutput.getAbsolutePath());
+        if (requestCode == RESULT_IMAGE) {
+            File output = getCameraOutput();
+            if (output.exists()) {
+
+                Bitmap full = BitmapFactory.decodeFile(output.getAbsolutePath());
                 Bitmap scaled = ImageUtils.scaleToMax(full, 1024);
                 Bitmap thumb = ImageUtils.scaleToMax(scaled, 600);
 
@@ -390,50 +396,56 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
 
                     SurveyorApplication.LOG.d("Saved image capture to " + uri);
 
-                    MsgIn msg = Engine.createMsgIn("", "image/jpeg:" + uri);
-                    resumeSession(msg);
-                } catch (Exception e) {
-                    handleProblem("Couldn't handle message", e);
+                    msg = Engine.createMsgIn("", "image/jpeg:" + uri);
+                } catch (IOException e) {
+                    handleProblem("Unable capture image", e);
                 }
+
+                output.delete();
+            }
+        } else if (requestCode == RESULT_VIDEO) {
+            File output = getVideoOutput();
+            if (output.exists()) {
+
+                Bitmap thumb = ThumbnailUtils.createVideoThumbnail(output.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND);
+
+                try {
+                    Uri uri = submission.saveMedia(output);
+
+                    addMedia(thumb, uri.toString(), R.string.media_video);
+
+                    SurveyorApplication.LOG.d("Saved video capture to " + uri);
+
+                    msg = Engine.createMsgIn("", "video/mp4:" + uri);
+                } catch (IOException e) {
+                    handleProblem("Unable capture video", e);
+                }
+
+                output.delete();
+            }
+
+        } else if (requestCode == RESULT_AUDIO) {
+            File output = getAudioOutput();
+            if (output.exists()) {
+
+                try {
+                    Uri uri = submission.saveMedia(output);
+                    SurveyorApplication.LOG.d("Saved audio capture to " + uri);
+
+                    addMediaLink(getString(R.string.made_recording), uri.toString(), R.string.media_audio);
+
+                    msg = Engine.createMsgIn("", "audio/m4a:" + uri);
+                } catch (IOException e) {
+                    handleProblem("Unable capture audio", e);
+                }
+
+                output.delete();
             }
         }
 
-        if (requestCode == RESULT_VIDEO) {
-
-            String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
-            if (file != null) {
-
-                Bitmap thumb = ThumbnailUtils.createVideoThumbnail(file, MediaStore.Images.Thumbnails.MINI_KIND);
-
-                try {
-                    String url = "file:" + file;
-
-                    // TODO
-                    //m_runner.resume(m_runState, Input.of("video/mp4", url));
-                    addMedia(thumb, url, R.string.media_video);
-                    //addMessages(m_runState);
-                    //saveSteps();
-                } catch (Exception e) {
-                    handleProblem("Couldn't handle message", e);
-                }
-            }
-        }
-
-        if (requestCode == RESULT_AUDIO) {
-            String file = data.getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
-            if (file != null) {
-                try {
-                    String url = "file:" + file;
-                    // TODO
-                    //m_runner.resume(m_runState, Input.of("audio/mp4", url));
-                    addMediaLink(getString(R.string.made_recording), url, R.string.media_audio);
-                    //addMessages(m_runState);
-                    //saveSteps();
-
-                } catch (Exception e) {
-                    handleProblem("Couldn't handle message", e);
-                }
-            }
+        // if we have a message we can try to resume now...
+        if (msg != null) {
+            resumeSession(msg);
         }
     }
 
@@ -615,16 +627,26 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     /**
      * User pressed the save button - session is already saved so all we have to do is finish the activity
      *
-     * @param view the save button
+     * @param view the button
      */
     public void onActionSave(View view) {
         finish();
     }
 
+    /**
+     * User pressed the discard button - prompt user to confirm if they want to lose this submission
+     *
+     * @param view the button
+     */
     public void onActionDiscard(View view) {
         confirmDiscardRun();
     }
 
+    /**
+     * User pressed the cancel menu item - prompt user to confirm if they want to lose this submission
+     *
+     * @param item the menu item
+     */
     public void onActionCancel(MenuItem item) {
         confirmDiscardRun();
     }
@@ -678,7 +700,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     @Override
     public void onConnected(Bundle bundle) {
         SurveyorApplication.LOG.d("GoogleAPI client connected");
-        m_connected = true;
+        connected = true;
     }
 
     @Override

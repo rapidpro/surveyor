@@ -47,7 +47,5 @@ public class IconLinkView extends CachedLinearLayout {
         } else if (type == R.string.media_location) {
             iconView.setText(R.string.icon_place);
         }
-
     }
-
 }

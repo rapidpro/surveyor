@@ -5,6 +5,7 @@ import android.net.Uri;
 import com.nyaruka.goflow.mobile.Event;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -77,6 +78,19 @@ public class Submission {
     public Uri saveMedia(byte[] data, String extension) throws IOException {
         File file = new File(getMediaDirectory(), UUID.randomUUID().toString() + "." + extension);
         FileUtils.writeByteArrayToFile(file, data);
+        return SurveyorApplication.get().getUriForFile(file);
+    }
+
+    /**
+     * Saves a new media file to this submission
+     *
+     * @param src the file to copy
+     * @return the URI of the saved file
+     */
+    public Uri saveMedia(File src) throws IOException {
+        String extension = FilenameUtils.getExtension(src.getName());
+        File file = new File(getMediaDirectory(), UUID.randomUUID().toString() + "." + extension);
+        FileUtils.copyFile(src, file);
         return SurveyorApplication.get().getUriForFile(file);
     }
 

@@ -12,12 +12,18 @@ import java.text.NumberFormat;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.Org;
 
 public class FlowListAdapter extends ArrayAdapter<Flow> {
 
-    public FlowListAdapter(Context context, int resourceId, List<Flow> flows) {
+    private Org org;
+
+    public FlowListAdapter(Context context, int resourceId, Org org, List<Flow> flows) {
         super(context, resourceId, flows);
+
+        this.org = org;
     }
 
     @Override
@@ -31,9 +37,9 @@ public class FlowListAdapter extends ArrayAdapter<Flow> {
             row = inflater.inflate(R.layout.item_flow, parent, false);
 
             cache = new ViewCache();
-            cache.titleView = (TextView) row.findViewById(R.id.text_flow_name);
-            cache.questionView = (TextView) row.findViewById(R.id.text_flow_questions);
-            cache.pendingSubmissions = (TextView) row.findViewById(R.id.text_pending_submissions);
+            cache.titleView = row.findViewById(R.id.text_flow_name);
+            cache.questionView = row.findViewById(R.id.text_flow_questions);
+            cache.pendingSubmissions = row.findViewById(R.id.text_pending_submissions);
 
             row.setTag(cache);
         } else {
@@ -43,8 +49,9 @@ public class FlowListAdapter extends ArrayAdapter<Flow> {
         Flow flow = getItem(position);
         cache.titleView.setText(flow.getName());
 
+        int submissions = SurveyorApplication.get().getSubmissionService().getPendingCount(org, flow);
+
         NumberFormat nf = NumberFormat.getInstance();
-        int submissions = 12; /* TODO Submission.getPendingSubmissionCount(flow); */
         cache.pendingSubmissions.setText(nf.format(submissions));
         cache.pendingSubmissions.setTag(flow);
 

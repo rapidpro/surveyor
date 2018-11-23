@@ -25,10 +25,12 @@ import io.rapidpro.surveyor.task.RefreshOrgTask;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.rapidpro.surveyor.ui.ViewCache;
 
-
+/**
+ * Home screen for an org - shows available flows and pending submissions
+ */
 public class OrgActivity extends BaseActivity implements FlowListFragment.Container {
 
-    private Org getOrg() {
+    public Org getOrg() {
         String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
 
         try {
@@ -52,10 +54,6 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
 
         setTitle(org.getName());
 
-        if (!org.hasAssets()) {
-            confirmRefreshOrg(true);
-        }
-
         // this holds our flow list fragment which shows all available flows
         setContentView(R.layout.activity_org);
 
@@ -63,6 +61,11 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
             Fragment fragment = new FlowListFragment();
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(R.id.fragment_container, fragment).commit();
+        }
+
+        // if this org doesn't have downloaded assets, ask the user if we can download them now
+        if (!org.hasAssets()) {
+            confirmRefreshOrg(true);
         }
     }
 

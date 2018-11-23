@@ -16,6 +16,7 @@ import java.util.List;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.Org;
 
 /**
  * A list of flows than can be selected from
@@ -32,9 +33,10 @@ public class FlowListFragment extends Fragment implements AbsListView.OnItemClic
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Org org = container.getOrg();
         List<Flow> items = container.getListItems();
 
-        adapter = new FlowListAdapter(getActivity(), R.layout.item_flow, items);
+        adapter = new FlowListAdapter(getActivity(), R.layout.item_flow, org, items);
     }
 
     @Override
@@ -71,6 +73,7 @@ public class FlowListFragment extends Fragment implements AbsListView.OnItemClic
      * Container activity should implement this to be notified when a flow is clicked
      */
     public interface Container {
+        Org getOrg();
         List<Flow> getListItems();
         void onItemClick(Flow flow);
     }

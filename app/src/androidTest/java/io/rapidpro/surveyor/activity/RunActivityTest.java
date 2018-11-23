@@ -2,19 +2,24 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 
+import androidx.test.espresso.intent.ActivityResultFunction;
+import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
@@ -31,6 +36,7 @@ import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intending;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
@@ -49,7 +55,22 @@ public class RunActivityTest extends BaseApplicationTest {
     private static final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
 
     @Rule
-    public IntentsTestRule<RunActivity> rule = new IntentsTestRule<>(RunActivity.class, true, false);
+    public IntentsTestRule<RunActivity> rule = new IntentsTestRule<RunActivity>(RunActivity.class, true, false) {
+        @Override
+        protected void afterActivityLaunched() {
+            mockMediaCapturing();
+        }
+    };
+
+    @Before
+    public void startTrackingIntents() {
+        Intents.init();
+    }
+
+    @After
+    public void stopTrackingIntents() {
+        Intents.release();
+    }
 
     @Before
     public void ensureLoggedIn() throws IOException {
@@ -108,19 +129,34 @@ public class RunActivityTest extends BaseApplicationTest {
     }
 
     @Test
-    public void multimedia() throws IOException {
+    public void multimedia() {
         launchForFlow("585958f3-ee7a-4f81-b4c2-fda374155681");
 
-        mockImageCaptureActivity(R.mipmap.ic_launcher);
-
-        onView(allOf(withParent(withId(R.id.chat_history)), withClassName(is(ChatBubbleView.class.getName()))))
+        onView(allOf(withId(R.id.text_message), withText("Hi there, please send a selfie")))
                 .check(matches(isDisplayed()));
-        onView(allOf(withParent(withClassName(is(ChatBubbleView.class.getName()))), withId(R.id.text_message)))
-                .check(matches(withText("Hi there, please send a selfie")));
 
         onView(withId(R.id.container_request_media))
                 .check(matches(isDisplayed()))
                 .perform(click());
+
+        onView(allOf(withId(R.id.text_message), withText("Now send a video")))
+                .check(matches(isDisplayed()));
+
+        onView(withId(R.id.container_request_media))
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        onView(allOf(withId(R.id.text_message), withText("Now send an audio recording")))
+                .check(matches(isDisplayed()));
+
+        onView(withId(R.id.container_request_media))
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        onView(allOf(withId(R.id.text_message), withText("Finally please send your location")))
+                .check(matches(isDisplayed()));
+
+        // TODO mock location capturing
     }
 
     private void launchForFlow(String flowUuid) {
@@ -136,19 +172,66 @@ public class RunActivityTest extends BaseApplicationTest {
         onView(withId(R.id.button_send)).perform(click());
     }
 
-    private void mockImageCaptureActivity(int imageResId) throws IOException {
-        // create a bitmap we can use for our simulated camera image
-        Bitmap bmp = BitmapFactory.decodeResource(getInstrumentation().getTargetContext().getResources(), imageResId);
+    private void mockMediaCapturing() {
+        final int imageResId = io.rapidpro.surveyor.test.R.raw.capture_image;
+        final int videoResId = io.rapidpro.surveyor.test.R.raw.capture_video;
+        final int audioResId = io.rapidpro.surveyor.test.R.raw.capture_audio;
+        final Context context = getInstrumentation().getContext();
 
-        byte[] asJpg = ImageUtils.convertToJPEG(bmp);
-        File camerOutput = new File(getSurveyor().getStorageDirectory(), "camera.jpg");
-        FileUtils.writeByteArrayToFile(camerOutput, asJpg);
+        intending(toPackage("com.android.camera2")).respondWithFunction(new ActivityResultFunction() {
+            @Override
+            public Instrumentation.ActivityResult apply(Intent intent) {
+                // create a bitmap we can use for our simulated camera image
+                Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), imageResId);
 
-        // create an activity result to look like the camera returning an image
-        Intent resultData = new Intent();
-        resultData.putExtra("data", bmp);
-        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
+                byte[] asJpg = ImageUtils.convertToJPEG(bmp);
+                File output = new File(getSurveyor().getStorageDirectory(), "camera.jpg");
 
-        intending(toPackage("com.android.camera2")).respondWith(result);
+                try {
+                    FileUtils.writeByteArrayToFile(output, asJpg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // create an activity result to look like the camera returning an image
+                Intent resultData = new Intent();
+                resultData.putExtra("data", bmp);
+                return new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
+            }
+        });
+
+        intending(hasComponent(VideoCaptureActivity.class.getName())).respondWithFunction(new ActivityResultFunction() {
+            @Override
+            public Instrumentation.ActivityResult apply(Intent intent) {
+                InputStream input = context.getResources().openRawResource(videoResId);
+                File output = new File(getSurveyor().getStorageDirectory(), "video.mp4");
+
+                try {
+                    FileUtils.copyInputStreamToFile(input, output);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Intent resultData = new Intent();
+                return new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
+            }
+        });
+
+        intending(hasComponent(AudioCaptureActivity.class.getName())).respondWithFunction(new ActivityResultFunction() {
+            @Override
+            public Instrumentation.ActivityResult apply(Intent intent) {
+                InputStream input = context.getResources().openRawResource(audioResId);
+                File output = new File(getSurveyor().getStorageDirectory(), "audio.m4a");
+
+                try {
+                    FileUtils.copyInputStreamToFile(input, output);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Intent resultData = new Intent();
+                return new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
+            }
+        });
     }
 }

@@ -16,6 +16,9 @@ import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.rapidpro.surveyor.engine.Engine;
 
+/**
+ * Home screen for a flow - shows start button and pending submissions
+ */
 public class FlowActivity extends BaseActivity {
 
     private Org org;
@@ -59,13 +62,13 @@ public class FlowActivity extends BaseActivity {
         cache.setText(R.id.text_flow_questions, nf.format(flow.getQuestionCount()) + questionString);
         cache.setText(R.id.text_flow_revision, "(v" + nf.format(flow.getRevision()) + ")");
 
-        /*int submissions = Submission.getPendingSubmissionCount(flow);
+        int submissions = getSurveyor().getSubmissionService().getPendingCount(org, flow);
         if (submissions > 0) {
             cache.show(R.id.container_pending);
             cache.setButtonText(R.id.button_pending, nf.format(submissions));
         } else {
             cache.hide(R.id.container_pending);
-        }*/
+        }
     }
 
     public void onActionStart(View view) {
