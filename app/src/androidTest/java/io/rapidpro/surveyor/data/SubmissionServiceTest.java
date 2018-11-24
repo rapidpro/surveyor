@@ -2,6 +2,7 @@ package io.rapidpro.surveyor.data;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 
 import io.rapidpro.surveyor.test.BaseApplicationTest;
@@ -26,6 +27,15 @@ public class SubmissionServiceTest extends BaseApplicationTest {
         Submission sub = svc.newSubmission(org, flow1);
         svc.newSubmission(org, flow1);
         svc.newSubmission(org, flow2);
+
+        File submissionsDir = new File(getSurveyor().getStorageDirectory(), "submissions");
+        assertThat(submissionsDir.exists(), is(true));
+
+        File orgDir = new File(submissionsDir, ORG_UUID);
+        assertThat(orgDir.exists(), is(true));
+
+        File flow1Dir = new File(orgDir, "14ca824e-6607-4c11-82f5-18e298d0bd58");
+        assertThat(flow1Dir.exists(), is(true));
 
         assertThat(svc.getPendingCount(org), is(3));
         assertThat(svc.getPendingCount(org, flow1), is(2));

@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.support.v4.content.FileProvider;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 import io.rapidpro.surveyor.data.OrgService;
@@ -60,8 +61,13 @@ public class SurveyorApplication extends Application {
         s_this = this;
 
         tembaService = new TembaService(getTembaHost(), LOG);
-        orgService = new OrgService(getOrgsDirectory(), LOG);
-        submissionService = new SubmissionService(getSubmissionsDirectory(), LOG);
+
+        try {
+            orgService = new OrgService(getOrgsDirectory(), LOG);
+            submissionService = new SubmissionService(getSubmissionsDirectory(), LOG);
+        } catch (IOException e) {
+            LOG.e("Unable to create directory based services", e);
+        }
     }
 
     /**
@@ -95,7 +101,7 @@ public class SurveyorApplication extends Application {
     /**
      * Saves a string-set shared preference for this application
      *
-     * @param key   the preference key
+     * @param key    the preference key
      * @param values the preference value
      */
     public void setPreference(String key, Set<String> values) {
@@ -139,6 +145,7 @@ public class SurveyorApplication extends Application {
 
     /**
      * Returns the Temba API service
+     *
      * @return the service
      */
     public TembaService getTembaService() {
@@ -147,6 +154,7 @@ public class SurveyorApplication extends Application {
 
     /**
      * Returns the local orgs service
+     *
      * @return the service
      */
     public OrgService getOrgService() {
@@ -155,6 +163,7 @@ public class SurveyorApplication extends Application {
 
     /**
      * Returns the local submissions service
+     *
      * @return the service
      */
     public SubmissionService getSubmissionService() {
@@ -163,32 +172,34 @@ public class SurveyorApplication extends Application {
 
     /**
      * Gets the org storage directory
+     *
      * @return the directory
      */
-    public File getOrgsDirectory() {
-        File dir = new File(getFilesDir(), "orgs");
-        dir.mkdirs();
-        return dir;
+    public File getOrgsDirectory() throws IOException {
+        return SurveyUtils.mkdir(getFilesDir(), "orgs");
     }
 
     /**
      * Gets the external storage directory
+     *
      * @return the directory
      */
-    public File getStorageDirectory() {
+    public File getStorageDirectory() throws IOException {
         return SurveyUtils.mkdir(Environment.getExternalStorageDirectory(), "Surveyor");
     }
 
     /**
      * Gets the submissions storage directory
+     *
      * @return the directory
      */
-    private File getSubmissionsDirectory() {
+    private File getSubmissionsDirectory() throws IOException {
         return SurveyUtils.mkdir(getStorageDirectory(), "submissions");
     }
 
     /**
      * Gets the URI for the given file using our application's file provider
+     *
      * @param file the file
      * @return the URI
      */

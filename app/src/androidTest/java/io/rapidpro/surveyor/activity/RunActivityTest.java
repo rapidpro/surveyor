@@ -46,6 +46,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertThat;
 
@@ -55,22 +56,7 @@ public class RunActivityTest extends BaseApplicationTest {
     private static final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
 
     @Rule
-    public IntentsTestRule<RunActivity> rule = new IntentsTestRule<RunActivity>(RunActivity.class, true, false) {
-        @Override
-        protected void afterActivityLaunched() {
-            mockMediaCapturing();
-        }
-    };
-
-    @Before
-    public void startTrackingIntents() {
-        Intents.init();
-    }
-
-    @After
-    public void stopTrackingIntents() {
-        Intents.release();
-    }
+    public IntentsTestRule<RunActivity> rule = new IntentsTestRule<>(RunActivity.class, true, false);
 
     @Before
     public void ensureLoggedIn() throws IOException {
@@ -132,6 +118,8 @@ public class RunActivityTest extends BaseApplicationTest {
     public void multimedia() {
         launchForFlow("585958f3-ee7a-4f81-b4c2-fda374155681");
 
+        mockMediaCapturing();
+
         onView(allOf(withId(R.id.text_message), withText("Hi there, please send a selfie")))
                 .check(matches(isDisplayed()));
 
@@ -164,7 +152,9 @@ public class RunActivityTest extends BaseApplicationTest {
         intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, ORG_UUID);
         intent.putExtra(SurveyorIntent.EXTRA_FLOW_UUID, flowUuid);
 
-        rule.launchActivity(intent);
+        BaseActivity activity = rule.launchActivity(intent);
+
+        assertThat(activity, is(notNullValue()));
     }
 
     private void sendTextReply(String text) {
@@ -185,9 +175,9 @@ public class RunActivityTest extends BaseApplicationTest {
                 Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), imageResId);
 
                 byte[] asJpg = ImageUtils.convertToJPEG(bmp);
-                File output = new File(getSurveyor().getStorageDirectory(), "camera.jpg");
 
                 try {
+                    File output = new File(getSurveyor().getStorageDirectory(), "camera.jpg");
                     FileUtils.writeByteArrayToFile(output, asJpg);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -204,9 +194,9 @@ public class RunActivityTest extends BaseApplicationTest {
             @Override
             public Instrumentation.ActivityResult apply(Intent intent) {
                 InputStream input = context.getResources().openRawResource(videoResId);
-                File output = new File(getSurveyor().getStorageDirectory(), "video.mp4");
 
                 try {
+                    File output = new File(getSurveyor().getStorageDirectory(), "video.mp4");
                     FileUtils.copyInputStreamToFile(input, output);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -221,9 +211,9 @@ public class RunActivityTest extends BaseApplicationTest {
             @Override
             public Instrumentation.ActivityResult apply(Intent intent) {
                 InputStream input = context.getResources().openRawResource(audioResId);
-                File output = new File(getSurveyor().getStorageDirectory(), "audio.m4a");
 
                 try {
+                    File output = new File(getSurveyor().getStorageDirectory(), "audio.m4a");
                     FileUtils.copyInputStreamToFile(input, output);
                 } catch (IOException e) {
                     e.printStackTrace();

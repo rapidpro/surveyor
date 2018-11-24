@@ -13,6 +13,7 @@ import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 
 import com.greysonparrelli.permiso.Permiso;
 import com.greysonparrelli.permiso.PermisoActivity;
@@ -106,6 +107,11 @@ public abstract class BaseActivity extends PermisoActivity {
     @Override
     protected void onCreate(Bundle bundle) {
         SurveyorApplication.LOG.d(getClass().getSimpleName() + ".onCreate");
+
+        // so that espresso tests always have an unlocked screen
+        if (BuildConfig.DEBUG) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
 
         super.onCreate(bundle);
 

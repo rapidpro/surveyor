@@ -4,6 +4,7 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.UUID;
 
 import io.rapidpro.surveyor.Logger;
@@ -30,7 +31,7 @@ public class SubmissionService {
      * @param flow the flow
      * @return the new submission
      */
-    public Submission newSubmission(Org org, Flow flow) {
+    public Submission newSubmission(Org org, Flow flow) throws IOException {
         File directory = SurveyUtils.mkdir(rootDir, org.getUuid(), flow.getUuid(), UUID.randomUUID().toString());
 
         log.d("Creating new submission in " + directory.getPath());

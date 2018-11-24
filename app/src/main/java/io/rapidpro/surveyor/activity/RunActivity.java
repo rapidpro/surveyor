@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
@@ -231,9 +230,13 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
                         handleProblem("Can't find camera device", null);
                         return;
                     }
-                    File cameraOutput = getCameraOutput();
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, getSurveyor().getUriForFile(cameraOutput));
-                    startActivityForResult(intent, RESULT_IMAGE);
+                    try {
+                        File cameraOutput = getCameraOutput();
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, getSurveyor().getUriForFile(cameraOutput));
+                        startActivityForResult(intent, RESULT_IMAGE);
+                    } catch (IOException e) {
+                        SurveyorApplication.LOG.e("Unable to create temp media", e);
+                    }
                 }
             }
 
@@ -249,10 +252,14 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
      * Captures a video from the camera
      */
     private void captureVideo() {
-        Intent intent = new Intent(this, VideoCaptureActivity.class);
-        intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getVideoOutput().getAbsolutePath());
+        try {
+            Intent intent = new Intent(this, VideoCaptureActivity.class);
+            intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getVideoOutput().getAbsolutePath());
 
-        startActivityForResult(intent, RESULT_VIDEO);
+            startActivityForResult(intent, RESULT_VIDEO);
+        } catch (IOException e) {
+            SurveyorApplication.LOG.e("Unable to create temp media", e);
+        }
     }
 
     /**
@@ -264,10 +271,14 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             @SuppressWarnings("ResourceType")
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.areAllPermissionsGranted()) {
-                    Intent intent = new Intent(RunActivity.this, AudioCaptureActivity.class);
-                    intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getAudioOutput().getAbsolutePath());
+                    try {
+                        Intent intent = new Intent(RunActivity.this, AudioCaptureActivity.class);
+                        intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getAudioOutput().getAbsolutePath());
 
-                    startActivityForResult(intent, RESULT_AUDIO);
+                        startActivityForResult(intent, RESULT_AUDIO);
+                    } catch (IOException e) {
+                        SurveyorApplication.LOG.e("Unable to create temp media", e);
+                    }
                 }
             }
 
@@ -356,15 +367,15 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         }
     }
 
-    private File getCameraOutput() {
+    private File getCameraOutput() throws IOException {
         return new File(getSurveyor().getStorageDirectory(), "camera.jpg");
     }
 
-    private File getVideoOutput() {
+    private File getVideoOutput() throws IOException {
         return new File(getSurveyor().getStorageDirectory(), "video.mp4");
     }
 
-    private File getAudioOutput() {
+    private File getAudioOutput() throws IOException {
         return new File(getSurveyor().getStorageDirectory(), "audio.m4a");
     }
 
@@ -379,17 +390,16 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
 
         MsgIn msg = null;
 
-        if (requestCode == RESULT_IMAGE) {
-            File output = getCameraOutput();
-            if (output.exists()) {
+        try {
+            if (requestCode == RESULT_IMAGE) {
+                File output = getCameraOutput();
+                if (output.exists()) {
+                    Bitmap full = BitmapFactory.decodeFile(output.getAbsolutePath());
+                    Bitmap scaled = ImageUtils.scaleToMax(full, 1024);
+                    Bitmap thumb = ImageUtils.scaleToMax(scaled, 600);
 
-                Bitmap full = BitmapFactory.decodeFile(output.getAbsolutePath());
-                Bitmap scaled = ImageUtils.scaleToMax(full, 1024);
-                Bitmap thumb = ImageUtils.scaleToMax(scaled, 600);
+                    byte[] asJpg = ImageUtils.convertToJPEG(scaled);
 
-                byte[] asJpg = ImageUtils.convertToJPEG(scaled);
-
-                try {
                     Uri uri = submission.saveMedia(asJpg, "jpg");
 
                     addMedia(thumb, uri.toString(), R.string.media_image);
@@ -397,19 +407,14 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
                     SurveyorApplication.LOG.d("Saved image capture to " + uri);
 
                     msg = Engine.createMsgIn("", "image/jpeg:" + uri);
-                } catch (IOException e) {
-                    handleProblem("Unable capture image", e);
+
+                    output.delete();
                 }
+            } else if (requestCode == RESULT_VIDEO) {
+                File output = getVideoOutput();
+                if (output.exists()) {
+                    Bitmap thumb = ThumbnailUtils.createVideoThumbnail(output.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND);
 
-                output.delete();
-            }
-        } else if (requestCode == RESULT_VIDEO) {
-            File output = getVideoOutput();
-            if (output.exists()) {
-
-                Bitmap thumb = ThumbnailUtils.createVideoThumbnail(output.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND);
-
-                try {
                     Uri uri = submission.saveMedia(output);
 
                     addMedia(thumb, uri.toString(), R.string.media_video);
@@ -417,30 +422,25 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
                     SurveyorApplication.LOG.d("Saved video capture to " + uri);
 
                     msg = Engine.createMsgIn("", "video/mp4:" + uri);
-                } catch (IOException e) {
-                    handleProblem("Unable capture video", e);
+
+                    output.delete();
                 }
 
-                output.delete();
-            }
-
-        } else if (requestCode == RESULT_AUDIO) {
-            File output = getAudioOutput();
-            if (output.exists()) {
-
-                try {
+            } else if (requestCode == RESULT_AUDIO) {
+                File output = getAudioOutput();
+                if (output.exists()) {
                     Uri uri = submission.saveMedia(output);
                     SurveyorApplication.LOG.d("Saved audio capture to " + uri);
 
                     addMediaLink(getString(R.string.made_recording), uri.toString(), R.string.media_audio);
 
                     msg = Engine.createMsgIn("", "audio/m4a:" + uri);
-                } catch (IOException e) {
-                    handleProblem("Unable capture audio", e);
-                }
 
-                output.delete();
+                    output.delete();
+                }
             }
+        } catch (IOException e) {
+            handleProblem("Unable capture media", e);
         }
 
         // if we have a message we can try to resume now...

@@ -105,7 +105,7 @@ public class Submission {
         }
     }
 
-    private File getMediaDirectory() {
+    private File getMediaDirectory() throws IOException {
         return SurveyUtils.mkdir(directory, MEDIA_DIR);
     }
 }

@@ -1,5 +1,6 @@
 package io.rapidpro.surveyor.test;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -7,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorPreferences;
 import okhttp3.mockwebserver.MockResponse;
@@ -28,6 +31,12 @@ import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
 public abstract class BaseApplicationTest {
 
     protected MockWebServer mockServer;
+
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    );
 
     @Before
     public void startMockServer() throws IOException {
@@ -62,9 +71,9 @@ public abstract class BaseApplicationTest {
      * Clears the file system after each test
      */
     @After
-    public void clearFiles() {
-        FileUtils.deleteQuietly(getSurveyor().getOrgsDirectory());
-        FileUtils.deleteQuietly(getSurveyor().getStorageDirectory());
+    public void clearFiles() throws IOException {
+        FileUtils.deleteDirectory(getSurveyor().getOrgsDirectory());
+        FileUtils.deleteDirectory(getSurveyor().getStorageDirectory());
     }
 
     protected SurveyorApplication getSurveyor() {

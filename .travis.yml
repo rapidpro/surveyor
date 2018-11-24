@@ -1,28 +1,35 @@
 language: android
-
-env:
-  global:
-    - ANDROID_TARGET=android-22
-    - ANDROID_ABI=armeabi-v7a
+jdk: oraclejdk8
 
 android:
   components:
-    - tools
     - platform-tools
     - tools
-    - build-tools-28.0.3
+    - android-24
     - android-26
-    - ${ANDROID_TARGET}
-    - extra
+    - android-27
+    - build-tools-28.0.3
+    - extra-google-m2repository
     - extra-android-m2repository
-    - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
+    - sys-img-armeabi-v7a-android-24
+  licenses:
+    - android-sdk-license-.+
+    - '.+'
+
+before_install:
+  - yes | sdkmanager "platforms;android-24"
+  - yes | sdkmanager "platforms;android-27"
+
+before_script:
+  - android list targets
+  - echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
+  - QEMU_AUDIO_DRV=none emulator -avd test -no-window &
+  - android-wait-for-emulator
+  - adb shell setprop dalvik.vm.dexopt-flags v=n,o=v
+  - adb shell input keyevent 82 &
 
 script:
   - ./gradlew build jacocoTestReport assembleAndroidTest
-  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
-  - emulator -avd test -no-audio -no-window -skin 768x1280 &
-  - android-wait-for-emulator
-  - adb shell setprop dalvik.vm.dexopt-flags v=n,o=v
   - ./gradlew connectedCheck
 
 after_success:
