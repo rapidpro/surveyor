@@ -72,7 +72,7 @@ public class CreateAccountActivity extends BaseActivity {
 
     protected void fetchOrgAndLogin(final String email, final Token token) {
 
-        new FetchOrgsTask(new FetchOrgsTask.FetchOrgsListener() {
+        new FetchOrgsTask(new FetchOrgsTask.Listener() {
             @Override
             public void onComplete(Set<String> orgUUIDs) {
                 login(email, orgUUIDs);

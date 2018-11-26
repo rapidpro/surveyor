@@ -15,10 +15,10 @@ import io.rapidpro.surveyor.net.responses.Token;
  */
 public class FetchOrgsTask extends AsyncTask<Token, Void, Set<String>> {
 
-    private FetchOrgsListener listener;
+    private Listener listener;
     private boolean failed;
 
-    public FetchOrgsTask(FetchOrgsListener listener) {
+    public FetchOrgsTask(Listener listener) {
         this.listener = listener;
     }
 
@@ -53,7 +53,7 @@ public class FetchOrgsTask extends AsyncTask<Token, Void, Set<String>> {
         }
     }
 
-    public interface FetchOrgsListener {
+    public interface Listener {
         void onComplete(Set<String> orgUUIDs);
         void onFailure();
     }

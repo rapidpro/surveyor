@@ -2,37 +2,30 @@ package io.rapidpro.surveyor.task;
 
 import android.os.AsyncTask;
 
-import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.data.Submission;
 
 /**
- * Task to completely refresh a single org - details and assets
+ * Task for sending submissions to the server
  */
-public class RefreshOrgTask extends AsyncTask<Org, Integer, Void> {
+public class SubmitSubmissionsTask extends AsyncTask<Submission, Integer, Void> {
 
     private Listener listener;
     private boolean failed;
 
-    public RefreshOrgTask(Listener listener) {
+    public SubmitSubmissionsTask(Listener listener) {
         this.listener = listener;
     }
 
     @Override
-    protected Void doInBackground(Org... args) {
-        Org org = args[0];
+    protected Void doInBackground(Submission... submissions) {
+        int s = 0;
+        for (Submission submission : submissions) {
 
-        try {
-            org.refresh(true, new Org.RefreshProgress() {
-                @Override
-                public void reportProgress(int percent) {
-                    publishProgress(percent);
-                }
-            });
+            // TODO
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            this.failed = true;
+            s++;
+            publishProgress(100 * s / submissions.length);
         }
-
         return null;
     }
 

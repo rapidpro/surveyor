@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -214,7 +212,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     protected void fetchOrgsAndLogin(final String email, final List<Token> tokens) {
-        new FetchOrgsTask(new FetchOrgsTask.FetchOrgsListener() {
+        new FetchOrgsTask(new FetchOrgsTask.Listener() {
             @Override
             public void onComplete(Set<String> orgUUIDs) {
                 login(email, orgUUIDs);

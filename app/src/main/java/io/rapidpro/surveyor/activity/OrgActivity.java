@@ -128,7 +128,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
         final BlockingProgress progressModal = new BlockingProgress(OrgActivity.this, R.string.one_moment, R.string.refresh_org, 3);
         progressModal.show();
 
-        new RefreshOrgTask(new RefreshOrgTask.RefreshOrgListener() {
+        new RefreshOrgTask(new RefreshOrgTask.Listener() {
             @Override
             public void onProgress(int percent) {
                 progressModal.setProgress(percent);
@@ -151,13 +151,11 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
     }
 
     public void onClickSubmit(View view) {
-        SurveyorApplication.LOG.d("Clicked on submit..");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirm_send_all_submissions))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-
                         // TODO
                         /* final File[] submissions = Submission.getPendingSubmissions(getDBOrg().getId());
 
@@ -165,7 +163,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
                                 R.string.submit_title, R.string.submit_body, submissions.length);
                         progress.show();
 
-                        new SubmitSubmissions(OrgActivity.this, submissions, progress).execute();*/
+                        new SubmitSubmissionsTask(OrgActivity.this, submissions, progress).execute();*/
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
