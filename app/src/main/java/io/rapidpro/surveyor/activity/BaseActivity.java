@@ -203,7 +203,7 @@ public abstract class BaseActivity extends PermisoActivity {
 
         ShareCompat.IntentBuilder.from(this)
                 .setType("message/rfc822")
-                .addEmailTo("support@rapidpro.io")
+                .addEmailTo(getString(R.string.support_email))
                 .setSubject("SurveyorApplication Bug Report")
                 .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
                 .setStream(outputUri)

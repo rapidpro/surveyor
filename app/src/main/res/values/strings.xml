@@ -845,6 +845,7 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="pref_default_host">https://app.rapidpro.io</string>
+    <string name="support_email">support@rapidpro.io</string>
     <string name="pref_title_rapidpro_host">RapidPro Host</string>
     <string name="pref_summary_rapidpro_host">The address for your RapidPro installation</string>
     <string name="download_blurb">Download a Flow to run it later without a network connection.</string>

@@ -9,6 +9,9 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,10 +36,14 @@ public abstract class BaseApplicationTest {
     protected MockWebServer mockServer;
 
     @Rule
-    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    );
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+    @Rule
+    public TestRule logger = new TestWatcher() {
+        protected void starting(Description description) {
+            SurveyorApplication.LOG.d("========= Starting test: " + description.getClassName() + "#" + description.getMethodName() + " =========");
+        }
+    };
 
     @Before
     public void startMockServer() throws IOException {

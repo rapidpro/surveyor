@@ -24,6 +24,16 @@ android {
             testCoverageEnabled true
         }
     }
+    flavorDimensions 'version'
+    productFlavors {
+        rapidpro {
+            dimension 'version'
+        }
+        "$thirdparty.applicationId" {
+            dimension 'version'
+            applicationId thirdparty.applicationId
+        }
+    }
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
