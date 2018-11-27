@@ -52,7 +52,7 @@ public class EngineTest extends BaseApplicationTest {
         final String FLOW_UUID = "14ca824e-6607-4c11-82f5-18e298d0bd58";
 
         installOrg(ORG_UUID, R.raw.org1_details, R.raw.org1_flows, R.raw.org1_assets);
-        OrgService svc = new OrgService(getSurveyor().getOrgsDirectory(), SurveyorApplication.LOG);
+        OrgService svc = getSurveyor().getOrgService();
         Org org = svc.get(ORG_UUID);
 
         String assetsJson = readRawResource(R.raw.org1_assets);

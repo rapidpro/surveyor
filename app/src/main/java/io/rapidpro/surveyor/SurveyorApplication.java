@@ -193,7 +193,7 @@ public class SurveyorApplication extends Application {
      *
      * @return the directory
      */
-    private File getSubmissionsDirectory() throws IOException {
+    protected File getSubmissionsDirectory() throws IOException {
         return SurveyUtils.mkdir(getStorageDirectory(), "submissions");
     }
 

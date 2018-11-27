@@ -19,6 +19,7 @@ import com.greysonparrelli.permiso.Permiso;
 import com.greysonparrelli.permiso.PermisoActivity;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -192,23 +193,25 @@ public abstract class BaseActivity extends PermisoActivity {
         SurveyorApplication.LOG.d(info.toString());
 
         // generate a dump file
-        File outputFile = new File(Environment.getExternalStorageDirectory(), "surveyor-debug.txt");
         try {
+            File outputFile = new File(getSurveyor().getStorageDirectory(), "bug-report.txt");
+
             Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E SurveyorApplication:*\" ");
-        } catch (Throwable t) {
-            SurveyorApplication.LOG.e("Failed to generate report", t);
+
+            Uri outputUri = getSurveyor().getUriForFile(outputFile);
+
+            ShareCompat.IntentBuilder.from(this)
+                    .setType("message/rfc822")
+                    .addEmailTo(getString(R.string.support_email))
+                    .setSubject("SurveyorApplication Bug Report")
+                    .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
+                    .setStream(outputUri)
+                    .setChooserTitle("Send Email")
+                    .startChooser();
+
+        } catch (IOException e) {
+            SurveyorApplication.LOG.e("Failed to generate report", e);
         }
-
-        Uri outputUri = getSurveyor().getUriForFile(outputFile);
-
-        ShareCompat.IntentBuilder.from(this)
-                .setType("message/rfc822")
-                .addEmailTo(getString(R.string.support_email))
-                .setSubject("SurveyorApplication Bug Report")
-                .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
-                .setStream(outputUri)
-                .setChooserTitle("Send Email")
-                .startChooser();
     }
 
     public ViewCache getViewCache() {

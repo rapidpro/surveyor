@@ -28,7 +28,7 @@ public class SubmissionServiceTest extends BaseApplicationTest {
         svc.newSubmission(org, flow1);
         svc.newSubmission(org, flow2);
 
-        File submissionsDir = new File(getSurveyor().getStorageDirectory(), "submissions");
+        File submissionsDir = new File(getSurveyor().getStorageDirectory(), "test_submissions");
         assertThat(submissionsDir.exists(), is(true));
 
         File orgDir = new File(submissionsDir, ORG_UUID);

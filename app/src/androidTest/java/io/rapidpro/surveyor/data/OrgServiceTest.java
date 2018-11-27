@@ -25,7 +25,7 @@ public class OrgServiceTest extends BaseApplicationTest {
         // install an org without downloaded assets
         installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, 0, 0);
 
-        OrgService svc = new OrgService(getSurveyor().getOrgsDirectory(), SurveyorApplication.LOG);
+        OrgService svc = getSurveyor().getOrgService();
 
         // load single org by UUID
         Org org = svc.get(ORG_UUID);

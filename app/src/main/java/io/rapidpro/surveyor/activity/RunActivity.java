@@ -1,6 +1,7 @@
 package io.rapidpro.surveyor.activity;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -225,8 +226,11 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.areAllPermissionsGranted()) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    ComponentName cameraPkg = intent.resolveActivity(getPackageManager());
 
-                    if (intent.resolveActivity(getPackageManager()) == null) {
+                    SurveyorApplication.LOG.d("Camera package is " + cameraPkg.toString());
+
+                    if (cameraPkg == null) {
                         handleProblem("Can't find camera device", null);
                         return;
                     }

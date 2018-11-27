@@ -168,7 +168,7 @@ public class RunActivityTest extends BaseApplicationTest {
         final int audioResId = io.rapidpro.surveyor.test.R.raw.capture_audio;
         final Context context = getInstrumentation().getContext();
 
-        intending(toPackage("com.android.camera2")).respondWithFunction(new ActivityResultFunction() {
+        ActivityResultFunction mockCamera = new ActivityResultFunction() {
             @Override
             public Instrumentation.ActivityResult apply(Intent intent) {
                 // create a bitmap we can use for our simulated camera image
@@ -188,7 +188,10 @@ public class RunActivityTest extends BaseApplicationTest {
                 resultData.putExtra("data", bmp);
                 return new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
             }
-        });
+        };
+
+        intending(toPackage("com.android.camera")).respondWithFunction(mockCamera);
+        intending(toPackage("com.android.camera2")).respondWithFunction(mockCamera);
 
         intending(hasComponent(VideoCaptureActivity.class.getName())).respondWithFunction(new ActivityResultFunction() {
             @Override
