@@ -114,7 +114,7 @@ public class Engine {
     /**
      * Creates a new incoming message
      *
-     * @param text        the message text
+     * @param text the message text
      * @return the message
      */
     public static MsgIn createMsgIn(String text) {

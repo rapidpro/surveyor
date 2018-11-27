@@ -12,6 +12,7 @@ public class TokenResults {
 
     /**
      * Gets the tokens as a simple array of token strings
+     *
      * @return the array of tokens
      */
     public String[] toRawTokens() {

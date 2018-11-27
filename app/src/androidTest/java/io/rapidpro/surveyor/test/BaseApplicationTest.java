@@ -65,22 +65,18 @@ public abstract class BaseApplicationTest {
     }
 
     /**
-     * Clears all shared preferences after each test
+     * Clears the preferences and file system after each test
      */
     @After
-    public void clearPreferences() {
+    public void clearData() throws IOException {
         SharedPreferences.Editor editor = getSurveyor().getPreferences().edit();
         editor.clear();
         editor.apply();
-    }
 
-    /**
-     * Clears the file system after each test
-     */
-    @After
-    public void clearFiles() throws IOException {
         FileUtils.deleteDirectory(getSurveyor().getOrgsDirectory());
         FileUtils.deleteDirectory(getSurveyor().getStorageDirectory());
+
+        getSurveyor().getOrgService().clearCache();
     }
 
     protected SurveyorApplication getSurveyor() {

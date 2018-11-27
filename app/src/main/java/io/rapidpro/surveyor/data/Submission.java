@@ -105,6 +105,14 @@ public class Submission {
         }
     }
 
+    public void submit() {
+        // TODO upload media
+
+        // TODO send events
+
+        delete();
+    }
+
     private File getMediaDirectory() throws IOException {
         return SurveyUtils.mkdir(directory, MEDIA_DIR);
     }

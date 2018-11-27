@@ -23,7 +23,7 @@
             android:background="@drawable/tertiary_button"
             android:minWidth="80dp"
             android:minHeight="0dp"
-            android:onClick="onClickSubmit"
+            android:onClick="onActionSubmit"
             android:text="3,122"
             android:textColor="@color/pending_button_text"
             android:textSize="18dp"

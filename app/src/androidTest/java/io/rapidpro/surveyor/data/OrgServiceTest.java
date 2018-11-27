@@ -20,6 +20,12 @@ import static org.junit.Assert.assertThat;
 public class OrgServiceTest extends BaseApplicationTest {
     private static final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
 
+    @Test(expected = RuntimeException.class)
+    public void get_throwsExceptionIfOrgNotExist() throws IOException {
+        OrgService svc = getSurveyor().getOrgService();
+        svc.get("b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06");
+    }
+
     @Test
     public void get() throws IOException {
         // install an org without downloaded assets
@@ -59,7 +65,7 @@ public class OrgServiceTest extends BaseApplicationTest {
     public void getOrFetch() throws IOException, TembaException {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_org_get, "application/json", 200);
 
-        OrgService svc = new OrgService(getSurveyor().getOrgsDirectory(), SurveyorApplication.LOG);
+        OrgService svc = getSurveyor().getOrgService();
 
         Org org = svc.getOrFetch(ORG_UUID, "Nyaruka", "67537873784848322fghsaf3g");
         assertThat(org.getUuid(), is("b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06"));

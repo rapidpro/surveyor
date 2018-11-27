@@ -9,7 +9,8 @@ import java.io.IOException;
 public class SurveyUtils {
     /**
      * Creates a nested directory
-     * @param root the root directory
+     *
+     * @param root    the root directory
      * @param folders the nested directory names
      * @return the directory
      * @throws IOException if any directory couldn't be created

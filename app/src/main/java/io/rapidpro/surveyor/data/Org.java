@@ -59,8 +59,9 @@ public class Org {
 
     /**
      * Creates an new empty org
+     *
      * @param directory the directory
-     * @param token the API token
+     * @param token     the API token
      * @return the org
      */
     public static Org create(File directory, String name, String token) throws IOException {
@@ -84,7 +85,7 @@ public class Org {
      * @return the org
      */
     static Org load(File directory) throws IOException {
-        if (!directory.exists() || !directory.isDirectory()){
+        if (!directory.exists() || !directory.isDirectory()) {
             throw new RuntimeException(directory.getPath() + " is not a valid org directory");
         }
 
@@ -96,7 +97,8 @@ public class Org {
         // read flows.json
         String flowsJson = FileUtils.readFileToString(new File(directory, FLOWS_FILE));
 
-        TypeToken type = new TypeToken<List<Flow>>() {};
+        TypeToken type = new TypeToken<List<Flow>>() {
+        };
         org.flows = JsonUtils.unmarshal(flowsJson, type);
         return org;
     }

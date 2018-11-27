@@ -8,6 +8,9 @@ import java.util.Map;
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.net.TembaException;
 
+/**
+ * Directory based service for org configurations
+ */
 public class OrgService {
 
     private File rootDir;
@@ -18,6 +21,8 @@ public class OrgService {
     public OrgService(File rootDir, Logger log) {
         this.rootDir = rootDir;
         this.log = log;
+
+        log.d("OrgService created for directory " + this.rootDir.getAbsolutePath());
     }
 
     public Org get(String uuid) throws IOException {
@@ -36,8 +41,8 @@ public class OrgService {
     /**
      * Fetches an org using the given API token and saves it to the org storage
      *
-     * @param uuid the UUID of the org
-     * @param name the name of the org
+     * @param uuid  the UUID of the org
+     * @param name  the name of the org
      * @param token the API token
      */
     public Org getOrFetch(String uuid, String name, String token) throws TembaException, IOException {

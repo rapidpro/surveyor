@@ -55,6 +55,7 @@ public class FetchOrgsTask extends AsyncTask<Token, Void, Set<String>> {
 
     public interface Listener {
         void onComplete(Set<String> orgUUIDs);
+
         void onFailure();
     }
 }

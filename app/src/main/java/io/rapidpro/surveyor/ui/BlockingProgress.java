@@ -8,16 +8,16 @@ import android.content.Context;
  */
 public class BlockingProgress extends ProgressDialog {
 
-    public BlockingProgress(Context context, int title, int message, int total) {
+    public BlockingProgress(Context context, int title, int message) {
         super(context);
 
         setTitle(title);
         setMessage(getContext().getString(message));
         setIndeterminate(false);
-        setMax(total);
         setCancelable(false);
         setCanceledOnTouchOutside(false);
         setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         setProgress(0);
+        setMax(100);
     }
 }

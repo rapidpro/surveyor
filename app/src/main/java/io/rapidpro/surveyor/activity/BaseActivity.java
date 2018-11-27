@@ -7,9 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.ShareCompat;
-import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +19,6 @@ import com.greysonparrelli.permiso.PermisoActivity;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import io.rapidpro.surveyor.BuildConfig;
@@ -29,7 +26,6 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.SurveyorPreferences;
-import io.rapidpro.surveyor.task.FetchOrgsTask;
 import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
@@ -42,6 +38,7 @@ public abstract class BaseActivity extends PermisoActivity {
 
     /**
      * Gets the instance of the application
+     *
      * @return the application
      */
     public SurveyorApplication getSurveyor() {

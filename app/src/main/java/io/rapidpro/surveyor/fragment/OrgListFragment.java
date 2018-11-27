@@ -11,7 +11,6 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import java.io.IOException;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
@@ -73,6 +72,7 @@ public class OrgListFragment extends Fragment implements AbsListView.OnItemClick
      */
     public interface Container {
         List<Org> getListItems();
+
         void onItemClick(Org org);
     }
 }

@@ -8,18 +8,20 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import java.text.NumberFormat;
+import java.util.List;
 
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
-import io.rapidpro.surveyor.ui.ViewCache;
+import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.engine.Engine;
+import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
  * Home screen for a flow - shows start button and pending submissions
  */
-public class FlowActivity extends BaseActivity {
+public class FlowActivity extends BaseSubmissionsActivity {
 
     private Org org;
     private Flow flow;
@@ -38,7 +40,7 @@ public class FlowActivity extends BaseActivity {
         refresh();
     }
 
-    public void refresh() {
+    protected void refresh() {
         String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
         String flowUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_FLOW_UUID);
 
@@ -100,7 +102,11 @@ public class FlowActivity extends BaseActivity {
         }
     }
 
-    public void onActionSubmit(View view) {
-        // TODO
+    /**
+     * @see BaseSubmissionsActivity#getPendingSubmissions()
+     */
+    @Override
+    protected List<Submission> getPendingSubmissions() {
+        return getSurveyor().getSubmissionService().getPending(org, flow);
     }
 }

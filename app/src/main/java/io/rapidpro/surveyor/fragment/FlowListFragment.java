@@ -74,7 +74,9 @@ public class FlowListFragment extends Fragment implements AbsListView.OnItemClic
      */
     public interface Container {
         Org getOrg();
+
         List<Flow> getListItems();
+
         void onItemClick(Flow flow);
     }
 }

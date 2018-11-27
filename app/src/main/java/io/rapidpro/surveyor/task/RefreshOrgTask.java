@@ -62,7 +62,9 @@ public class RefreshOrgTask extends AsyncTask<Org, Integer, Void> {
 
     public interface Listener {
         void onProgress(int percent);
+
         void onComplete();
+
         void onFailure();
     }
 }

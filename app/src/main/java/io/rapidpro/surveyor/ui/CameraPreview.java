@@ -1,7 +1,5 @@
 package io.rapidpro.surveyor.ui;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
@@ -13,6 +11,8 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+
+import java.io.IOException;
 
 import io.rapidpro.surveyor.SurveyorApplication;
 

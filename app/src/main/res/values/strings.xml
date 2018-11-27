@@ -23,9 +23,12 @@
     <string name="confirm_org_refresh">Refresh all flows for this organization?</string>
     <string name="confirm_bug_report">Oops, it looks like Surveyor is having difficulty. Would you like to send a bug report so we can look into it?</string>
     <string name="confirm_submission_discard">Are you sure you want to discard the data collected?</string>
+    <string name="confirm_send_submissions">Are you sure you want to send submissions to the server?</string>
 
     <!-- error messages -->
     <string name="error_org_missing">Org couldn\'t be found</string>
+    <string name="error_org_refresh">A problem occurred whilst refreshing this org. Please try again later.</string>
+    <string name="error_submissions_send">A problem occurred whilst sending submissions to the server. Please try again later.</string>
 
     <!-- chat log messages -->
     <string name="log_flow_complete">Flow complete</string>
@@ -41,6 +44,11 @@
     <string name="permission_record">We need permission to record audio to in order to collect audio recordings.</string>
     <string name="permission_location">We need permission to access your location in order to collect GPS data.</string>
     <string name="permission_contacts">Surveyor can access your contacts to help you fill out the login form. This permission is not required.</string>
+
+    <plurals name="submissions_sent">
+        <item quantity="one">%d submission sent</item>
+        <item quantity="other">%d submissions sent</item>
+    </plurals>
 
     <!-- miscellaneous -->
     <string name="token">token</string>
@@ -855,10 +863,7 @@
     <string name="prompt_contact_name">Contact Name</string>
     <string name="action_start_flow">Start Flow</string>
     <string name="prompt_phone">Phone Number</string>
-    <string name="confirm_send_submissions">Are you sure you want to send all pending submissions for this flow?</string>
-    <string name="confirm_send_all_submissions">Are you sure you want to send all pending submissions?</string>
     <string name="error_no_orgs">Sorry, your account doesn\'t have access to submit surveys. Check with your system administrator.</string>
-    <string name="submit_title">Submit</string>
     <string name="submit_body">Submitting flow runs to the server.</string>
     <string name="error_server_not_found">Server is unavailable. Please check your settings or try again later.</string>
     <string name="error_server_failure">Server error, please try again later.</string>
@@ -870,7 +875,6 @@
     <string name="refresh_title">Refresh</string>
     <string name="confirm_flow_refresh">Are you sure you want to refresh the flow definition? This will overwrite the existing version and cannot be undone.</string>
     <string name="refresh_flow">Refreshing flow definition.</string>
-    <string name="error_org_refresh">A problem occurred whilst refreshing this org. Please try again later.</string>
     <string name="action_delete">Delete</string>
     <string name="flow_delete_warning">Delete this flow and all existing submissions.</string>
     <string name="action_submit">Submit</string>

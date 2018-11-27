@@ -8,18 +8,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import java.text.NumberFormat;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
 import io.rapidpro.surveyor.task.RefreshOrgTask;
 import io.rapidpro.surveyor.ui.BlockingProgress;
@@ -28,7 +27,7 @@ import io.rapidpro.surveyor.ui.ViewCache;
 /**
  * Home screen for an org - shows available flows and pending submissions
  */
-public class OrgActivity extends BaseActivity implements FlowListFragment.Container {
+public class OrgActivity extends BaseSubmissionsActivity implements FlowListFragment.Container {
 
     public Org getOrg() {
         String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
@@ -76,7 +75,7 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
         refresh();
     }
 
-    private void refresh() {
+    protected void refresh() {
         FlowListAdapter adapter = (FlowListAdapter) getViewCache().getListViewAdapter(android.R.id.list);
         if (adapter != null) {
             adapter.notifyDataSetChanged();
@@ -124,8 +123,8 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
                 .show();
     }
 
-    protected void doRefresh() {
-        final BlockingProgress progressModal = new BlockingProgress(OrgActivity.this, R.string.one_moment, R.string.refresh_org, 3);
+    private void doRefresh() {
+        final BlockingProgress progressModal = new BlockingProgress(OrgActivity.this, R.string.one_moment, R.string.refresh_org);
         progressModal.show();
 
         new RefreshOrgTask(new RefreshOrgTask.Listener() {
@@ -150,29 +149,12 @@ public class OrgActivity extends BaseActivity implements FlowListFragment.Contai
         }).execute(getOrg());
     }
 
-    public void onClickSubmit(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.confirm_send_all_submissions))
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // TODO
-                        /* final File[] submissions = Submission.getPendingSubmissions(getDBOrg().getId());
-
-                        final BlockingProgress progress = new BlockingProgress(OrgActivity.this,
-                                R.string.submit_title, R.string.submit_body, submissions.length);
-                        progress.show();
-
-                        new SubmitSubmissionsTask(OrgActivity.this, submissions, progress).execute();*/
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
-                .show();
+    /**
+     * @see BaseSubmissionsActivity#getPendingSubmissions()
+     */
+    @Override
+    protected List<Submission> getPendingSubmissions() {
+        return getSurveyor().getSubmissionService().getPending(getOrg());
     }
 
     /**

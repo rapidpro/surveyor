@@ -66,6 +66,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private SurveyorApplication getSurveyor() {
-       return ((BaseActivity) getActivity()).getSurveyor();
+        return ((BaseActivity) getActivity()).getSurveyor();
     }
 }

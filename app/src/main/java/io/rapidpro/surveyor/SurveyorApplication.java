@@ -54,7 +54,7 @@ public class SurveyorApplication extends Application {
 
     @Override
     public void onCreate() {
-        LOG.d("SurveyorApplication.onCreate");
+        LOG.d("Creating Surveyor application...");
 
         super.onCreate();
 

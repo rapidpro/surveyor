@@ -29,7 +29,7 @@ public class Session {
      * Reads an existing session from JSON
      *
      * @param assets the session assets
-     * @param json the JSON
+     * @param json   the JSON
      */
     public static Session fromJson(SessionAssets assets, String json) throws EngineException {
         try {

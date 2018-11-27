@@ -20,8 +20,7 @@ public class SubmitSubmissionsTask extends AsyncTask<Submission, Integer, Void> 
     protected Void doInBackground(Submission... submissions) {
         int s = 0;
         for (Submission submission : submissions) {
-
-            // TODO
+            submission.submit();
 
             s++;
             publishProgress(100 * s / submissions.length);
@@ -55,7 +54,9 @@ public class SubmitSubmissionsTask extends AsyncTask<Submission, Integer, Void> 
 
     public interface Listener {
         void onProgress(int percent);
+
         void onComplete();
+
         void onFailure();
     }
 }
