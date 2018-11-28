@@ -45,7 +45,7 @@ public class SubmissionService {
 
         log.d("Creating new submission in " + directory.getPath());
 
-        return new Submission(directory);
+        return new Submission(org, directory);
     }
 
     /**
@@ -75,7 +75,7 @@ public class SubmissionService {
         File flowDir = new File(orgDir, flow.getUuid());
         if (flowDir.exists()) {
             for (File file : flowDir.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY)) {
-                pending.add(new Submission(flowDir));
+                pending.add(new Submission(org, file));
             }
         }
         return pending;

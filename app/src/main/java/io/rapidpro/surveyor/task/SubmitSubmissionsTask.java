@@ -2,7 +2,11 @@ package io.rapidpro.surveyor.task;
 
 import android.os.AsyncTask;
 
+import java.io.IOException;
+
 import io.rapidpro.surveyor.data.Submission;
+import io.rapidpro.surveyor.net.TembaException;
+import io.rapidpro.surveyor.net.TembaService;
 
 /**
  * Task for sending submissions to the server
@@ -10,7 +14,7 @@ import io.rapidpro.surveyor.data.Submission;
 public class SubmitSubmissionsTask extends AsyncTask<Submission, Integer, Void> {
 
     private Listener listener;
-    private boolean failed;
+    private int numFailed = 0;
 
     public SubmitSubmissionsTask(Listener listener) {
         this.listener = listener;
@@ -20,7 +24,12 @@ public class SubmitSubmissionsTask extends AsyncTask<Submission, Integer, Void> 
     protected Void doInBackground(Submission... submissions) {
         int s = 0;
         for (Submission submission : submissions) {
-            submission.submit();
+            try {
+                submission.submit();
+            } catch (IOException | TembaException e) {
+                e.printStackTrace();
+                numFailed++;
+            }
 
             s++;
             publishProgress(100 * s / submissions.length);
@@ -45,8 +54,8 @@ public class SubmitSubmissionsTask extends AsyncTask<Submission, Integer, Void> 
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
 
-        if (this.failed) {
-            this.listener.onFailure();
+        if (numFailed > 0) {
+            this.listener.onFailure(numFailed);
         } else {
             this.listener.onComplete();
         }
@@ -57,6 +66,6 @@ public class SubmitSubmissionsTask extends AsyncTask<Submission, Integer, Void> 
 
         void onComplete();
 
-        void onFailure();
+        void onFailure(int numFailed);
     }
 }

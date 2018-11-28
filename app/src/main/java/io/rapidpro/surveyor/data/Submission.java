@@ -6,17 +6,25 @@ import com.nyaruka.goflow.mobile.Event;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.engine.EngineException;
 import io.rapidpro.surveyor.engine.Session;
+import io.rapidpro.surveyor.net.TembaException;
+import io.rapidpro.surveyor.net.requests.SessionAndEvents;
+import io.rapidpro.surveyor.utils.RawJson;
 import io.rapidpro.surveyor.utils.SurveyUtils;
 
 public class Submission {
@@ -25,9 +33,17 @@ public class Submission {
     private static final String EVENTS_FILE = "events.jsonl";
     private static final String MEDIA_DIR = "media";
 
+    private transient Org org;
     private transient File directory;
 
-    public Submission(File directory) {
+    /**
+     * Creates a new submission for the given org in the given directory
+     *
+     * @param org       the org
+     * @param directory the directory
+     */
+    public Submission(Org org, File directory) {
+        this.org = org;
         this.directory = directory;
     }
 
@@ -38,6 +54,24 @@ public class Submission {
      */
     public String getUuid() {
         return directory.getName();
+    }
+
+    /**
+     * Gets the org this submission belongs to
+     *
+     * @return the org
+     */
+    public Org getOrg() {
+        return org;
+    }
+
+    /**
+     * Get's the directory this submission is stored in
+     *
+     * @return the directory
+     */
+    public File getDirectory() {
+        return directory;
     }
 
     /**
@@ -105,12 +139,63 @@ public class Submission {
         }
     }
 
-    public void submit() {
-        // TODO upload media
+    public void submit() throws IOException, TembaException {
+        SurveyorApplication.LOG.d("Submitting submission " + getUuid() + "...");
 
-        // TODO send events
+        String session = FileUtils.readFileToString(new File(directory, SESSION_FILE));
+        List<String> events = FileUtils.readLines(new File(directory, EVENTS_FILE));
+
+        // upload all media and get a new remote URL for each item
+        Map<Uri, String> mediaUrls = uploadMedia();
+
+        // convert the map to parallel arrays of strings for replacement
+        String[] oldUris = new String[mediaUrls.size()];
+        String[] newUrls = new String[mediaUrls.size()];
+        int e = 0;
+        for (Map.Entry<Uri, String> entry : mediaUrls.entrySet()) {
+            oldUris[e] = entry.getKey().toString();
+            newUrls[e] = entry.getValue();
+        }
+
+        RawJson sessionJson = new RawJson(StringUtils.replaceEach(session, oldUris, newUrls));
+        List<RawJson> eventsJson = new ArrayList<>(events.size());
+        for (String event : events) {
+            eventsJson.add(new RawJson(StringUtils.replaceEach(event, oldUris, newUrls)));
+        }
+
+        SessionAndEvents payload = new SessionAndEvents(sessionJson, eventsJson);
+
+        SurveyorApplication.get().getTembaService().submitSession(org.getToken(), payload);
 
         delete();
+    }
+
+    /**
+     * Upload all media files for this submission and return a map of their new URLs
+     *
+     * @return the map of local URIs to remote URLs
+     */
+    private Map<Uri, String> uploadMedia() throws IOException, TembaException {
+        if (hasMedia()) {
+            return Collections.emptyMap();
+        }
+
+        SurveyorApplication app = SurveyorApplication.get();
+        Map<Uri, String> uploads = new HashMap<>();
+
+        for (File mediaFile : getMediaDirectory().listFiles()) {
+            Uri mediaUri = app.getUriForFile(mediaFile);
+            String newUrl = app.getTembaService().uploadMedia(org.getToken(), mediaUri);
+
+            uploads.put(mediaUri, newUrl);
+
+            SurveyorApplication.LOG.d("Uploaded media " + mediaUri + " to " + newUrl);
+        }
+        return uploads;
+    }
+
+    private boolean hasMedia() {
+        return new File(directory, MEDIA_DIR).exists();
     }
 
     private File getMediaDirectory() throws IOException {

@@ -12,6 +12,10 @@ import java.util.Collections;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.data.Submission;
+import io.rapidpro.surveyor.data.SubmissionService;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -96,5 +100,25 @@ public class OrgActivityTest extends BaseApplicationTest {
                         hasExtra(SurveyorIntent.EXTRA_FLOW_UUID, "14ca824e-6607-4c11-82f5-18e298d0bd58")
                 )
         );
+    }
+
+    @Test
+    public void showSubmitIfHasSubmissions() throws IOException {
+        installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows, io.rapidpro.surveyor.test.R.raw.org1_assets);
+
+        Org org = getSurveyor().getOrgService().get(ORG_UUID);
+        Flow flow1 = org.getFlow("14ca824e-6607-4c11-82f5-18e298d0bd58");
+
+        SubmissionService svc = getSurveyor().getSubmissionService();
+        svc.newSubmission(org, flow1);
+        svc.newSubmission(org, flow1);
+
+        Intent intent = new Intent();
+        intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, ORG_UUID);
+
+        rule.launchActivity(intent);
+
+        onView(withId(R.id.container_pending)).check(matches(isDisplayed()));
+        onView(withId(R.id.button_pending)).check(matches(withText("2")));
     }
 }

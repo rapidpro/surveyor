@@ -1,6 +1,5 @@
 package io.rapidpro.surveyor.test;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -20,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.GrantPermissionRule;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorPreferences;
 import okhttp3.mockwebserver.MockResponse;
@@ -33,17 +31,13 @@ import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
  */
 public abstract class BaseApplicationTest {
 
-    protected MockWebServer mockServer;
-
-    @Rule
-    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
     @Rule
     public TestRule logger = new TestWatcher() {
         protected void starting(Description description) {
             SurveyorApplication.LOG.d("========= Starting test: " + description.getClassName() + "#" + description.getMethodName() + " =========");
         }
     };
+    protected MockWebServer mockServer;
 
     @Before
     public void startMockServer() throws IOException {
@@ -73,8 +67,8 @@ public abstract class BaseApplicationTest {
         editor.clear();
         editor.apply();
 
-        FileUtils.deleteDirectory(getSurveyor().getOrgsDirectory());
-        FileUtils.deleteDirectory(getSurveyor().getStorageDirectory());
+        FileUtils.deleteQuietly(getSurveyor().getOrgsDirectory());
+        FileUtils.deleteQuietly(getSurveyor().getStorageDirectory());
 
         getSurveyor().getOrgService().clearCache();
     }
@@ -107,12 +101,12 @@ public abstract class BaseApplicationTest {
         dir.mkdirs();
 
         // install details.json
-        String detailsJSON = readRawResource(detailsResId);
+        String detailsJSON = readResourceAsString(detailsResId);
         FileUtils.writeStringToFile(new File(dir, "details.json"), detailsJSON);
 
         if (flowsResId > 0) {
             // install flows.json
-            String flowsJSON = readRawResource(flowsResId);
+            String flowsJSON = readResourceAsString(flowsResId);
             FileUtils.writeStringToFile(new File(dir, "flows.json"), flowsJSON);
         } else {
             // a valid org must have details.json and flows.json
@@ -121,7 +115,7 @@ public abstract class BaseApplicationTest {
 
         if (assetsResId > 0) {
             // install assets.json
-            String assetsJSON = readRawResource(assetsResId);
+            String assetsJSON = readResourceAsString(assetsResId);
             FileUtils.writeStringToFile(new File(dir, "assets.json"), assetsJSON);
         }
     }
@@ -143,7 +137,7 @@ public abstract class BaseApplicationTest {
      * Enqueues a response on the mock HTTP server from the given resource file and MIME type and status code
      */
     protected void mockServerResponse(int rawResId, String mimeType, int code) throws IOException {
-        mockServerResponse(readRawResource(rawResId), mimeType, code);
+        mockServerResponse(readResourceAsString(rawResId), mimeType, code);
     }
 
     /**
@@ -157,9 +151,13 @@ public abstract class BaseApplicationTest {
         mockServer.enqueue(response);
     }
 
-    protected String readRawResource(int rawResId) throws IOException {
+    protected String readResourceAsString(int rawResId) throws IOException {
+        return IOUtils.toString(readResource(rawResId), "UTF-8");
+    }
+
+    protected byte[] readResource(int rawResId) throws IOException {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
         InputStream input = context.getResources().openRawResource(rawResId);
-        return IOUtils.toString(input, StandardCharsets.UTF_8);
+        return IOUtils.toByteArray(input);
     }
 }

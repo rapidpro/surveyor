@@ -1,6 +1,10 @@
 package io.rapidpro.surveyor.net;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import java.util.List;
+import java.util.Map;
 
 import io.rapidpro.surveyor.net.responses.Boundary;
 import io.rapidpro.surveyor.net.responses.Definitions;
@@ -10,11 +14,15 @@ import io.rapidpro.surveyor.net.responses.Group;
 import io.rapidpro.surveyor.net.responses.Org;
 import io.rapidpro.surveyor.net.responses.PaginatedResults;
 import io.rapidpro.surveyor.net.responses.TokenResults;
+import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PartMap;
 import retrofit2.http.Query;
 
 public interface TembaAPI {
@@ -61,5 +69,18 @@ public interface TembaAPI {
     Call<PaginatedResults<Group>> getGroups(
             @Header("Authorization") String token,
             @Query("cursor") String cursor
+    );
+
+    @Multipart
+    @POST("/api/v2/media.json")
+    Call<JsonObject> uploadMedia(
+            @Header("Authorization") String token,
+            @PartMap Map<String, RequestBody> params
+    );
+
+    @POST("/mr/session/submit.json")
+    Call<JsonObject> submitSession(
+            @Header("Authorization") String token,
+            @Body JsonElement sessionAndEvents
     );
 }

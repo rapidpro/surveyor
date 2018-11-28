@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Environment;
 import android.support.v4.content.FileProvider;
 
 import java.io.File;
@@ -185,7 +184,7 @@ public class SurveyorApplication extends Application {
      * @return the directory
      */
     public File getStorageDirectory() throws IOException {
-        return SurveyUtils.mkdir(Environment.getExternalStorageDirectory(), "Surveyor");
+        return SurveyUtils.mkdir(getExternalFilesDir(null));
     }
 
     /**

@@ -1,17 +1,27 @@
 package io.rapidpro.surveyor.net;
 
+import android.net.Uri;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.net.requests.SessionAndEvents;
 import io.rapidpro.surveyor.net.responses.Boundary;
 import io.rapidpro.surveyor.net.responses.Definitions;
 import io.rapidpro.surveyor.net.responses.Field;
@@ -22,7 +32,9 @@ import io.rapidpro.surveyor.net.responses.PaginatedResults;
 import io.rapidpro.surveyor.net.responses.TokenResults;
 import io.rapidpro.surveyor.utils.JsonUtils;
 import io.rapidpro.surveyor.utils.RawJson;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -162,6 +174,45 @@ public class TembaService {
         } catch (IOException e) {
             throw new TembaException("Unable to fetch definitions", e);
         }
+    }
+
+    /**
+     * Uploads a media file and returns the remove URL
+     *
+     * @param uri the local file to upload
+     * @return the new media URL
+     */
+    public String uploadMedia(String token, Uri uri) throws TembaException {
+        String uriString = uri.toString();
+        String baseName = FilenameUtils.getBaseName(uriString);
+        String extension = FilenameUtils.getExtension(uriString);
+
+        // build multipart request
+        Map<String, RequestBody> map = new HashMap<>();
+        map.put("extension", RequestBody.create(MediaType.parse("text/plain"), extension));
+
+        try {
+            InputStream stream = SurveyorApplication.get().getContentResolver().openInputStream(uri);
+            byte[] bytes = IOUtils.toByteArray(stream);
+
+            RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), bytes);
+            map.put("media_file\"; filename=\"" + baseName, fileBody);
+
+            Response<JsonObject> result = api.uploadMedia(asAuth(token), map).execute();
+            checkResponse(result);
+
+            return result.body().get("location").getAsString();
+
+        } catch (IOException e) {
+            throw new TembaException("Error uploading media", e);
+        }
+    }
+
+    public void submitSession(String token, SessionAndEvents payload) throws TembaException {
+
+        SurveyorApplication.LOG.d(JsonUtils.marshal(payload));
+
+        // TODO
     }
 
     /**

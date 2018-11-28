@@ -22,6 +22,7 @@ import androidx.test.espresso.intent.ActivityResultFunction;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.test.BaseApplicationTest;

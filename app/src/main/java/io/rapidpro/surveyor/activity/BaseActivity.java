@@ -37,6 +37,81 @@ public abstract class BaseActivity extends PermisoActivity {
     private ViewCache m_viewCache;
 
     /**
+     * @see android.app.Activity#onCreate(Bundle)
+     */
+    @Override
+    protected void onCreate(Bundle bundle) {
+        SurveyorApplication.LOG.d("Creating " + getClass().getSimpleName());
+
+        // so that espresso tests always have an unlocked screen
+        if (BuildConfig.DEBUG) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+
+        super.onCreate(bundle);
+
+        // make new activity come in from right
+        overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
+
+        // if we're on an activity that requires a logged in user, and we aren't, redirect to login activity
+        if (requireLogin() && !isLoggedIn()) {
+            logout();
+        }
+    }
+
+    /**
+     * @see android.app.Activity#onCreateOptionsMenu(Menu)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        // show the settings menu in debug mode
+        if (BuildConfig.DEBUG) {
+            MenuItem menuItem = menu.findItem(R.id.action_settings);
+            if (menuItem != null) {
+                menuItem.setVisible(true);
+            }
+        }
+        // show logout action if we're logged in
+        if (isLoggedIn()) {
+            MenuItem menuItem = menu.findItem(R.id.action_logout);
+            if (menuItem != null) {
+                menuItem.setVisible(true);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * User clicked "Settings" menu option
+     *
+     * @param item the menu item
+     */
+    public void onActionSettings(MenuItem item) {
+        startActivity(new Intent(this, SettingsActivity.class));
+    }
+
+    /**
+     * User clicked "Logout" menu option
+     *
+     * @param item the menu item
+     */
+    public void onActionLogout(MenuItem item) {
+        logout();
+    }
+
+    /**
+     * User clicked "Bug Report" menu option
+     *
+     * @param item the menu item
+     */
+    public void onActionBugReport(MenuItem item) {
+        sendBugReport();
+    }
+
+    /**
      * Gets the instance of the application
      *
      * @return the application
@@ -97,69 +172,6 @@ public abstract class BaseActivity extends PermisoActivity {
             intent.putExtra(SurveyorIntent.EXTRA_ERROR, getString(errorResId));
         }
         startActivity(intent);
-    }
-
-    /**
-     * @see android.app.Activity#onCreate(Bundle)
-     */
-    @Override
-    protected void onCreate(Bundle bundle) {
-        SurveyorApplication.LOG.d(getClass().getSimpleName() + ".onCreate");
-
-        // so that espresso tests always have an unlocked screen
-        if (BuildConfig.DEBUG) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        }
-
-        super.onCreate(bundle);
-
-        // make new activity come in from right
-        overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
-
-        // if we're on an activity that requires a logged in user, and we aren't, redirect to login activity
-        if (requireLogin() && !isLoggedIn()) {
-            logout();
-        }
-    }
-
-    /**
-     * @see android.app.Activity#onCreateOptionsMenu(Menu)
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-
-        // show the settings menu in debug mode
-        if (BuildConfig.DEBUG) {
-            MenuItem menuItem = menu.findItem(R.id.action_settings);
-            if (menuItem != null) {
-                menuItem.setVisible(true);
-            }
-        }
-        // show logout action if we're logged in
-        if (isLoggedIn()) {
-            MenuItem menuItem = menu.findItem(R.id.action_logout);
-            if (menuItem != null) {
-                menuItem.setVisible(true);
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        } else if (id == R.id.action_logout) {
-            logout();
-            return true;
-        } else if (id == R.id.action_bug_report) {
-            sendBugReport();
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void showBugReportDialog() {

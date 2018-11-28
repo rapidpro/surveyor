@@ -1,7 +1,11 @@
 package io.rapidpro.surveyor.net;
 
+import android.net.Uri;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -185,5 +189,26 @@ public class TembaServiceTest extends BaseApplicationTest {
 
         assertThat(definitions, hasSize(3));
         assertThat(definitions.get(0).toString(), startsWith("{\"entry\":\"c50f7200-2432-4912-897d-d809a2d2ad8d\""));
+    }
+
+    /**
+     * @see TembaService#uploadMedia(String, Uri)
+     */
+    @Test
+    public void uploadMedia() throws Exception {
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_media_post, "application/json", 200);
+
+        File upload = new File(getSurveyor().getStorageDirectory(), "test.jpg");
+        FileUtils.write(upload, "I'm an image!");
+        Uri uri = getSurveyor().getUriForFile(upload);
+
+        String newUrl = getSurveyor().getTembaService().uploadMedia("abc123", uri);
+
+        assertThat(newUrl, is("https://uploads.rapidpro.io/1224626264215.jpg"));
+
+        RecordedRequest request1 = mockServer.takeRequest();
+        assertThat(request1.getPath(), is("/api/v2/media.json"));
+        assertThat(request1.getHeader("Authorization"), is("Token abc123"));
+        assertThat(request1.getMethod(), is("POST"));
     }
 }

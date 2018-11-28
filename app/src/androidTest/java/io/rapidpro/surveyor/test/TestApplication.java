@@ -31,15 +31,6 @@ public class TestApplication extends SurveyorApplication {
     }
 
     /**
-     * @see SurveyorApplication#getStorageDirectory()
-     */
-    @Override
-    public File getStorageDirectory() throws IOException {
-        // TODO try again to get travis to let us write to external storage?
-        return SurveyUtils.mkdir(getFilesDir(), "shared");
-    }
-
-    /**
      * @see SurveyorApplication#getSubmissionsDirectory()
      */
     @Override

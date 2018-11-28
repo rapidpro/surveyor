@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'jacoco-android'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "io.rapidpro.surveyor"
-        minSdkVersion 17
-        targetSdkVersion 26
+        minSdkVersion 19
+        targetSdkVersion 27
         versionCode 1153
         versionName "11.5.3"
         multiDexEnabled = true
@@ -76,8 +76,9 @@ dependencies {
     // internationalization, language iso codes
     implementation 'com.neovisionaries:nv-i18n:1.11'
 
-    // apache commons io
-    implementation 'commons-io:commons-io:2.4'
+    // apache commons
+    implementation  'org.apache.commons:commons-lang3:3.8.1'
+    implementation 'commons-io:commons-io:2.4'  // newer versions use java.nio methods not supported on older Android versions
 
     // Android M permissions
     implementation 'com.greysonparrelli.permiso:permiso:0.1.3'

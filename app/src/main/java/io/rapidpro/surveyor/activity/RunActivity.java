@@ -417,7 +417,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             } else if (requestCode == RESULT_VIDEO) {
                 File output = getVideoOutput();
                 if (output.exists()) {
-                    Bitmap thumb = ThumbnailUtils.createVideoThumbnail(output.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND);
+                    Bitmap thumb = ImageUtils.thumbnailFromVideo(output);
 
                     Uri uri = submission.saveMedia(output);
 

@@ -69,7 +69,7 @@ public abstract class BaseSubmissionsActivity extends BaseActivity {
             }
 
             @Override
-            public void onFailure() {
+            public void onFailure(int numFailed) {
                 progressModal.dismiss();
 
                 Toast.makeText(BaseSubmissionsActivity.this, getString(R.string.error_submissions_send), Toast.LENGTH_SHORT).show();

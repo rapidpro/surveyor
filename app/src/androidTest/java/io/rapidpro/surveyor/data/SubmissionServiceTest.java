@@ -4,17 +4,19 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
 public class SubmissionServiceTest extends BaseApplicationTest {
     private static final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
 
     @Test
-    public void counts() throws IOException {
+    public void getPending() throws IOException {
         installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows, io.rapidpro.surveyor.test.R.raw.org1_assets);
 
         Org org = getSurveyor().getOrgService().get(ORG_UUID);
@@ -24,9 +26,13 @@ public class SubmissionServiceTest extends BaseApplicationTest {
 
         SubmissionService svc = getSurveyor().getSubmissionService();
 
-        Submission sub = svc.newSubmission(org, flow1);
-        svc.newSubmission(org, flow1);
-        svc.newSubmission(org, flow2);
+        Submission sub1 = svc.newSubmission(org, flow1);
+        Submission sub2 = svc.newSubmission(org, flow1);
+        Submission sub3 = svc.newSubmission(org, flow2);
+
+        assertThat(sub1.getOrg(), is(org));
+        assertThat(sub2.getOrg(), is(org));
+        assertThat(sub3.getOrg(), is(org));
 
         File submissionsDir = new File(getSurveyor().getStorageDirectory(), "test_submissions");
         assertThat(submissionsDir.exists(), is(true));
@@ -37,9 +43,19 @@ public class SubmissionServiceTest extends BaseApplicationTest {
         File flow1Dir = new File(orgDir, "14ca824e-6607-4c11-82f5-18e298d0bd58");
         assertThat(flow1Dir.exists(), is(true));
 
+        File sub1Dir = new File(flow1Dir, sub1.getUuid());
+        assertThat(sub1Dir.exists(), is(true));
+
+        assertThat(sub1.getDirectory(), is(sub1Dir));
+
         assertThat(svc.getPendingCount(org), is(3));
         assertThat(svc.getPendingCount(org, flow1), is(2));
         assertThat(svc.getPendingCount(org, flow2), is(1));
         assertThat(svc.getPendingCount(org, flow3), is(0));
+
+        List<Submission> pending = svc.getPending(org);
+        assertThat(pending, is(hasSize(3)));
+
+        assertThat(pending.get(0).getDirectory(), is(sub1Dir));
     }
 }

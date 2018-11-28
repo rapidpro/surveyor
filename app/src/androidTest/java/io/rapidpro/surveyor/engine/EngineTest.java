@@ -15,7 +15,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.OrgService;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
@@ -55,7 +54,7 @@ public class EngineTest extends BaseApplicationTest {
         OrgService svc = getSurveyor().getOrgService();
         Org org = svc.get(ORG_UUID);
 
-        String assetsJson = readRawResource(R.raw.org1_assets);
+        String assetsJson = readResourceAsString(R.raw.org1_assets);
 
         AssetsSource source = Engine.loadAssets(assetsJson);
         SessionAssets assets = Engine.createSessionAssets(source);
