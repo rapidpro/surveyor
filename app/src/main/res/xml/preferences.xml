@@ -6,8 +6,8 @@
         <EditTextPreference
             android:key="host"
             android:defaultValue="@string/pref_default_host"
-            android:title="@string/pref_title_rapidpro_host"
-            android:summary="@string/pref_summary_rapidpro_host"/>
+            android:title="@string/pref_title_host"
+            android:summary="@string/pref_summary_host"/>
 
     </PreferenceCategory>
 

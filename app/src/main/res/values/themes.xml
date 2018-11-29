@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="RapidTheme" parent="RapidTheme.Base"/>
+    <style name="RapidTheme" parent="RapidTheme.Base" />
+
     <style name="RapidTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowBackground">@color/background</item>
         <item name="colorPrimary">@color/primary</item>
@@ -9,11 +10,8 @@
     </style>
 
     <style name="LoginTheme">
-        <!-- Used for the bottom line when not selected / focused -->
         <item name="colorControlNormal">@color/primary_lightest</item>
-        <!-- colorControlActivated & colorControlHighlight use the colorAccent color by default -->
     </style>
-
 
     <style name="RapidTheme.FullScreen" parent="@style/RapidTheme.Base">
         <item name="windowNoTitle">true</item>
@@ -21,7 +19,4 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
-
-
-
 </resources>

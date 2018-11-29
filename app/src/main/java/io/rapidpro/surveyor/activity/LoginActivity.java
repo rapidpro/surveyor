@@ -229,7 +229,7 @@ public class LoginActivity extends BaseActivity {
     /**
      * Shows the progress UI and hides the login form.
      */
-    public void showProgress(final boolean show) {
+    private void showProgress(final boolean show) {
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
         m_loginFormView.setVisibility(show ? View.GONE : View.VISIBLE);

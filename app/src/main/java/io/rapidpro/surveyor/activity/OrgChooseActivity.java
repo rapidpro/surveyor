@@ -47,7 +47,7 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.C
 
         // if we don't have any orgs, take us back to the login screen
         if (orgs == null || orgs.size() == 0) {
-            logout();
+            logout(R.string.error_no_orgs);
 
             overridePendingTransition(0, 0);
         }

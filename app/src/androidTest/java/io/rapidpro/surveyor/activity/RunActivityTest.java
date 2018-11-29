@@ -20,6 +20,7 @@ import java.util.Collections;
 import androidx.test.espresso.intent.ActivityResultFunction;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
@@ -168,6 +169,8 @@ public class RunActivityTest extends BaseApplicationTest {
         ActivityResultFunction mockCamera = new ActivityResultFunction() {
             @Override
             public Instrumentation.ActivityResult apply(Intent intent) {
+                SurveyorApplication.LOG.d("Handling mocked image capture intent");
+
                 // create a bitmap we can use for our simulated camera image
                 Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), imageResId);
 
@@ -193,6 +196,8 @@ public class RunActivityTest extends BaseApplicationTest {
         intending(hasComponent(VideoCaptureActivity.class.getName())).respondWithFunction(new ActivityResultFunction() {
             @Override
             public Instrumentation.ActivityResult apply(Intent intent) {
+                SurveyorApplication.LOG.d("Handling mocked video capture intent");
+
                 InputStream input = context.getResources().openRawResource(videoResId);
 
                 try {
@@ -210,6 +215,8 @@ public class RunActivityTest extends BaseApplicationTest {
         intending(hasComponent(AudioCaptureActivity.class.getName())).respondWithFunction(new ActivityResultFunction() {
             @Override
             public Instrumentation.ActivityResult apply(Intent intent) {
+                SurveyorApplication.LOG.d("Handling mocked audio capture intent");
+
                 InputStream input = context.getResources().openRawResource(audioResId);
 
                 try {
