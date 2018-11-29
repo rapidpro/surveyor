@@ -522,10 +522,11 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
      */
     private void handleEngineOutput(List<Event> events) throws IOException, EngineException {
         for (Event event : events) {
-            SurveyorApplication.LOG.d("Event: " + event.getPayload());
-            JsonObject asObj = new JsonParser().parse(event.getPayload()).getAsJsonObject();
+            SurveyorApplication.LOG.d("Event: " + event.payload());
 
-            if (event.getType().equals("msg_created")) {
+            JsonObject asObj = new JsonParser().parse(event.payload()).getAsJsonObject();
+
+            if (event.type().equals("msg_created")) {
                 JsonObject msg = asObj.get("msg").getAsJsonObject();
                 addMessage(msg.get("text").getAsString(), false);
             }
@@ -538,7 +539,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             cache.hide(R.id.chat_box, true);
             cache.show(R.id.completion_buttons);
         } else {
-            waitForInput(session.getWait().getMediaHint());
+            waitForInput(session.getWait().mediaHint());
         }
 
         submission.saveSession(session);

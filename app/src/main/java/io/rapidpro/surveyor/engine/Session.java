@@ -73,7 +73,7 @@ public class Session {
      * @return the status
      */
     public String getStatus() {
-        return target.getStatus();
+        return target.status();
     }
 
     /**

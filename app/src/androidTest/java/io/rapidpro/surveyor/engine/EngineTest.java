@@ -8,18 +8,22 @@ import com.nyaruka.goflow.mobile.FlowReference;
 import com.nyaruka.goflow.mobile.MsgIn;
 import com.nyaruka.goflow.mobile.Resume;
 import com.nyaruka.goflow.mobile.SessionAssets;
+import com.nyaruka.goflow.mobile.StringSlice;
 import com.nyaruka.goflow.mobile.Trigger;
 
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
+import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.OrgService;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 import io.rapidpro.surveyor.test.R;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
@@ -70,8 +74,8 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(session.getStatus(), is("waiting"));
         assertThat(session.isWaiting(), is(true));
         assertThat(events, hasSize(2));
-        assertThat(events.get(0).getType(), is("msg_created"));
-        assertThat(events.get(1).getType(), is("msg_wait"));
+        assertThat(events.get(0).type(), is("msg_created"));
+        assertThat(events.get(1).type(), is("msg_wait"));
 
         MsgIn msg1 = Engine.createMsgIn("I like club");
         Resume resume1 = Engine.createMsgResume(null, null, msg1);
@@ -81,10 +85,11 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(session.getStatus(), is("waiting"));
         assertThat(session.isWaiting(), is(true));
         assertThat(events, hasSize(4));
-        assertThat(events.get(0).getType(), is("msg_received"));
-        assertThat(events.get(1).getType(), is("run_result_changed"));
-        assertThat(events.get(2).getType(), is("msg_created"));
-        assertThat(events.get(3).getType(), is("msg_wait"));
+        assertThat(events.get(0).type(), is("msg_received"));
+        assertThat(events.get(0).payload(), containsString("I like club"));
+        assertThat(events.get(1).type(), is("run_result_changed"));
+        assertThat(events.get(2).type(), is("msg_created"));
+        assertThat(events.get(3).type(), is("msg_wait"));
 
         MsgIn msg2 = Engine.createMsgIn("RED");
         Resume resume2 = Engine.createMsgResume(null, null, msg2);
@@ -94,9 +99,9 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(session.getStatus(), is("completed"));
         assertThat(session.isWaiting(), is(false));
         assertThat(events, hasSize(3));
-        assertThat(events.get(0).getType(), is("msg_received"));
-        assertThat(events.get(1).getType(), is("run_result_changed"));
-        assertThat(events.get(2).getType(), is("msg_created"));
+        assertThat(events.get(0).type(), is("msg_received"));
+        assertThat(events.get(1).type(), is("run_result_changed"));
+        assertThat(events.get(2).type(), is("msg_created"));
 
         // try to marshal to JSON
         String marshaled = session.toJSON();
@@ -105,5 +110,59 @@ public class EngineTest extends BaseApplicationTest {
         // and unmarshal back
         Session session2 = Session.fromJson(assets, marshaled);
         assertThat(session2.getStatus(), is("completed"));
+    }
+
+    @Test
+    public void multimedia() throws IOException, EngineException {
+        final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
+        final String FLOW_UUID = "585958f3-ee7a-4f81-b4c2-fda374155681";
+
+        installOrg(ORG_UUID, R.raw.org1_details, R.raw.org1_flows, R.raw.org1_assets);
+        OrgService svc = getSurveyor().getOrgService();
+        Org org = svc.get(ORG_UUID);
+        Flow flow = org.getFlow(FLOW_UUID);
+
+        String assetsJson = readResourceAsString(R.raw.org1_assets);
+
+        AssetsSource source = Engine.loadAssets(assetsJson);
+        SessionAssets assets = Engine.createSessionAssets(source);
+        Session session = new Session(assets);
+
+        Environment env = Engine.createEnvironment(org);
+        Contact contact = Engine.createEmptyContact();
+        Trigger trigger = Engine.createManualTrigger(env, contact, flow.toReference());
+
+        List<Event> events = session.start(trigger);
+
+        assertThat(session.getStatus(), is("waiting"));
+        assertThat(session.isWaiting(), is(true));
+        assertThat(session.getWait().mediaHint(), is("image"));
+        assertThat(events, hasSize(2));
+        assertThat(events.get(0).type(), is("msg_created"));
+        assertThat(events.get(1).type(), is("msg_wait"));
+
+        MsgIn msg1 = Engine.createMsgIn("", "content://io.rapidpro.surveyor/files/selfie.jpg");
+        Resume resume1 = Engine.createMsgResume(null, null, msg1);
+
+        events = session.resume(resume1);
+
+        assertThat(session.getStatus(), is("waiting"));
+        assertThat(session.isWaiting(), is(true));
+        assertThat(events, hasSize(4));
+        assertThat(events.get(0).type(), is("msg_received"));
+        assertThat(events.get(0).payload(), containsString("content://io.rapidpro.surveyor/files/selfie.jpg"));
+        assertThat(events.get(1).type(), is("run_result_changed"));
+        assertThat(events.get(2).type(), is("msg_created"));
+        assertThat(events.get(3).type(), is("msg_wait"));
+    }
+
+    @Test
+    public void listToSlice() {
+        List<String> vals = Arrays.asList("Foo", "bar");
+        StringSlice slice = Engine.listToSlice(vals);
+
+        assertThat(slice.length(), is(2L));
+        assertThat(slice.get(0L), is("Foo"));
+        assertThat(slice.get(1L), is("bar"));
     }
 }

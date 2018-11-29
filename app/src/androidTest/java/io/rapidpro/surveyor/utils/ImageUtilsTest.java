@@ -2,7 +2,6 @@ package io.rapidpro.surveyor.utils;
 
 import android.graphics.Bitmap;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -18,9 +17,8 @@ import static org.junit.Assert.assertThat;
 public class ImageUtilsTest extends BaseApplicationTest {
     @Test
     public void thumbnailFromVideo() throws IOException {
-        byte[] videoBytes = readResource(R.raw.capture_video);
         File temp = File.createTempFile("video", "", getSurveyor().getCacheDir());
-        FileUtils.writeByteArrayToFile(temp, videoBytes);
+        copyResource(R.raw.capture_video, temp);
 
         Bitmap thumbnail = ImageUtils.thumbnailFromVideo(temp);
 

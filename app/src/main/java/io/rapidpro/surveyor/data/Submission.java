@@ -77,6 +77,15 @@ public class Submission {
     }
 
     /**
+     * Get's the directory this submission's media is stored in
+     *
+     * @return the directory
+     */
+    public File getMediaDirectory() throws IOException {
+        return SurveyUtils.mkdir(directory, MEDIA_DIR);
+    }
+
+    /**
      * Gets whether this submission is complete
      *
      * @return true if complete
@@ -106,7 +115,7 @@ public class Submission {
         BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
 
         for (Event event : events) {
-            writer.write(event.getPayload());
+            writer.write(event.payload());
             writer.newLine();
         }
 
@@ -157,6 +166,7 @@ public class Submission {
     public void delete() {
         try {
             FileUtils.deleteDirectory(directory);
+            directory = null;
         } catch (IOException e) {
             SurveyorApplication.LOG.e("Unable to delete submission " + directory.getAbsolutePath(), e);
         }
@@ -199,7 +209,7 @@ public class Submission {
      * @return the map of local URIs to remote URLs
      */
     private Map<Uri, String> uploadMedia() throws IOException, TembaException {
-        if (hasMedia()) {
+        if (!hasMedia()) {
             return Collections.emptyMap();
         }
 
@@ -219,9 +229,5 @@ public class Submission {
 
     private boolean hasMedia() {
         return new File(directory, MEDIA_DIR).exists();
-    }
-
-    private File getMediaDirectory() throws IOException {
-        return SurveyUtils.mkdir(directory, MEDIA_DIR);
     }
 }

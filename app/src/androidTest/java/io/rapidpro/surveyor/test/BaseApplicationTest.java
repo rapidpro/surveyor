@@ -150,6 +150,15 @@ public abstract class BaseApplicationTest {
         mockServer.enqueue(response);
     }
 
+    /**
+     * Copies a raw test resource to the given file (more efficient than loading into memory first)
+     */
+    protected void copyResource(int rawResId, File dest) throws IOException {
+        Context context = InstrumentationRegistry.getInstrumentation().getContext();
+        InputStream input = context.getResources().openRawResource(rawResId);
+        FileUtils.copyInputStreamToFile(input, dest);
+    }
+
     protected String readResourceAsString(int rawResId) throws IOException {
         return IOUtils.toString(readResource(rawResId), "UTF-8");
     }
