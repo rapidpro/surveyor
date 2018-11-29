@@ -15,7 +15,6 @@ import org.junit.runner.Description;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -45,7 +44,7 @@ public abstract class BaseApplicationTest {
         mockServer.start();
 
         String mockServerURL = mockServer.url("/").toString();
-        SurveyorApplication.LOG.d("mock server started at " + mockServerURL);
+        SurveyorApplication.LOG.d("Mock server started at " + mockServerURL);
 
         getSurveyor().setPreference(SurveyorPreferences.HOST, mockServerURL);
         getSurveyor().onTembaHostChanged();
@@ -55,7 +54,7 @@ public abstract class BaseApplicationTest {
     public void stopMockServer() throws IOException {
         mockServer.shutdown();
 
-        SurveyorApplication.LOG.d("mock server stopped after " + mockServer.getRequestCount() + " requests");
+        SurveyorApplication.LOG.d("Mock server stopped after " + mockServer.getRequestCount() + " requests");
     }
 
     /**
@@ -68,7 +67,7 @@ public abstract class BaseApplicationTest {
         editor.apply();
 
         FileUtils.deleteQuietly(getSurveyor().getOrgsDirectory());
-        FileUtils.deleteQuietly(getSurveyor().getStorageDirectory());
+        FileUtils.deleteQuietly(getSurveyor().getUserDirectory());
 
         getSurveyor().getOrgService().clearCache();
     }

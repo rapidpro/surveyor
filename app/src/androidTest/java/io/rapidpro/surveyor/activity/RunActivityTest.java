@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,10 +18,8 @@ import java.io.InputStream;
 import java.util.Collections;
 
 import androidx.test.espresso.intent.ActivityResultFunction;
-import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
@@ -104,15 +101,14 @@ public class RunActivityTest extends BaseApplicationTest {
         onView(withText("Save")).check(matches(isDisplayed()));
         onView(withText("Discard")).check(matches(isDisplayed()));
 
-        // we should have a pending submission
+        // we should have a incomplete submission
         Org org = getSurveyor().getOrgService().get(ORG_UUID);
-        assertThat(getSurveyor().getSubmissionService().getPendingCount(org), is(1));
+        assertThat(getSurveyor().getSubmissionService().getCompletedCount(org), is(0));
 
-        // unless we discard it
-        onView(withText("Discard")).perform(click());
-        onView(withText("Yes")).perform(click());
+        // unless we save it
+        onView(withText("Save")).perform(click());
 
-        assertThat(getSurveyor().getSubmissionService().getPendingCount(org), is(0));
+        assertThat(getSurveyor().getSubmissionService().getCompletedCount(org), is(1));
     }
 
     @Test
@@ -178,7 +174,7 @@ public class RunActivityTest extends BaseApplicationTest {
                 byte[] asJpg = ImageUtils.convertToJPEG(bmp);
 
                 try {
-                    File output = new File(getSurveyor().getStorageDirectory(), "camera.jpg");
+                    File output = new File(getSurveyor().getUserDirectory(), "camera.jpg");
                     FileUtils.writeByteArrayToFile(output, asJpg);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -200,7 +196,7 @@ public class RunActivityTest extends BaseApplicationTest {
                 InputStream input = context.getResources().openRawResource(videoResId);
 
                 try {
-                    File output = new File(getSurveyor().getStorageDirectory(), "video.mp4");
+                    File output = new File(getSurveyor().getUserDirectory(), "video.mp4");
                     FileUtils.copyInputStreamToFile(input, output);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -217,7 +213,7 @@ public class RunActivityTest extends BaseApplicationTest {
                 InputStream input = context.getResources().openRawResource(audioResId);
 
                 try {
-                    File output = new File(getSurveyor().getStorageDirectory(), "audio.m4a");
+                    File output = new File(getSurveyor().getUserDirectory(), "audio.m4a");
                     FileUtils.copyInputStreamToFile(input, output);
                 } catch (IOException e) {
                     e.printStackTrace();

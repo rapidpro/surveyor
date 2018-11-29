@@ -81,7 +81,7 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
             adapter.notifyDataSetChanged();
         }
 
-        int pending = getSurveyor().getSubmissionService().getPendingCount(getOrg());
+        int pending = getSurveyor().getSubmissionService().getCompletedCount(getOrg());
         ViewCache cache = getViewCache();
         cache.setVisible(R.id.container_pending, pending > 0);
         cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
@@ -154,7 +154,7 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
      */
     @Override
     protected List<Submission> getPendingSubmissions() {
-        return getSurveyor().getSubmissionService().getPending(getOrg());
+        return getSurveyor().getSubmissionService().getCompleted(getOrg());
     }
 
     /**

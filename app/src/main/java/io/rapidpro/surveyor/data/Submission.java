@@ -29,12 +29,14 @@ import io.rapidpro.surveyor.utils.SurveyUtils;
 
 public class Submission {
 
+    static final String INCOMPLETE_DIRECTORY_NAME = "current";
+
     private static final String SESSION_FILE = "session.json";
     private static final String EVENTS_FILE = "events.jsonl";
     private static final String MEDIA_DIR = "media";
 
-    private transient Org org;
-    private transient File directory;
+    private Org org;
+    private File directory;
 
     /**
      * Creates a new submission for the given org in the given directory
@@ -72,6 +74,15 @@ public class Submission {
      */
     public File getDirectory() {
         return directory;
+    }
+
+    /**
+     * Gets whether this submission is complete
+     *
+     * @return true if complete
+     */
+    public boolean isComplete() {
+        return !directory.getName().equals(INCOMPLETE_DIRECTORY_NAME);
     }
 
     /**
@@ -126,6 +137,18 @@ public class Submission {
         File file = new File(getMediaDirectory(), UUID.randomUUID().toString() + "." + extension);
         FileUtils.copyFile(src, file);
         return SurveyorApplication.get().getUriForFile(file);
+    }
+
+    /**
+     * Completes an incomplete submission
+     */
+    public void complete() throws IOException {
+        File dest = new File(directory.getParentFile(), UUID.randomUUID().toString());
+
+        if (!isComplete()) {
+            FileUtils.moveDirectory(directory, dest);
+            directory = dest;
+        }
     }
 
     /**

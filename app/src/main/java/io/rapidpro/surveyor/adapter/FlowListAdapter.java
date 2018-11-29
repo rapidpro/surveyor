@@ -49,7 +49,7 @@ public class FlowListAdapter extends ArrayAdapter<Flow> {
         Flow flow = getItem(position);
         cache.titleView.setText(flow.getName());
 
-        int submissions = SurveyorApplication.get().getSubmissionService().getPendingCount(org, flow);
+        int submissions = SurveyorApplication.get().getSubmissionService().getCompletedCount(org, flow);
 
         NumberFormat nf = NumberFormat.getInstance();
         cache.pendingSubmissions.setText(nf.format(submissions));

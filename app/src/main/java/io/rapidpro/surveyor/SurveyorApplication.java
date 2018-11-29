@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
@@ -136,10 +138,19 @@ public class SurveyorApplication extends Application {
      * Called when our host setting has changed
      */
     public void onTembaHostChanged() {
+        String newHost = getTembaHost();
+
+        LOG.d("Host changed to " + newHost);
+
         clearPreference(SurveyorPreferences.AUTH_USERNAME);
         clearPreference(SurveyorPreferences.AUTH_ORGS);
+        try {
+            clearSubmissions();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        tembaService = new TembaService(getTembaHost(), LOG);
+        tembaService = new TembaService(newHost, LOG);
     }
 
     /**
@@ -170,7 +181,7 @@ public class SurveyorApplication extends Application {
     }
 
     /**
-     * Gets the org storage directory
+     * Gets the directory for org configurations
      *
      * @return the directory
      */
@@ -179,11 +190,11 @@ public class SurveyorApplication extends Application {
     }
 
     /**
-     * Gets the external storage directory
+     * Gets the directory for user collected data
      *
      * @return the directory
      */
-    public File getStorageDirectory() throws IOException {
+    public File getUserDirectory() throws IOException {
         return SurveyUtils.mkdir(getExternalFilesDir(null));
     }
 
@@ -193,7 +204,14 @@ public class SurveyorApplication extends Application {
      * @return the directory
      */
     protected File getSubmissionsDirectory() throws IOException {
-        return SurveyUtils.mkdir(getStorageDirectory(), "submissions");
+        return SurveyUtils.mkdir(getUserDirectory(), "submissions");
+    }
+
+    /**
+     * Clears the submissions storage directory
+     */
+    public void clearSubmissions() throws IOException {
+        FileUtils.deleteDirectory(getSubmissionsDirectory());
     }
 
     /**

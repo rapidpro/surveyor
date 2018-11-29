@@ -27,14 +27,19 @@ public class SubmissionServiceTest extends BaseApplicationTest {
         SubmissionService svc = getSurveyor().getSubmissionService();
 
         Submission sub1 = svc.newSubmission(org, flow1);
+        sub1.complete();
         Submission sub2 = svc.newSubmission(org, flow1);
+        sub2.complete();
         Submission sub3 = svc.newSubmission(org, flow2);
+        sub3.complete();
+        Submission sub4 = svc.newSubmission(org, flow2);
 
         assertThat(sub1.getOrg(), is(org));
         assertThat(sub2.getOrg(), is(org));
         assertThat(sub3.getOrg(), is(org));
+        assertThat(sub4.getOrg(), is(org));
 
-        File submissionsDir = new File(getSurveyor().getStorageDirectory(), "test_submissions");
+        File submissionsDir = new File(getSurveyor().getUserDirectory(), "test_submissions");
         assertThat(submissionsDir.exists(), is(true));
 
         File orgDir = new File(submissionsDir, ORG_UUID);
@@ -48,12 +53,12 @@ public class SubmissionServiceTest extends BaseApplicationTest {
 
         assertThat(sub1.getDirectory(), is(sub1Dir));
 
-        assertThat(svc.getPendingCount(org), is(3));
-        assertThat(svc.getPendingCount(org, flow1), is(2));
-        assertThat(svc.getPendingCount(org, flow2), is(1));
-        assertThat(svc.getPendingCount(org, flow3), is(0));
+        assertThat(svc.getCompletedCount(org), is(3));
+        assertThat(svc.getCompletedCount(org, flow1), is(2));
+        assertThat(svc.getCompletedCount(org, flow2), is(1));
+        assertThat(svc.getCompletedCount(org, flow3), is(0));
 
-        List<Submission> pending = svc.getPending(org);
+        List<Submission> pending = svc.getCompleted(org);
         assertThat(pending, is(hasSize(3)));
 
         assertThat(pending.get(0).getDirectory(), is(sub1Dir));

@@ -64,7 +64,7 @@ public class FlowActivity extends BaseSubmissionsActivity {
         cache.setText(R.id.text_flow_questions, nf.format(flow.getQuestionCount()) + questionString);
         cache.setText(R.id.text_flow_revision, "(v" + nf.format(flow.getRevision()) + ")");
 
-        int submissions = getSurveyor().getSubmissionService().getPendingCount(org, flow);
+        int submissions = getSurveyor().getSubmissionService().getCompletedCount(org, flow);
         if (submissions > 0) {
             cache.show(R.id.container_pending);
             cache.setButtonText(R.id.button_pending, nf.format(submissions));
@@ -107,6 +107,6 @@ public class FlowActivity extends BaseSubmissionsActivity {
      */
     @Override
     protected List<Submission> getPendingSubmissions() {
-        return getSurveyor().getSubmissionService().getPending(org, flow);
+        return getSurveyor().getSubmissionService().getCompleted(org, flow);
     }
 }

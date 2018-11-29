@@ -1,7 +1,5 @@
 package io.rapidpro.surveyor.test;
 
-import android.os.Environment;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -35,6 +33,6 @@ public class TestApplication extends SurveyorApplication {
      */
     @Override
     protected File getSubmissionsDirectory() throws IOException {
-        return SurveyUtils.mkdir(getStorageDirectory(), "test_submissions");
+        return SurveyUtils.mkdir(getUserDirectory(), "test_submissions");
     }
 }

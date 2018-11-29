@@ -110,7 +110,10 @@ public class OrgActivityTest extends BaseApplicationTest {
         Flow flow1 = org.getFlow("14ca824e-6607-4c11-82f5-18e298d0bd58");
 
         SubmissionService svc = getSurveyor().getSubmissionService();
-        svc.newSubmission(org, flow1);
+        Submission sub1 = svc.newSubmission(org, flow1);
+        sub1.complete();
+        Submission sub2 = svc.newSubmission(org, flow1);
+        sub2.complete();
         svc.newSubmission(org, flow1);
 
         Intent intent = new Intent();

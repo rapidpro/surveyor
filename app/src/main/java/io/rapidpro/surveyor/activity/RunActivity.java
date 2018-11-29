@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -372,15 +371,15 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     }
 
     private File getCameraOutput() throws IOException {
-        return new File(getSurveyor().getStorageDirectory(), "camera.jpg");
+        return new File(getSurveyor().getUserDirectory(), "camera.jpg");
     }
 
     private File getVideoOutput() throws IOException {
-        return new File(getSurveyor().getStorageDirectory(), "video.mp4");
+        return new File(getSurveyor().getUserDirectory(), "video.mp4");
     }
 
     private File getAudioOutput() throws IOException {
-        return new File(getSurveyor().getStorageDirectory(), "audio.m4a");
+        return new File(getSurveyor().getUserDirectory(), "audio.m4a");
     }
 
     /**
@@ -629,11 +628,17 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     }
 
     /**
-     * User pressed the save button - session is already saved so all we have to do is finish the activity
+     * User pressed the save button
      *
      * @param view the button
      */
     public void onActionSave(View view) {
+        try {
+            submission.complete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         finish();
     }
 

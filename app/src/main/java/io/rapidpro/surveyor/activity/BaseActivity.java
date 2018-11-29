@@ -163,6 +163,12 @@ public abstract class BaseActivity extends PermisoActivity {
         getSurveyor().clearPreference(SurveyorPreferences.AUTH_USERNAME);
         getSurveyor().setPreference(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet());
 
+        try {
+            getSurveyor().clearSubmissions();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Intent intent = new Intent(this, LoginActivity.class);
 
         // clear the activity stack
@@ -203,7 +209,7 @@ public abstract class BaseActivity extends PermisoActivity {
 
         // generate a dump file
         try {
-            File outputFile = new File(getSurveyor().getStorageDirectory(), "bug-report.txt");
+            File outputFile = new File(getSurveyor().getUserDirectory(), "bug-report.txt");
 
             Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E SurveyorApplication:*\" ");
 
