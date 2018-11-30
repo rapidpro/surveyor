@@ -14,9 +14,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.greysonparrelli.permiso.Permiso;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -24,6 +26,7 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.SurveyorPreferences;
+import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.net.responses.Token;
 import io.rapidpro.surveyor.net.responses.TokenResults;
@@ -98,6 +101,15 @@ public class LoginActivity extends BaseActivity {
 
         // set our error message if we have one
         setErrorMessage(getIntent().getStringExtra(SurveyorIntent.EXTRA_ERROR));
+
+        if (Legacy.isMigrationNeeded()) {
+            try {
+                Legacy.migrate();
+            } catch (IOException e) {
+                SurveyorApplication.LOG.e("Error migrating legacy orgs", e);
+                Toast.makeText(this, "Unable to prepare legacy submissions", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     public void onResume() {

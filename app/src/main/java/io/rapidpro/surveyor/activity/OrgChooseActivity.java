@@ -43,6 +43,11 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.C
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // the base activity may have logged us out and sent us to the login page
+        if (!isLoggedIn()) {
+            return;
+        }
+
         List<Org> orgs = getOrgs();
 
         // if we don't have any orgs, take us back to the login screen

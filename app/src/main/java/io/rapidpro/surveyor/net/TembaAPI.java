@@ -83,4 +83,27 @@ public interface TembaAPI {
             @Header("Authorization") String token,
             @Body JsonElement sessionAndEvents
     );
+
+    /* Legacy endpoints to be removed */
+
+    @Deprecated
+    @POST("/api/v1/fields.json")
+    Void legacyAddCreatedField(
+            @Header("Authorization") String token,
+            @Body io.rapidpro.flows.runner.Field field
+    );
+
+    @Deprecated
+    @POST("/api/v1/contacts.json")
+    Call<JsonObject> legacyAddContact(
+            @Header("Authorization") String token,
+            @Body JsonElement contact
+    );
+
+    @Deprecated
+    @POST("/api/v1/steps.json")
+    Call<JsonObject> legacyAddResults(
+            @Header("Authorization") String token,
+            @Body JsonElement submissionJson
+    );
 }

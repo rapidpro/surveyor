@@ -113,6 +113,15 @@ public class Org {
     }
 
     /**
+     * Gets the directory of this org
+     *
+     * @return the directory
+     */
+    public File getDirectory() {
+        return directory;
+    }
+
+    /**
      * Gets the API token for this org
      *
      * @return the API token

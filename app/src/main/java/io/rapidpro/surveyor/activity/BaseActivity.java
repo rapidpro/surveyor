@@ -26,6 +26,7 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.SurveyorPreferences;
+import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
