@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".legacy.LegacySubmissionsActivity">
+
+    <LinearLayout
+        android:id="@+id/container_pending"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/pending_background"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:visibility="visible">
+
+        <Button
+            android:id="@+id/button_pending"
+            style="?android:textAppearanceSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/tertiary_button"
+            android:minWidth="80dp"
+            android:minHeight="0dp"
+            android:onClick="onActionSubmit"
+            android:text="3,122"
+            android:textColor="@color/pending_button_text"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="-10dp"
+            android:layout_marginEnd="12dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:text="@string/pending_summary"
+            android:textColor="@color/pending_text"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/legacy_blurb"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/container_pending"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:text="@string/legacy_submissions_blurb" />
+
+</RelativeLayout>

@@ -76,6 +76,13 @@
     <string name="pref_title_host">RapidPro Host</string>
     <string name="pref_summary_host">The address for your RapidPro installation</string>
 
+    <!-- legacy stuff to be removed -->
+    <string name="title_activity_legacy">Legacy Submissions</string>
+    <string name="action_legacy_submissions">Legacy Submissions</string>
+    <string name="legacy_submissions_blurb">This version of the Surveyor app uses a newer flow engine but you can still submit data collected with the old engine by clicking the button below.</string>
+    <string name="error_legacy_submissions_read">A problem occurred reading legacy submissions.</string>
+    <string name="error_legacy_submissions_submit">A problem occurred submitting legacy submissions.</string>
+
     <string name="start_flow_blurb">Select a Flow to begin.</string>
     <string name="send_message">Send</string>
     <string name="prompt_contact_name">Contact Name</string>

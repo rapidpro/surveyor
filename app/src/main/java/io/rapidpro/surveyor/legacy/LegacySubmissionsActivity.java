@@ -1,28 +1,42 @@
-package io.rapidpro.surveyor.activity;
+package io.rapidpro.surveyor.legacy;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.res.Resources;
+import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
-import java.util.List;
+import java.io.IOException;
+import java.text.NumberFormat;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.data.Submission;
-import io.rapidpro.surveyor.task.SubmitSubmissionsTask;
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.activity.BaseActivity;
 import io.rapidpro.surveyor.ui.BlockingProgress;
+import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
- * Base for activities that have submissions ((org and flow views)
+ * Allows users to submit legacy submissions created with the previous flow engine
  */
-public abstract class BaseSubmissionsActivity extends BaseActivity {
+public class LegacySubmissionsActivity extends BaseActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-    /**
-     * User has clicked a submit button
-     *
-     * @param view the button
-     */
+        // this holds our flow list fragment which shows all available flows
+        setContentView(R.layout.activity_legacy);
+
+        try {
+            int pending = Legacy.getSubmissionsCount();
+            ViewCache cache = getViewCache();
+            cache.setVisible(R.id.container_pending, pending > 0);
+            cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
+        } catch (IOException e) {
+            SurveyorApplication.LOG.e("Unable to read legacy submissions", e);
+            showToast(R.string.error_legacy_submissions_read);
+            finish();
+        }
+    }
+
     public void onActionSubmit(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirm_send_submissions))
@@ -41,16 +55,9 @@ public abstract class BaseSubmissionsActivity extends BaseActivity {
                 .show();
     }
 
-    /**
-     * Does the actual invoking of the submissions task
-     */
     private void doSubmit() {
         final BlockingProgress progressModal = new BlockingProgress(this, R.string.one_moment, R.string.submit_body);
         progressModal.show();
-
-        final List<Submission> pending = getPendingSubmissions();
-        final Submission[] asArray = pending.toArray(new Submission[0]);
-        final Resources res = getResources();
 
         new SubmitSubmissionsTask(new SubmitSubmissionsTask.Listener() {
             @Override
@@ -60,24 +67,17 @@ public abstract class BaseSubmissionsActivity extends BaseActivity {
 
             @Override
             public void onComplete() {
-                refresh();
-
                 progressModal.dismiss();
 
-                CharSequence toast = res.getQuantityString(R.plurals.submissions_sent, pending.size(), pending.size());
-                Toast.makeText(BaseSubmissionsActivity.this, toast, Toast.LENGTH_SHORT).show();
+                finish();
             }
 
             @Override
-            public void onFailure(int numFailed) {
+            public void onFailure() {
                 progressModal.dismiss();
 
-                Toast.makeText(BaseSubmissionsActivity.this, getString(R.string.error_submissions_send), Toast.LENGTH_SHORT).show();
+                showToast(R.string.error_legacy_submissions_submit);
             }
-        }).execute(asArray);
+        }).execute(getUsername());
     }
-
-    protected abstract List<Submission> getPendingSubmissions();
-
-    protected abstract void refresh();
 }

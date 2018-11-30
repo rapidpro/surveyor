@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.greysonparrelli.permiso.Permiso;
 import com.greysonparrelli.permiso.PermisoActivity;
@@ -27,6 +28,7 @@ import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.legacy.Legacy;
+import io.rapidpro.surveyor.legacy.LegacySubmissionsActivity;
 import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
@@ -81,6 +83,13 @@ public abstract class BaseActivity extends PermisoActivity {
                 menuItem.setVisible(true);
             }
         }
+        // show legacy submissions option if there are legacy submissions
+        if (Legacy.hasSubmissions()) {
+            MenuItem menuItem = menu.findItem(R.id.action_legacy_submissions);
+            if (menuItem != null) {
+                menuItem.setVisible(true);
+            }
+        }
 
         return true;
     }
@@ -110,6 +119,11 @@ public abstract class BaseActivity extends PermisoActivity {
      */
     public void onActionBugReport(MenuItem item) {
         sendBugReport();
+    }
+
+    public void onActionLegacySubmissions(MenuItem item) {
+        Intent intent = new Intent(this, LegacySubmissionsActivity.class);
+        startActivity(intent);
     }
 
     /**
@@ -272,6 +286,10 @@ public abstract class BaseActivity extends PermisoActivity {
 
         dialog.show();
         return dialog;
+    }
+
+    protected void showToast(int resId) {
+        Toast.makeText(this, resId, Toast.LENGTH_SHORT).show();
     }
 
     public void showRationaleDialog(int body, Permiso.IOnRationaleProvided callback) {

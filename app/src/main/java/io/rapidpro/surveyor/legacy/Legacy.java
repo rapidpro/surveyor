@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.net.TembaException;
+import io.rapidpro.surveyor.utils.SurveyUtils;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -26,11 +27,11 @@ public class Legacy {
         return new File(SurveyorApplication.get().getFilesDir(), "default.realm").exists();
     }
 
-    public static File getStorageDirectory() throws IOException {
+    public static File getStorageDirectory() {
         return new File(Environment.getExternalStorageDirectory(), "Surveyor");
     }
 
-    public static File getSubmissionsDirectory() throws IOException {
+    public static File getSubmissionsDirectory() {
         return new File(getStorageDirectory(), "submissions");
     }
 
@@ -43,7 +44,7 @@ public class Legacy {
         Realm.setDefaultConfiguration(config);
         Realm realm = Realm.getDefaultInstance();
 
-        File orgsDirectory = SurveyorApplication.get().getOrgsDirectory();
+        File orgsDirectory = SurveyUtils.mkdir(SurveyorApplication.get().getFilesDir(), "orgs");
 
         RealmResults<DBOrg> orgs = realm.allObjects(DBOrg.class);
         for (DBOrg legacyOrg : orgs) {
@@ -66,6 +67,15 @@ public class Legacy {
         // delete no longer needed realm DB
         realm.close();
         Realm.deleteRealm(realm.getConfiguration());
+    }
+
+    /**
+     * Gets whether legacy submissions exist
+     *
+     * @return true if there are legacy submissions
+     */
+    public static boolean hasSubmissions() {
+        return getSubmissionsDirectory().exists();
     }
 
     /**
@@ -92,8 +102,11 @@ public class Legacy {
      *
      * @param username the username to submit as
      */
-    public static void submitAll(String username) throws IOException, TembaException {
+    public static void submitAll(String username, SubmitProgress progress) throws IOException, TembaException {
         File submissionsDir = getSubmissionsDirectory();
+
+        int total = getSubmissionsCount();
+        int submitted = 0;
 
         if (submissionsDir.exists()) {
             for (File orgDir : submissionsDir.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY)) {
@@ -105,6 +118,9 @@ public class Legacy {
                         Submission submission = Submission.load(username, subFile);
                         submission.submit(apiToken);
                         submission.delete();
+
+                        submitted++;
+                        progress.onProgress(100 * submitted / total);
                     }
                     FileUtils.deleteDirectory(flowDir);
                 }
@@ -112,5 +128,9 @@ public class Legacy {
             }
             FileUtils.deleteDirectory(submissionsDir);
         }
+    }
+
+    interface SubmitProgress {
+        void onProgress(int percent);
     }
 }

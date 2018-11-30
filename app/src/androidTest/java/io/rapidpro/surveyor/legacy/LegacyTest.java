@@ -34,6 +34,31 @@ public class LegacyTest extends BaseApplicationTest {
     }
 
     @Test
+    public void migrate() throws IOException {
+        unzipResource(R.raw.legacy_files, getSurveyor().getFilesDir());
+
+        File orgsDir = new File(getSurveyor().getFilesDir(), "orgs");
+        assertThat(orgsDir.exists(), is(true));
+
+        File org1Dir = new File(orgsDir, "1");
+
+        assertThat(org1Dir.exists(), is(true));
+        assertThat(Legacy.isMigrationNeeded(), is(true));
+
+        Legacy.getStorageDirectory().mkdirs();
+        Legacy.getSubmissionsDirectory().mkdirs();
+        File orgSubmissionsDir = SurveyUtils.mkdir(Legacy.getSubmissionsDirectory(), "1");
+
+        Legacy.migrate();
+
+        // org config directory should be deleted
+        assertThat(org1Dir.exists(), is(false));
+
+        // but org submissions directory still exists and has a new token file
+        assertThat(new File(orgSubmissionsDir, "token").exists(), is(true));
+    }
+
+    @Test
     public void getSubmissionsCount_whenStorageDirNotExists() throws IOException {
         assertThat(Legacy.getSubmissionsCount(), is(0));
     }
@@ -71,41 +96,5 @@ public class LegacyTest extends BaseApplicationTest {
         assertThat(mockServer.takeRequest().getRequestLine(), is("POST /api/v1/steps.json HTTP/1.1"));
 
         assertThat(Legacy.getSubmissionsDirectory().exists(), is(false));
-    }
-
-    /**
-     * Utility to unzip a raw test resource into the given target directory
-     */
-    private void unzipResource(int rawResId, File targetDirectory) throws IOException {
-        Context context = InstrumentationRegistry.getInstrumentation().getContext();
-        InputStream input = context.getResources().openRawResource(rawResId);
-        ZipInputStream zis = new ZipInputStream(new BufferedInputStream(input));
-
-        // see https://stackoverflow.com/a/27050680
-        try {
-            ZipEntry ze;
-            int count;
-            byte[] buffer = new byte[8192];
-            while ((ze = zis.getNextEntry()) != null) {
-                File file = new File(targetDirectory, ze.getName());
-                File dir = ze.isDirectory() ? file : file.getParentFile();
-                if (!dir.isDirectory() && !dir.mkdirs()) {
-                    throw new FileNotFoundException("Failed to ensure directory: " + dir.getAbsolutePath());
-                }
-                if (ze.isDirectory()) {
-                    continue;
-                }
-                FileOutputStream fout = new FileOutputStream(file);
-                try {
-                    while ((count = zis.read(buffer)) != -1) {
-                        fout.write(buffer, 0, count);
-                    }
-                } finally {
-                    fout.close();
-                }
-            }
-        } finally {
-            zis.close();
-        }
     }
 }
