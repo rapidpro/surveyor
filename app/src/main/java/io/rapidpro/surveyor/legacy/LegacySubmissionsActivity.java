@@ -5,11 +5,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 
-import java.io.IOException;
 import java.text.NumberFormat;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.activity.BaseActivity;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.rapidpro.surveyor.ui.ViewCache;
@@ -25,18 +23,17 @@ public class LegacySubmissionsActivity extends BaseActivity {
         // this holds our flow list fragment which shows all available flows
         setContentView(R.layout.activity_legacy);
 
-        try {
-            int pending = Legacy.getSubmissionsCount();
-            ViewCache cache = getViewCache();
-            cache.setVisible(R.id.container_pending, pending > 0);
-            cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
-        } catch (IOException e) {
-            SurveyorApplication.LOG.e("Unable to read legacy submissions", e);
-            showToast(R.string.error_legacy_submissions_read);
-            finish();
-        }
+        int pending = Legacy.getSubmissionsCount();
+        ViewCache cache = getViewCache();
+        cache.setVisible(R.id.container_pending, pending > 0);
+        cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
     }
 
+    /**
+     * User clicked the submit button
+     *
+     * @param view the button
+     */
     public void onActionSubmit(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirm_send_submissions))

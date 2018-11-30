@@ -63,7 +63,7 @@
         <activity
             android:name=".activity.AudioCaptureActivity"
             android:screenOrientation="portrait"
-            android:label="@string/title_audio_activity">
+            android:label="@string/title_activity_audio">
         </activity>
         <activity
             android:name=".activity.VideoCaptureActivity"

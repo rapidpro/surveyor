@@ -83,7 +83,7 @@ public class Legacy {
      *
      * @return the count
      */
-    public static int getSubmissionsCount() throws IOException {
+    public static int getSubmissionsCount() {
         File submissionsDir = getSubmissionsDirectory();
         int total = 0;
 
