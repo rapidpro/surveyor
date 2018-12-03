@@ -33,7 +33,7 @@ import static org.hamcrest.CoreMatchers.not;
 
 public class OrgActivityTest extends BaseApplicationTest {
 
-    private static final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
+    private static final String ORG_UUID = "dc8123a1-168c-4962-ab9e-f784f3d804a2";
 
     @Rule
     public IntentsTestRule<OrgActivity> rule = new IntentsTestRule<>(OrgActivity.class, true, false);
@@ -97,7 +97,7 @@ public class OrgActivityTest extends BaseApplicationTest {
                 allOf(
                         hasComponent(FlowActivity.class.getName()),
                         hasExtra(SurveyorIntent.EXTRA_ORG_UUID, ORG_UUID),
-                        hasExtra(SurveyorIntent.EXTRA_FLOW_UUID, "14ca824e-6607-4c11-82f5-18e298d0bd58")
+                        hasExtra(SurveyorIntent.EXTRA_FLOW_UUID, "bdd61538-5f50-4836-a8fb-acaafd64ddb1")
                 )
         );
     }
@@ -107,7 +107,7 @@ public class OrgActivityTest extends BaseApplicationTest {
         installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows, io.rapidpro.surveyor.test.R.raw.org1_assets);
 
         Org org = getSurveyor().getOrgService().get(ORG_UUID);
-        Flow flow1 = org.getFlow("14ca824e-6607-4c11-82f5-18e298d0bd58");
+        Flow flow1 = org.getFlow("bdd61538-5f50-4836-a8fb-acaafd64ddb1");
 
         SubmissionService svc = getSurveyor().getSubmissionService();
         Submission sub1 = svc.newSubmission(org, flow1);

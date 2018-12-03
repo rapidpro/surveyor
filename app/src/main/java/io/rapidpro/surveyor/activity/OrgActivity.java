@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
+import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.task.RefreshOrgTask;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.rapidpro.surveyor.ui.ViewCache;
@@ -29,29 +31,11 @@ import io.rapidpro.surveyor.ui.ViewCache;
  */
 public class OrgActivity extends BaseSubmissionsActivity implements FlowListFragment.Container {
 
-    public Org getOrg() {
-        String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
-
-        try {
-            return getSurveyor().getOrgService().get(orgUUID);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+    private Org org;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Org org = getOrg();
-        if (org == null) {
-            showBugReportDialog();
-            finish();
-            return;
-        }
-
-        setTitle(org.getName());
 
         // this holds our flow list fragment which shows all available flows
         setContentView(R.layout.activity_org);
@@ -61,6 +45,8 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(R.id.fragment_container, fragment).commit();
         }
+
+        refresh();
 
         // if this org doesn't have downloaded assets, ask the user if we can download them now
         if (!org.hasAssets()) {
@@ -76,12 +62,26 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
     }
 
     protected void refresh() {
+        String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
+        try {
+            org = getSurveyor().getOrgService().get(orgUUID);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showBugReportDialog();
+            finish();
+            return;
+        }
+
+        setTitle(org.getName());
+
         FlowListAdapter adapter = (FlowListAdapter) getViewCache().getListViewAdapter(android.R.id.list);
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
 
         int pending = getSurveyor().getSubmissionService().getCompletedCount(getOrg());
+        pending += Legacy.getCompletedCount(getOrg());
+
         ViewCache cache = getViewCache();
         cache.setVisible(R.id.container_pending, pending > 0);
         cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
@@ -155,6 +155,16 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
     @Override
     protected List<Submission> getPendingSubmissions() {
         return getSurveyor().getSubmissionService().getCompleted(getOrg());
+    }
+
+    @Override
+    protected List<File> getLegacySubmissions() {
+        return Legacy.getCompleted(getOrg());
+    }
+
+    @Override
+    public Org getOrg() {
+        return org;
     }
 
     /**

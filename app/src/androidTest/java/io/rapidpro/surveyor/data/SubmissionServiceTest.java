@@ -20,9 +20,9 @@ public class SubmissionServiceTest extends BaseApplicationTest {
         installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows, io.rapidpro.surveyor.test.R.raw.org1_assets);
 
         Org org = getSurveyor().getOrgService().get(ORG_UUID);
-        Flow flow1 = org.getFlow("14ca824e-6607-4c11-82f5-18e298d0bd58");
+        Flow flow1 = org.getFlow("bdd61538-5f50-4836-a8fb-acaafd64ddb1");
         Flow flow2 = org.getFlow("ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec");
-        Flow flow3 = org.getFlow("585958f3-ee7a-4f81-b4c2-fda374155681");
+        Flow flow3 = org.getFlow("e54809ba-2f28-439b-b90b-c623eafa05ae");
 
         SubmissionService svc = getSurveyor().getSubmissionService();
 
@@ -45,7 +45,7 @@ public class SubmissionServiceTest extends BaseApplicationTest {
         File orgDir = new File(submissionsDir, ORG_UUID);
         assertThat(orgDir.exists(), is(true));
 
-        File flow1Dir = new File(orgDir, "14ca824e-6607-4c11-82f5-18e298d0bd58");
+        File flow1Dir = new File(orgDir, "bdd61538-5f50-4836-a8fb-acaafd64ddb1");
         assertThat(flow1Dir.exists(), is(true));
 
         File sub1Dir = new File(flow1Dir, sub1.getUuid());

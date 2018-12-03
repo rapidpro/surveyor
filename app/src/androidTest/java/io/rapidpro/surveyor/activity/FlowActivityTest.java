@@ -27,7 +27,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 public class FlowActivityTest extends BaseApplicationTest {
 
     private static final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
-    private static final String FLOW_UUID = "14ca824e-6607-4c11-82f5-18e298d0bd58";
+    private static final String FLOW_UUID = "bdd61538-5f50-4836-a8fb-acaafd64ddb1";
 
     @Rule
     public IntentsTestRule<FlowActivity> rule = new IntentsTestRule<>(FlowActivity.class, true, false);

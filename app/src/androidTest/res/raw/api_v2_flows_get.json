@@ -3,7 +3,7 @@
   "previous": null,
   "results": [
     {
-      "uuid": "14ca824e-6607-4c11-82f5-18e298d0bd58",
+      "uuid": "bdd61538-5f50-4836-a8fb-acaafd64ddb1",
       "name": "Two Questions",
       "type": "survey",
       "archived": false,
@@ -35,7 +35,7 @@
       "modified_on": "2018-11-14T21:12:10.148865Z"
     },
     {
-      "uuid": "585958f3-ee7a-4f81-b4c2-fda374155681",
+      "uuid": "e54809ba-2f28-439b-b90b-c623eafa05ae",
       "name": "Multimedia",
       "type": "survey",
       "archived": false,

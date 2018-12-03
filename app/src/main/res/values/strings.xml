@@ -53,14 +53,17 @@
     <string name="permission_location">We need permission to access your location in order to collect GPS data.</string>
     <string name="permission_storage">We need access to your storage in order to save your surveys that are in progress.</string>
 
+    <!-- miscellaneous -->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <plurals name="questions">
+        <item quantity="one">%d question</item>
+        <item quantity="other">%d questions</item>
+    </plurals>
     <plurals name="submissions_sent">
         <item quantity="one">%d submission sent</item>
         <item quantity="other">%d submissions sent</item>
     </plurals>
-
-    <!-- miscellaneous -->
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
 
     <!-- font icons -->
     <string name="icon_camera_front">\ue146</string>

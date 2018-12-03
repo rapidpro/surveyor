@@ -20,7 +20,7 @@ public class FlowTest {
 
         Flow summary = Flow.extract(new RawJson(definition));
 
-        assertThat(summary.getUuid(), is("14ca824e-6607-4c11-82f5-18e298d0bd58"));
+        assertThat(summary.getUuid(), is("bdd61538-5f50-4836-a8fb-acaafd64ddb1"));
         assertThat(summary.getName(), is("Two Questions"));
         assertThat(summary.getRevision(), is(24));
         assertThat(summary.getQuestionCount(), is(2));

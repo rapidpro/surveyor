@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.engine.Engine;
+import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
@@ -51,6 +53,7 @@ public class FlowActivity extends BaseSubmissionsActivity {
             e.printStackTrace();
             showBugReportDialog();
             finish();
+            return;
         }
 
         String questionString = " Questions";
@@ -64,13 +67,11 @@ public class FlowActivity extends BaseSubmissionsActivity {
         cache.setText(R.id.text_flow_questions, nf.format(flow.getQuestionCount()) + questionString);
         cache.setText(R.id.text_flow_revision, "(v" + nf.format(flow.getRevision()) + ")");
 
-        int submissions = getSurveyor().getSubmissionService().getCompletedCount(org, flow);
-        if (submissions > 0) {
-            cache.show(R.id.container_pending);
-            cache.setButtonText(R.id.button_pending, nf.format(submissions));
-        } else {
-            cache.hide(R.id.container_pending);
-        }
+        int pending = getSurveyor().getSubmissionService().getCompletedCount(org, flow);
+        pending += Legacy.getCompletedCount(org, flow);
+
+        cache.setVisible(R.id.container_pending, pending > 0);
+        cache.setButtonText(R.id.button_pending, nf.format(pending));
     }
 
     public void onActionStart(View view) {
@@ -108,5 +109,15 @@ public class FlowActivity extends BaseSubmissionsActivity {
     @Override
     protected List<Submission> getPendingSubmissions() {
         return getSurveyor().getSubmissionService().getCompleted(org, flow);
+    }
+
+    @Override
+    protected List<File> getLegacySubmissions() {
+        return Legacy.getCompleted(org, flow);
+    }
+
+    @Override
+    protected Org getOrg() {
+        return org;
     }
 }

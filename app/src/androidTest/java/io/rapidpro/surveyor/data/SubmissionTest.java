@@ -24,7 +24,7 @@ public class SubmissionTest extends BaseApplicationTest {
         installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows, io.rapidpro.surveyor.test.R.raw.org1_assets);
 
         Org org = getSurveyor().getOrgService().get(ORG_UUID);
-        Flow flow1 = org.getFlow("14ca824e-6607-4c11-82f5-18e298d0bd58");
+        Flow flow1 = org.getFlow("bdd61538-5f50-4836-a8fb-acaafd64ddb1");
 
         SubmissionService svc = getSurveyor().getSubmissionService();
 

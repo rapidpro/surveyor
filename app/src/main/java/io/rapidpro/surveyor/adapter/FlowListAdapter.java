@@ -15,6 +15,7 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.legacy.Legacy;
 
 public class FlowListAdapter extends ArrayAdapter<Flow> {
 
@@ -49,24 +50,18 @@ public class FlowListAdapter extends ArrayAdapter<Flow> {
         Flow flow = getItem(position);
         cache.titleView.setText(flow.getName());
 
-        int submissions = SurveyorApplication.get().getSubmissionService().getCompletedCount(org, flow);
+        int pending = SurveyorApplication.get().getSubmissionService().getCompletedCount(org, flow);
+        pending += Legacy.getCompletedCount(org, flow);
 
         NumberFormat nf = NumberFormat.getInstance();
-        cache.pendingSubmissions.setText(nf.format(submissions));
+        cache.pendingSubmissions.setText(nf.format(pending));
         cache.pendingSubmissions.setTag(flow);
+        cache.pendingSubmissions.setVisibility(pending > 0 ? View.VISIBLE : View.GONE);
 
-        if (submissions > 0) {
-            cache.pendingSubmissions.setVisibility(View.VISIBLE);
-        } else {
-            cache.pendingSubmissions.setVisibility(View.GONE);
-        }
+        int numQuestions = flow.getQuestionCount();
+        String questionsString = getContext().getResources().getQuantityString(R.plurals.questions, numQuestions, numQuestions);
 
-        String questionString = "Questions";
-        if (flow.getQuestionCount() == 1) {
-            questionString = "Question";
-        }
-
-        cache.questionView.setText(nf.format(flow.getQuestionCount()) + " " + questionString + " (v" + nf.format(flow.getRevision()) + ")");
+        cache.questionView.setText(questionsString + " (v" + nf.format(flow.getRevision()) + ")");
         return row;
     }
 

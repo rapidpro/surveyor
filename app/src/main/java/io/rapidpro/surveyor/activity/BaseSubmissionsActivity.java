@@ -6,9 +6,11 @@ import android.content.res.Resources;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.task.SubmitSubmissionsTask;
 import io.rapidpro.surveyor.ui.BlockingProgress;
@@ -52,19 +54,19 @@ public abstract class BaseSubmissionsActivity extends BaseActivity {
         final Submission[] asArray = pending.toArray(new Submission[0]);
         final Resources res = getResources();
 
-        new SubmitSubmissionsTask(new SubmitSubmissionsTask.Listener() {
+        SubmitSubmissionsTask task = new SubmitSubmissionsTask(new SubmitSubmissionsTask.Listener() {
             @Override
             public void onProgress(int percent) {
                 progressModal.setProgress(percent);
             }
 
             @Override
-            public void onComplete() {
+            public void onComplete(int total) {
                 refresh();
 
                 progressModal.dismiss();
 
-                CharSequence toast = res.getQuantityString(R.plurals.submissions_sent, pending.size(), pending.size());
+                CharSequence toast = res.getQuantityString(R.plurals.submissions_sent, total, total);
                 Toast.makeText(BaseSubmissionsActivity.this, toast, Toast.LENGTH_SHORT).show();
             }
 
@@ -74,10 +76,19 @@ public abstract class BaseSubmissionsActivity extends BaseActivity {
 
                 Toast.makeText(BaseSubmissionsActivity.this, getString(R.string.error_submissions_send), Toast.LENGTH_SHORT).show();
             }
-        }).execute(asArray);
+        });
+
+        task.setUsername(getUsername());
+        task.setLegacyToken(getOrg().getToken());
+        task.includeLegacySubmissions(getLegacySubmissions());
+        task.execute(asArray);
     }
 
     protected abstract List<Submission> getPendingSubmissions();
+
+    protected abstract List<File> getLegacySubmissions();
+
+    protected abstract Org getOrg();
 
     protected abstract void refresh();
 }

@@ -101,15 +101,6 @@ public class LoginActivity extends BaseActivity {
 
         // set our error message if we have one
         setErrorMessage(getIntent().getStringExtra(SurveyorIntent.EXTRA_ERROR));
-
-        if (Legacy.isMigrationNeeded()) {
-            try {
-                Legacy.migrate();
-            } catch (IOException e) {
-                SurveyorApplication.LOG.e("Error migrating legacy orgs", e);
-                Toast.makeText(this, "Unable to prepare legacy submissions", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     public void onResume() {

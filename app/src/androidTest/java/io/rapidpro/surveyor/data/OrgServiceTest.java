@@ -43,7 +43,7 @@ public class OrgServiceTest extends BaseApplicationTest {
         assertThat(org.getTimezone(), is("Africa/Kigali"));
         assertThat(org.getDateStyle(), is("day_first"));
         assertThat(org.isAnon(), is(false));
-        assertThat(org.getToken(), is("67537873784848322fghsaf3g"));
+        assertThat(org.getToken(), is("797d44ef78f7845de0f4dbb42d5174505563dd77"));
         assertThat(org.getFlows(), is(Collections.<Flow>emptyList()));
         assertThat(org.hasAssets(), is(false));
 
@@ -67,7 +67,7 @@ public class OrgServiceTest extends BaseApplicationTest {
 
         OrgService svc = getSurveyor().getOrgService();
 
-        Org org = svc.getOrFetch(ORG_UUID, "Nyaruka", "67537873784848322fghsaf3g");
+        Org org = svc.getOrFetch(ORG_UUID, "Nyaruka", "797d44ef78f7845de0f4dbb42d5174505563dd77");
         assertThat(org.getUuid(), is("b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06"));
         assertThat(org.getName(), is("Nyaruka"));
         assertThat(org.getCountry(), is("RW"));

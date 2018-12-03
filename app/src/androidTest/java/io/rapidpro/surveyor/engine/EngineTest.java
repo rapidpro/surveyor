@@ -52,7 +52,7 @@ public class EngineTest extends BaseApplicationTest {
     @Test
     public void twoQuestions() throws IOException, EngineException {
         final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
-        final String FLOW_UUID = "14ca824e-6607-4c11-82f5-18e298d0bd58";
+        final String FLOW_UUID = "bdd61538-5f50-4836-a8fb-acaafd64ddb1";
 
         installOrg(ORG_UUID, R.raw.org1_details, R.raw.org1_flows, R.raw.org1_assets);
         OrgService svc = getSurveyor().getOrgService();
@@ -115,7 +115,7 @@ public class EngineTest extends BaseApplicationTest {
     @Test
     public void multimedia() throws IOException, EngineException {
         final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
-        final String FLOW_UUID = "585958f3-ee7a-4f81-b4c2-fda374155681";
+        final String FLOW_UUID = "e54809ba-2f28-439b-b90b-c623eafa05ae";
 
         installOrg(ORG_UUID, R.raw.org1_details, R.raw.org1_flows, R.raw.org1_assets);
         OrgService svc = getSurveyor().getOrgService();

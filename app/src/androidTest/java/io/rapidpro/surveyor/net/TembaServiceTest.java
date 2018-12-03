@@ -145,14 +145,14 @@ public class TembaServiceTest extends BaseApplicationTest {
 
         List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
         assertThat(flows, hasSize(3));
-        assertThat(flows.get(0).getUuid(), is("14ca824e-6607-4c11-82f5-18e298d0bd58"));
+        assertThat(flows.get(0).getUuid(), is("bdd61538-5f50-4836-a8fb-acaafd64ddb1"));
         assertThat(flows.get(0).getName(), is("Two Questions"));
         assertThat(flows.get(0).getType(), is("survey"));
         assertThat(flows.get(0).isArchived(), is(false));
         assertThat(flows.get(0).getExpires(), is(10080));
         assertThat(flows.get(1).getUuid(), is("ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec"));
         assertThat(flows.get(1).getName(), is("Contact Details"));
-        assertThat(flows.get(2).getUuid(), is("585958f3-ee7a-4f81-b4c2-fda374155681"));
+        assertThat(flows.get(2).getUuid(), is("e54809ba-2f28-439b-b90b-c623eafa05ae"));
         assertThat(flows.get(2).getName(), is("Multimedia"));
     }
 

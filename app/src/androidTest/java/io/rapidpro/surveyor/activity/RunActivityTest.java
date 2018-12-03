@@ -66,7 +66,7 @@ public class RunActivityTest extends BaseApplicationTest {
 
     @Test
     public void twoQuestions() throws Exception {
-        launchForFlow("14ca824e-6607-4c11-82f5-18e298d0bd58");
+        launchForFlow("bdd61538-5f50-4836-a8fb-acaafd64ddb1");
 
         onView(allOf(withParent(withId(R.id.chat_history)), withClassName(is(ChatBubbleView.class.getName()))))
                 .check(matches(isDisplayed()));
@@ -114,7 +114,7 @@ public class RunActivityTest extends BaseApplicationTest {
 
     @Test
     public void multimedia() {
-        launchForFlow("585958f3-ee7a-4f81-b4c2-fda374155681");
+        launchForFlow("e54809ba-2f28-439b-b90b-c623eafa05ae");
 
         mockMediaCapturing();
 

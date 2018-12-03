@@ -37,7 +37,6 @@ import io.rapidpro.surveyor.net.TembaService;
  */
 public class Submission implements Jsonizable {
 
-    private transient static final String SUBMISSIONS_DIR = "submissions";
     private transient static final String FLOW_FILE = "flow.json";
     private transient static final String MEDIA_DIR = "media";
     private transient static final String CURRENT_FILE = "current.json";
@@ -72,21 +71,6 @@ public class Submission implements Jsonizable {
     private String m_appVersion;
 
     public Submission() {
-    }
-
-    /**
-     * The submission directory for the given flow
-     */
-    private static File getFlowDir(int orgId, String flowUuid) throws IOException {
-        File flowDir = new File(getOrgDir(orgId), flowUuid);
-        flowDir.mkdirs();
-        return flowDir;
-    }
-
-    private static File getOrgDir(int orgId) throws IOException {
-        File orgDir = new File(Legacy.getSubmissionsDirectory(), orgId + "");
-        orgDir.mkdirs();
-        return orgDir;
     }
 
     private static JsonObject migrateFlowToVersion9(String flowUUID, JsonObject root) {
@@ -210,13 +194,6 @@ public class Submission implements Jsonizable {
         submission.m_completed = obj.get("completed").getAsBoolean();
         submission.m_flow = obj.get("flow").getAsString();
         return submission;
-    }
-
-    public static void deleteFlowSubmissions(int orgId, String uuid) {
-        try {
-            FileUtils.deleteDirectory(getFlowDir(orgId, uuid));
-        } catch (IOException e) {
-        }
     }
 
     /**

@@ -27,8 +27,6 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.SurveyorPreferences;
-import io.rapidpro.surveyor.legacy.Legacy;
-import io.rapidpro.surveyor.legacy.LegacySubmissionsActivity;
 import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
@@ -76,16 +74,10 @@ public abstract class BaseActivity extends PermisoActivity {
                 menuItem.setVisible(true);
             }
         }
+
         // show logout action if we're logged in
         if (isLoggedIn()) {
             MenuItem menuItem = menu.findItem(R.id.action_logout);
-            if (menuItem != null) {
-                menuItem.setVisible(true);
-            }
-        }
-        // show legacy submissions option if there are legacy submissions
-        if (Legacy.hasSubmissions()) {
-            MenuItem menuItem = menu.findItem(R.id.action_legacy_submissions);
             if (menuItem != null) {
                 menuItem.setVisible(true);
             }
@@ -119,11 +111,6 @@ public abstract class BaseActivity extends PermisoActivity {
      */
     public void onActionBugReport(MenuItem item) {
         sendBugReport();
-    }
-
-    public void onActionLegacySubmissions(MenuItem item) {
-        Intent intent = new Intent(this, LegacySubmissionsActivity.class);
-        startActivity(intent);
     }
 
     /**

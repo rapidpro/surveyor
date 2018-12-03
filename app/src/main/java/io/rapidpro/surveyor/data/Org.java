@@ -53,6 +53,8 @@ public class Org {
 
     private boolean anon;
 
+    private String legacySubmissionsDirectory;
+
     private transient File directory;
 
     private transient List<Flow> flows;
@@ -72,6 +74,7 @@ public class Org {
         org.token = token;
         org.directory = directory;
         org.flows = new ArrayList<>();
+        org.legacySubmissionsDirectory = null;
 
         FileUtils.writeStringToFile(new File(directory, DETAILS_FILE), "{\"name\":\"" + name + "\",\"token\":\"" + token + "\"}");
         FileUtils.writeStringToFile(new File(directory, FLOWS_FILE), "[]");
@@ -168,6 +171,19 @@ public class Org {
         return anon;
     }
 
+    /**
+     * Gets the directory of legacy submissions for this org (may be null)
+     *
+     * @return the directory
+     */
+    public String getLegacySubmissionsDirectory() {
+        return legacySubmissionsDirectory;
+    }
+
+    public void setLegacySubmissionsDirectory(String legacySubmissionsDirectory) {
+        this.legacySubmissionsDirectory = legacySubmissionsDirectory;
+    }
+
     public List<Flow> getFlows() {
         return flows;
     }
@@ -219,10 +235,7 @@ public class Org {
         this.country = apiOrg.getCountry();
         this.dateStyle = apiOrg.getDateStyle();
         this.anon = apiOrg.isAnon();
-
-        // (re)write org fields to details.json
-        String detailsJSON = JsonUtils.marshal(this);
-        FileUtils.writeStringToFile(new File(directory, DETAILS_FILE), detailsJSON);
+        this.save();
 
         if (progress != null) {
             progress.reportProgress(10);
@@ -231,6 +244,12 @@ public class Org {
         if (includeAssets) {
             refreshAssets(progress);
         }
+    }
+
+    public void save() throws IOException {
+        // (re)write org fields to details.json
+        String detailsJSON = JsonUtils.marshal(this);
+        FileUtils.writeStringToFile(new File(directory, DETAILS_FILE), detailsJSON);
     }
 
     private void refreshAssets(RefreshProgress progress) throws TembaException, IOException {

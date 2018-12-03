@@ -73,11 +73,6 @@
         <activity android:name=".activity.CreateAccountActivity"
                   android:label="@string/title_activity_create_account">
         </activity>
-        <activity
-            android:name=".legacy.LegacySubmissionsActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_legacy" >
-        </activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
