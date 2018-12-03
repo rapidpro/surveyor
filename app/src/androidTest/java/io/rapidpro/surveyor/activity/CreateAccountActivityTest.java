@@ -186,7 +186,7 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
      * tested here because we need a IntentsTestRule based test
      */
     @Test
-    public void sendBugReport() throws IOException {
+    public void sendBugReport() throws IOException, InterruptedException {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_get, "text/html", 200);
 
         // mock the intent to pick an app to send the bug report too
@@ -195,6 +195,9 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
         rule.launchActivity(null);
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        
+        Thread.sleep(2000);
+
         onView(withText("Bug Report"))
                 .perform(click());
 

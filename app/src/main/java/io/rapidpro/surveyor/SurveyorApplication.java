@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v4.content.FileProvider;
 
 import org.apache.commons.io.FileUtils;
@@ -58,6 +59,8 @@ public class SurveyorApplication extends Application {
         LOG.d("Creating Surveyor application...");
 
         super.onCreate();
+
+        LOG.d("External storage dir=" + Environment.getExternalStorageDirectory() + " state=" + Environment.getExternalStorageState() + " emulated=" + Environment.isExternalStorageEmulated());
 
         s_this = this;
 
