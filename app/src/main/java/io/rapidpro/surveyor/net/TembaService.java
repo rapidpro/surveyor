@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.Logger;
-import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.net.requests.SessionAndEvents;
 import io.rapidpro.surveyor.net.responses.Boundary;
@@ -45,11 +44,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TembaService {
 
     private TembaAPI api;
-    private Logger log;
 
-    public TembaService(String host, Logger log) {
+    public TembaService(String host) {
         this.api = createRetrofit(host).create(TembaAPI.class);
-        this.log = log;
     }
 
     /**
@@ -210,7 +207,7 @@ public class TembaService {
 
     public void submitSession(String token, SessionAndEvents payload) throws TembaException {
 
-        SurveyorApplication.LOG.d(JsonUtils.marshal(payload));
+        Logger.d(JsonUtils.marshal(payload));
 
         // TODO
     }
@@ -255,7 +252,7 @@ public class TembaService {
             }
 
             // make a note of the error in our log
-            log.d(errorBody);
+            Logger.w(errorBody);
 
             // see if the server had anything interesting to say
             Gson gson = new Gson();

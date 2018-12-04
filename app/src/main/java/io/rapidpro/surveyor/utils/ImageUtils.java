@@ -7,8 +7,6 @@ import android.provider.MediaStore;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-import io.rapidpro.surveyor.SurveyorApplication;
-
 public class ImageUtils {
     public static byte[] convertToJPEG(Bitmap bm) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

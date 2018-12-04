@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import java.util.Set;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.net.responses.Token;
@@ -65,7 +66,7 @@ public class CreateAccountActivity extends BaseActivity {
 
         String createAccountURL = SurveyorApplication.get().getTembaHost() + CREATE_ACCOUNT_URL;
 
-        SurveyorApplication.LOG.d("Connecting to " + createAccountURL + "...");
+        Logger.d("Connecting to " + createAccountURL + "...");
 
         web.loadUrl(createAccountURL);
     }

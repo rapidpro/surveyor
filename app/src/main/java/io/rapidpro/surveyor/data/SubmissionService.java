@@ -17,19 +17,16 @@ import io.rapidpro.surveyor.utils.SurveyUtils;
 public class SubmissionService {
 
     private File rootDir;
-    private Logger log;
 
     /**
      * Creates a new submission service
      *
      * @param rootDir the root directory
-     * @param log     the logger
      */
-    public SubmissionService(File rootDir, Logger log) {
+    public SubmissionService(File rootDir) {
         this.rootDir = rootDir;
-        this.log = log;
 
-        log.d("SubmissionService created for directory " + this.rootDir.getAbsolutePath());
+        Logger.d("SubmissionService created for directory " + this.rootDir.getAbsolutePath());
     }
 
     /**
@@ -51,7 +48,7 @@ public class SubmissionService {
         directory = new File(flowDir, Submission.INCOMPLETE_DIRECTORY_NAME);
         directory.mkdirs();
 
-        log.d("Creating new submission in " + directory.getPath());
+        Logger.d("Creating new submission in " + directory.getPath());
 
         return new Submission(org, directory);
     }

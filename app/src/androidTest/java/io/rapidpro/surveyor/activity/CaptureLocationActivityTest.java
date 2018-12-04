@@ -1,8 +1,8 @@
 package io.rapidpro.surveyor.activity;
 
 import android.app.Instrumentation;
-import android.location.Location;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -20,6 +20,10 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+/**
+ * This test can only work after the Maps app has been opened and the T&C accepted
+ */
+@Ignore
 public class CaptureLocationActivityTest extends BaseApplicationTest {
 
     @Rule

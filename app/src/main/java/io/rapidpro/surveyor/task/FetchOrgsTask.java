@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.OrgService;
@@ -38,9 +39,9 @@ public class FetchOrgsTask extends AsyncTask<Token, Void, Set<String>> {
                 orgs.add(org);
                 orgUUIDs.add(org.getUuid());
 
-                SurveyorApplication.LOG.d("Fetched org with UUID " + org.getUuid());
+                Logger.d("Fetched org with UUID " + org.getUuid());
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.e("Unable to fetch org", e);
                 this.failed = true;
                 break;
             }
@@ -51,7 +52,7 @@ public class FetchOrgsTask extends AsyncTask<Token, Void, Set<String>> {
             try {
                 Legacy.cleanupOrgs(orgs);
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.e("Unable to cleanup legacy orgs", e);
             }
         }
 

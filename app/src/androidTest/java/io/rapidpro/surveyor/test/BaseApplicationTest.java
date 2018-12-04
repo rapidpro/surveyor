@@ -23,14 +23,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import androidx.test.platform.app.InstrumentationRegistry;
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorPreferences;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
-import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.Espresso.openContextualActionModeOverflowMenu;
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
 
 /**
@@ -41,7 +40,7 @@ public abstract class BaseApplicationTest {
     @Rule
     public TestRule logger = new TestWatcher() {
         protected void starting(Description description) {
-            SurveyorApplication.LOG.d("========= Starting test: " + description.getClassName() + "#" + description.getMethodName() + " =========");
+            Logger.d("========= Starting test: " + description.getClassName() + "#" + description.getMethodName() + " =========");
         }
     };
     protected MockWebServer mockServer;
@@ -52,7 +51,7 @@ public abstract class BaseApplicationTest {
         mockServer.start();
 
         String mockServerURL = mockServer.url("/").toString();
-        SurveyorApplication.LOG.d("Mock server started at " + mockServerURL);
+        Logger.d("Mock server started at " + mockServerURL);
 
         getSurveyor().setPreference(SurveyorPreferences.HOST, mockServerURL);
         getSurveyor().onTembaHostChanged();
@@ -62,7 +61,7 @@ public abstract class BaseApplicationTest {
     public void stopMockServer() throws IOException {
         mockServer.shutdown();
 
-        SurveyorApplication.LOG.d("Mock server stopped after " + mockServer.getRequestCount() + " requests");
+        Logger.d("Mock server stopped after " + mockServer.getRequestCount() + " requests");
     }
 
     /**

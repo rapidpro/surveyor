@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.ui.IconTextView;
@@ -39,7 +40,7 @@ public class CaptureAudioActivity extends BaseActivity {
             mediaRecorder.prepare();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.e("Unable to create media recorder", e);
         }
 
         mediaRecorder.start();

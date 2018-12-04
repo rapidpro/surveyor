@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
@@ -32,7 +33,7 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.C
             try {
                 orgs.add(getSurveyor().getOrgService().get(uuid));
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.e("Unable to load org", e);
             }
         }
 
@@ -58,7 +59,7 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.C
         }
         // if we have access to a single org, then skip this entire activity
         else if (orgs.size() == 1) {
-            SurveyorApplication.LOG.d("One org found, shortcutting chooser to: " + orgs.get(0).getName());
+            Logger.d("One org found, shortcutting chooser to: " + orgs.get(0).getName());
             showOrg(orgs.get(0));
             finish();
             overridePendingTransition(0, 0);

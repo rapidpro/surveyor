@@ -5,7 +5,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Collections;
 
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.net.TembaException;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 

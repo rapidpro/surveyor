@@ -55,11 +55,21 @@
     <string name="permission_location">We need permission to access your location in order to collect GPS data.</string>
     <string name="permission_storage">We need access to your storage in order to save your surveys that are in progress.</string>
 
+    <!-- media capturing -->
+    <string name="tap_to_record">Tap to Record</string>
+    <string name="tap_to_capture">Tap to Capture</string>
+    <string name="waiting_for_gps">Waiting for GPS…</string>
+    <string name="latitude_longitude">Lat: %.3f Long: %.3f</string>
+    <string name="accuracy_meters">Accuracy: %d meters</string>
+
+    <!-- preferences -->
+    <string name="pref_default_host">https://app.rapidpro.io</string>
+    <string name="pref_title_host">RapidPro Host</string>
+    <string name="pref_summary_host">The address for your RapidPro installation</string>
+
     <!-- miscellaneous -->
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="latitude_longitude">Lat: %.3f Long: %.3f</string>
-    <string name="accuracy_meters">Accuracy: %d meters</string>
     <plurals name="questions">
         <item quantity="one">%d question</item>
         <item quantity="other">%d questions</item>
@@ -87,15 +97,6 @@
     <string name="icon_stop">\ue02a</string>
     <string name="icon_videocam">\ue02e</string>
     <string name="icon_volume_up">\ue033</string>
-
-    <!-- media capturing -->
-    <string name="tap_to_record">Tap to Record</string>
-    <string name="tap_to_capture">Tap to Capture</string>
-
-    <!-- preferences -->
-    <string name="pref_default_host">https://app.rapidpro.io</string>
-    <string name="pref_title_host">RapidPro Host</string>
-    <string name="pref_summary_host">The address for your RapidPro installation</string>
 
     <!-- legacy stuff to be removed -->
     <string name="title_activity_legacy">Legacy Submissions</string>

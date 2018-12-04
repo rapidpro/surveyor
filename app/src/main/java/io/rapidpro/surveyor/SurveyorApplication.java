@@ -23,8 +23,6 @@ import io.rapidpro.surveyor.utils.SurveyUtils;
  */
 public class SurveyorApplication extends Application {
 
-    public static final Logger LOG = new Logger();
-
     /**
      * The singleton instance of this application
      */
@@ -56,21 +54,21 @@ public class SurveyorApplication extends Application {
 
     @Override
     public void onCreate() {
-        LOG.d("Creating Surveyor application...");
+        Logger.d("Creating Surveyor application...");
 
         super.onCreate();
 
-        LOG.d("External storage dir=" + Environment.getExternalStorageDirectory() + " state=" + Environment.getExternalStorageState() + " emulated=" + Environment.isExternalStorageEmulated());
+        Logger.d("External storage dir=" + Environment.getExternalStorageDirectory() + " state=" + Environment.getExternalStorageState() + " emulated=" + Environment.isExternalStorageEmulated());
 
         s_this = this;
 
-        tembaService = new TembaService(getTembaHost(), LOG);
+        tembaService = new TembaService(getTembaHost());
 
         try {
-            orgService = new OrgService(getOrgsDirectory(), LOG);
-            submissionService = new SubmissionService(getSubmissionsDirectory(), LOG);
+            orgService = new OrgService(getOrgsDirectory());
+            submissionService = new SubmissionService(getSubmissionsDirectory());
         } catch (IOException e) {
-            LOG.e("Unable to create directory based services", e);
+            Logger.e("Unable to create directory based services", e);
         }
     }
 
@@ -143,17 +141,17 @@ public class SurveyorApplication extends Application {
     public void onTembaHostChanged() {
         String newHost = getTembaHost();
 
-        LOG.d("Host changed to " + newHost);
+        Logger.d("Host changed to " + newHost);
 
         clearPreference(SurveyorPreferences.AUTH_USERNAME);
         clearPreference(SurveyorPreferences.AUTH_ORGS);
         try {
             clearSubmissions();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.e("Unable to clear submissions", e);
         }
 
-        tembaService = new TembaService(newHost, LOG);
+        tembaService = new TembaService(newHost);
     }
 
     /**

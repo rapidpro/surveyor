@@ -14,6 +14,7 @@ import java.io.File;
 import java.text.NumberFormat;
 import java.util.List;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.adapter.FlowListAdapter;
@@ -66,7 +67,7 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
         try {
             org = getSurveyor().getOrgService().get(orgUUID);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.e("Unable to load org", e);
             showBugReportDialog();
             finish();
             return;

@@ -32,7 +32,7 @@
         android:layout_below="@id/text_instructions"
         android:textSize="18sp"
         android:layout_marginTop="10dp"
-        android:text="@string/latitude_longitude"
+        android:text="@string/waiting_for_gps"
         android:layout_centerHorizontal="true"/>
 
     <TextView
@@ -42,6 +42,7 @@
         android:layout_below="@id/text_coordinates"
         android:textSize="18sp"
         android:layout_marginTop="10dp"
+        android:visibility="invisible"
         android:text="@string/accuracy_meters"
         android:layout_centerHorizontal="true"/>
 

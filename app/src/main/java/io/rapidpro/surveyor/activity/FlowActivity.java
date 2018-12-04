@@ -11,6 +11,7 @@ import java.io.File;
 import java.text.NumberFormat;
 import java.util.List;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
@@ -50,7 +51,7 @@ public class FlowActivity extends BaseSubmissionsActivity {
             org = getSurveyor().getOrgService().get(orgUUID);
             flow = org.getFlow(flowUUID);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.e("Unable to load org or flow", e);
             showBugReportDialog();
             finish();
             return;

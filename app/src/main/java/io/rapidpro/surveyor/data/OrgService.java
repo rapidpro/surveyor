@@ -14,26 +14,24 @@ import io.rapidpro.surveyor.net.TembaException;
 public class OrgService {
 
     private File rootDir;
-    private Logger log;
 
     private Map<String, Org> cache = new HashMap<>();
 
-    public OrgService(File rootDir, Logger log) {
+    public OrgService(File rootDir) {
         this.rootDir = rootDir;
-        this.log = log;
 
-        log.d("OrgService created for directory " + this.rootDir.getAbsolutePath());
+        Logger.d("OrgService created for directory " + this.rootDir.getAbsolutePath());
     }
 
     public Org get(String uuid) throws IOException {
         if (cache.containsKey(uuid)) {
-            log.d("Returning cached org " + uuid);
+            Logger.d("Returning cached org " + uuid);
             return cache.get(uuid);
         }
 
         File directory = new File(rootDir, uuid);
         Org org = Org.load(directory);
-        log.d("Loaded org " + uuid);
+        Logger.d("Loaded org " + uuid);
         cache.put(uuid, org);
         return org;
     }

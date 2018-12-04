@@ -2,6 +2,7 @@ package io.rapidpro.surveyor.task;
 
 import android.os.AsyncTask;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.data.Org;
 
 /**
@@ -29,7 +30,7 @@ public class RefreshOrgTask extends AsyncTask<Org, Integer, Void> {
             });
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.e("Unable to refresh org", e);
             this.failed = true;
         }
 

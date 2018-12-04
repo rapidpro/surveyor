@@ -14,19 +14,16 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.greysonparrelli.permiso.Permiso;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.SurveyorPreferences;
-import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.net.TembaService;
 import io.rapidpro.surveyor.net.responses.Token;
 import io.rapidpro.surveyor.net.responses.TokenResults;
@@ -174,7 +171,7 @@ public class LoginActivity extends BaseActivity {
                     if (response.isSuccessful()) {
                         List<Token> tokens = response.body().getTokens();
 
-                        SurveyorApplication.LOG.d("Authentication returned " + tokens.size() + " tokens");
+                        Logger.d("Authentication returned " + tokens.size() + " tokens");
 
                         fetchOrgsAndLogin(email, tokens);
 
@@ -198,7 +195,7 @@ public class LoginActivity extends BaseActivity {
 
                 @Override
                 public void onFailure(Call<TokenResults> call, Throwable t) {
-                    SurveyorApplication.LOG.e("Failure logging in", t);
+                    Logger.e("Failure logging in", t);
                     setErrorMessage(getString(R.string.error_network));
                     showProgress(false);
                 }

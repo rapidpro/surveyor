@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
@@ -60,7 +61,7 @@ public class Legacy {
             if (orgSubmissionsDir.exists()) {
                 Org newOrg = findEquivalentOrg(orgs, legacyOrg);
                 if (newOrg != null) {
-                    SurveyorApplication.LOG.d("Attaching legacy submissions for legacy org #" + legacyOrg.getId() + " to new org " + newOrg.getUuid());
+                    Logger.d("Attaching legacy submissions for legacy org #" + legacyOrg.getId() + " to new org " + newOrg.getUuid());
 
                     newOrg.setLegacySubmissionsDirectory(orgSubmissionsDir.getAbsolutePath());
                     newOrg.save();
@@ -108,7 +109,7 @@ public class Legacy {
      * @return the submission files
      */
     public static List<File> getCompleted(Org org, Flow flow) {
-        SurveyorApplication.LOG.d("Looking up completed legacy submissions for flow " + flow.getUuid());
+        Logger.d("Looking up completed legacy submissions for flow " + flow.getUuid());
 
         if (org.getLegacySubmissionsDirectory() == null) {
             return Collections.emptyList();

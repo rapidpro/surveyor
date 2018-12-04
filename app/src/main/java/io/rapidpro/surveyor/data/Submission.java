@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.engine.EngineException;
 import io.rapidpro.surveyor.engine.Session;
@@ -168,12 +169,12 @@ public class Submission {
             FileUtils.deleteDirectory(directory);
             directory = null;
         } catch (IOException e) {
-            SurveyorApplication.LOG.e("Unable to delete submission " + directory.getAbsolutePath(), e);
+            Logger.e("Unable to delete submission " + directory.getAbsolutePath(), e);
         }
     }
 
     public void submit() throws IOException, TembaException {
-        SurveyorApplication.LOG.d("Submitting submission " + getUuid() + "...");
+        Logger.d("Submitting submission " + getUuid() + "...");
 
         String session = FileUtils.readFileToString(new File(directory, SESSION_FILE));
         List<String> events = FileUtils.readLines(new File(directory, EVENTS_FILE));
@@ -222,7 +223,7 @@ public class Submission {
 
             uploads.put(mediaUri, newUrl);
 
-            SurveyorApplication.LOG.d("Uploaded media " + mediaUri + " to " + newUrl);
+            Logger.d("Uploaded media " + mediaUri + " to " + newUrl);
         }
         return uploads;
     }

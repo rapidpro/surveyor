@@ -28,6 +28,7 @@ import io.rapidpro.flows.runner.Field;
 import io.rapidpro.flows.runner.Step;
 import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.flows.utils.Jsonizable;
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.net.TembaException;
 import io.rapidpro.surveyor.net.TembaService;
@@ -94,12 +95,12 @@ public class Submission implements Jsonizable {
     private static Map<String, Flow> getFlows(File file) {
         String revision = file.getName().split("_")[0];
         File flowFile = new File(file.getParent(), revision + "_" + FLOW_FILE);
-        SurveyorApplication.LOG.d("Reading flow: " + flowFile.getName());
+        Logger.d("Reading flow: " + flowFile.getName());
         String flowString = null;
         try {
             flowString = FileUtils.readFileToString(flowFile);
         } catch (IOException e) {
-            SurveyorApplication.LOG.e("Error loading flow", e);
+            Logger.e("Error loading flow", e);
         }
 
         String flowUUID = file.getParentFile().getName();
@@ -310,7 +311,7 @@ public class Submission implements Jsonizable {
             for (RuleSet.Result result : results) {
                 String media = result.getMedia();
                 if (media != null) {
-                    SurveyorApplication.LOG.d("Resolving media result: " + media);
+                    Logger.d("Resolving media result: " + media);
                     int split = media.indexOf(":");
 
                     String type = media.substring(0, split);
@@ -334,7 +335,7 @@ public class Submission implements Jsonizable {
         rapid.legacyAddCreatedFields(token, m_fields);
 
         // first we need to create our contact
-        SurveyorApplication.LOG.d(m_contact.toJson().toString());
+        Logger.d(m_contact.toJson().toString());
         rapid.legacyAddContact(token, m_contact);
 
         // then post the results

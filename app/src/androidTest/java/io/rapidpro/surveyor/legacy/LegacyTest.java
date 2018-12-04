@@ -104,7 +104,7 @@ public class LegacyTest extends BaseApplicationTest {
         mockServerResponse("{\"error\":null}", "application/json", 200);
 
         // submit for Two Questions flow (no media)
-        Legacy.submit(legacySubs.get(0), "797d44ef78f7845de0f4dbb42d5174505563dd77","bob@nyaruka.com");
+        Legacy.submit(legacySubs.get(0), "797d44ef78f7845de0f4dbb42d5174505563dd77", "bob@nyaruka.com");
 
         RecordedRequest request1 = mockServer.takeRequest();
         assertThat(request1.getRequestLine(), is("POST /api/v1/contacts.json HTTP/1.1"));
@@ -121,7 +121,7 @@ public class LegacyTest extends BaseApplicationTest {
         mockServerResponse("{\"error\":null}", "application/json", 200);
 
         // submit for Multimedia flow (image and audio media)
-        Legacy.submit(legacySubs.get(1), "797d44ef78f7845de0f4dbb42d5174505563dd77","bob@nyaruka.com");
+        Legacy.submit(legacySubs.get(1), "797d44ef78f7845de0f4dbb42d5174505563dd77", "bob@nyaruka.com");
 
         assertThat(mockServer.takeRequest().getRequestLine(), is("POST /api/v1/contacts.json HTTP/1.1"));
         assertThat(mockServer.takeRequest().getRequestLine(), is("POST /api/v2/media.json HTTP/1.1"));

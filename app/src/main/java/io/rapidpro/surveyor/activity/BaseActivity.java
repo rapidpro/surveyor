@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import io.rapidpro.surveyor.BuildConfig;
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
@@ -42,7 +43,7 @@ public abstract class BaseActivity extends PermisoActivity {
      */
     @Override
     protected void onCreate(Bundle bundle) {
-        SurveyorApplication.LOG.d("Creating " + getClass().getSimpleName());
+        Logger.d("Creating " + getClass().getSimpleName());
 
         // so that espresso tests always have an unlocked screen
         if (BuildConfig.DEBUG) {
@@ -135,7 +136,7 @@ public abstract class BaseActivity extends PermisoActivity {
      * Logs in a user for the given orgs
      */
     public void login(String email, Set<String> orgUUIDs) {
-        SurveyorApplication.LOG.d("Logging in as " + email + " with access to orgs " + TextUtils.join(",", orgUUIDs));
+        Logger.d("Logging in as " + email + " with access to orgs " + TextUtils.join(",", orgUUIDs));
 
         // save email which we'll need for submissions later
         getSurveyor().setPreference(SurveyorPreferences.AUTH_USERNAME, email);
@@ -160,7 +161,7 @@ public abstract class BaseActivity extends PermisoActivity {
      * Logs the user out and returns them to the login page showing the given error string
      */
     protected void logout(int errorResId) {
-        SurveyorApplication.LOG.d("Logging out with error " + errorResId);
+        Logger.d("Logging out with error " + errorResId);
 
         getSurveyor().clearPreference(SurveyorPreferences.AUTH_USERNAME);
         getSurveyor().setPreference(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet());
@@ -168,7 +169,7 @@ public abstract class BaseActivity extends PermisoActivity {
         try {
             getSurveyor().clearSubmissions();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.e("Unable to clear submissions", e);
         }
 
         Intent intent = new Intent(this, LoginActivity.class);
@@ -207,7 +208,7 @@ public abstract class BaseActivity extends PermisoActivity {
         info.append("Version: " + BuildConfig.VERSION_NAME + "; " + BuildConfig.VERSION_CODE);
         info.append("\n  OS: " + System.getProperty("os.version") + " (API " + Build.VERSION.SDK_INT + ")");
         info.append("\n  Model: " + android.os.Build.MODEL + " (" + android.os.Build.DEVICE + ")");
-        SurveyorApplication.LOG.d(info.toString());
+        Logger.d(info.toString());
 
         // generate a dump file
         try {
@@ -227,7 +228,7 @@ public abstract class BaseActivity extends PermisoActivity {
                     .startChooser();
 
         } catch (IOException e) {
-            SurveyorApplication.LOG.e("Failed to generate report", e);
+            Logger.e("Failed to generate report", e);
         }
     }
 

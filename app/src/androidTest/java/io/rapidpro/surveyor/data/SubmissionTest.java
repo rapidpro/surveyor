@@ -4,14 +4,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import io.rapidpro.surveyor.net.TembaException;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 import io.rapidpro.surveyor.test.R;
 import okhttp3.mockwebserver.RecordedRequest;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;

@@ -16,8 +16,8 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.greysonparrelli.permiso.Permiso;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.ui.IconTextView;
 
 /**
@@ -57,7 +57,8 @@ public class CaptureLocationActivity extends BaseActivity implements GoogleApiCl
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult != null) {
-                    onLocationUpdate(locationResult.getLastLocation());;
+                    onLocationUpdate(locationResult.getLastLocation());
+                    ;
                 }
             }
         };
@@ -90,7 +91,7 @@ public class CaptureLocationActivity extends BaseActivity implements GoogleApiCl
      */
     @SuppressWarnings("ResourceType")
     private void startLocationUpdates() {
-        SurveyorApplication.LOG.d("Starting location updates...");
+        Logger.d("Starting location updates...");
 
         IconTextView button = (IconTextView) getViewCache().getView(R.id.button_capture);
         button.setText(R.string.icon_gps_not_fixed);
@@ -105,7 +106,7 @@ public class CaptureLocationActivity extends BaseActivity implements GoogleApiCl
     }
 
     private void onLocationUpdate(Location location) {
-        SurveyorApplication.LOG.d("Received location update: " + location.toString());
+        Logger.d("Received location update: " + location.toString());
 
         lastLocation = location;
 
@@ -116,6 +117,7 @@ public class CaptureLocationActivity extends BaseActivity implements GoogleApiCl
         coordinates.setText(getString(R.string.latitude_longitude, location.getLatitude(), location.getLongitude()));
 
         TextView accuracy = (TextView) getViewCache().getView(R.id.text_accuracy);
+        accuracy.setVisibility(View.VISIBLE);
         accuracy.setText(getString(R.string.accuracy_meters, (int) location.getAccuracy()));
     }
 
@@ -147,19 +149,19 @@ public class CaptureLocationActivity extends BaseActivity implements GoogleApiCl
 
     @Override
     public void onConnected(Bundle bundle) {
-        SurveyorApplication.LOG.d("GoogleAPI client connected");
+        Logger.d("GoogleAPI client connected");
 
         startLocationUpdates();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        SurveyorApplication.LOG.d("GoogleAPI client suspended");
+        Logger.d("GoogleAPI client suspended");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        SurveyorApplication.LOG.d("GoogleAPI client failed");
+        Logger.d("GoogleAPI client failed");
 
         showToast(R.string.error_google_api);
         finish();

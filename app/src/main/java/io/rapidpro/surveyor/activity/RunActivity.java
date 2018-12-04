@@ -38,8 +38,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
@@ -200,7 +200,7 @@ public class RunActivity extends BaseActivity {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     ComponentName cameraPkg = intent.resolveActivity(getPackageManager());
 
-                    SurveyorApplication.LOG.d("Camera package is " + cameraPkg.toString());
+                    Logger.d("Camera package is " + cameraPkg.toString());
 
                     if (cameraPkg == null) {
                         handleProblem("Can't find camera device", null);
@@ -300,7 +300,7 @@ public class RunActivity extends BaseActivity {
 
                     addMedia(thumb, uri.toString(), R.string.media_image);
 
-                    SurveyorApplication.LOG.d("Saved image capture to " + uri);
+                    Logger.d("Saved image capture to " + uri);
 
                     msg = Engine.createMsgIn("", "image/jpeg:" + uri);
 
@@ -315,7 +315,7 @@ public class RunActivity extends BaseActivity {
 
                     addMedia(thumb, uri.toString(), R.string.media_video);
 
-                    SurveyorApplication.LOG.d("Saved video capture to " + uri);
+                    Logger.d("Saved video capture to " + uri);
 
                     msg = Engine.createMsgIn("", "video/mp4:" + uri);
 
@@ -326,7 +326,7 @@ public class RunActivity extends BaseActivity {
                 File output = getAudioOutput();
                 if (output.exists()) {
                     Uri uri = submission.saveMedia(output);
-                    SurveyorApplication.LOG.d("Saved audio capture to " + uri);
+                    Logger.d("Saved audio capture to " + uri);
 
                     addMediaLink(getString(R.string.made_recording), uri.toString(), R.string.media_audio);
 
@@ -362,7 +362,7 @@ public class RunActivity extends BaseActivity {
         Toast.makeText(this, toastMsg, Toast.LENGTH_SHORT).show();
 
         if (e != null) {
-            SurveyorApplication.LOG.e("Error running flow", e);
+            Logger.e("Error running flow", e);
             showBugReportDialog();
         }
 
@@ -425,7 +425,7 @@ public class RunActivity extends BaseActivity {
      */
     private void handleEngineOutput(List<Event> events) throws IOException, EngineException {
         for (Event event : events) {
-            SurveyorApplication.LOG.d("Event: " + event.payload());
+            Logger.d("Event: " + event.payload());
 
             JsonObject asObj = new JsonParser().parse(event.payload()).getAsJsonObject();
 
@@ -540,11 +540,10 @@ public class RunActivity extends BaseActivity {
     public void onActionSave(View view) {
         try {
             submission.complete();
+            finish();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.e("Unable to complete submission", e);
         }
-
-        finish();
     }
 
     /**

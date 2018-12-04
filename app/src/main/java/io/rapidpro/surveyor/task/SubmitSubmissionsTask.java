@@ -7,11 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.net.TembaException;
-import io.rapidpro.surveyor.net.TembaService;
 
 /**
  * Task for sending submissions to the server
@@ -50,7 +49,7 @@ public class SubmitSubmissionsTask extends AsyncTask<Submission, Integer, Intege
             try {
                 submission.submit();
             } catch (IOException | TembaException e) {
-                e.printStackTrace();
+                Logger.e("Unable to send submission", e);
                 numFailed++;
             }
 
@@ -62,7 +61,7 @@ public class SubmitSubmissionsTask extends AsyncTask<Submission, Integer, Intege
             try {
                 Legacy.submit(legacy, legacyToken, username);
             } catch (IOException | TembaException e) {
-                e.printStackTrace();
+                Logger.e("Unable to send legacy submission", e);
                 numFailed++;
             }
 

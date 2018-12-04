@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.engine.OrgAssets;
 import io.rapidpro.surveyor.net.TembaException;
@@ -286,7 +287,7 @@ public class Org {
 
         progress.reportProgress(100);
 
-        SurveyorApplication.LOG.d("Refreshed assets for org " + getUuid() + " (flows=" + flows.size() + ", fields=" + fields.size() + ", groups=" + groups.size() + ")");
+        Logger.d("Refreshed assets for org " + getUuid() + " (flows=" + flows.size() + ", fields=" + fields.size() + ", groups=" + groups.size() + ")");
     }
 
     public interface RefreshProgress {
