@@ -82,7 +82,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.4'
 
     // Android M permissions
-    implementation 'com.greysonparrelli.permiso:permiso:0.1.3'
+    implementation 'com.greysonparrelli.permiso:permiso:0.3.0'
 
     // legacy
     annotationProcessor 'io.realm:realm-android:0.82.1'

@@ -28,7 +28,6 @@ import io.rapidpro.surveyor.utils.ImageUtils;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.pressBack;
@@ -86,7 +85,7 @@ public class RunActivityTest extends BaseApplicationTest {
         onView(withText("No")).perform(click());
 
         // do same from options menu
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        openOptionsMenu();
         onView(withText(R.string.action_cancel)).perform(click());
         onView(withText("No")).perform(click());
 
@@ -177,7 +176,7 @@ public class RunActivityTest extends BaseApplicationTest {
                 byte[] asJpg = ImageUtils.convertToJPEG(bmp);
 
                 try {
-                    File output = new File(getSurveyor().getUserDirectory(), "camera.jpg");
+                    File output = new File(getSurveyor().getExternalCacheDir(), "camera.jpg");
                     FileUtils.writeByteArrayToFile(output, asJpg);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -201,7 +200,7 @@ public class RunActivityTest extends BaseApplicationTest {
                 InputStream input = context.getResources().openRawResource(videoResId);
 
                 try {
-                    File output = new File(getSurveyor().getUserDirectory(), "video.mp4");
+                    File output = new File(getSurveyor().getExternalCacheDir(), "video.mp4");
                     FileUtils.copyInputStreamToFile(input, output);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -220,7 +219,7 @@ public class RunActivityTest extends BaseApplicationTest {
                 InputStream input = context.getResources().openRawResource(audioResId);
 
                 try {
-                    File output = new File(getSurveyor().getUserDirectory(), "audio.m4a");
+                    File output = new File(getSurveyor().getExternalCacheDir(), "audio.m4a");
                     FileUtils.copyInputStreamToFile(input, output);
                 } catch (IOException e) {
                     e.printStackTrace();

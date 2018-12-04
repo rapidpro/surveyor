@@ -19,7 +19,6 @@ import io.rapidpro.surveyor.test.BaseApplicationTest;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.Intents.intending;
@@ -36,7 +35,6 @@ import static androidx.test.espresso.web.webdriver.DriverAtoms.findElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.getText;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.webClick;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.webKeys;
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 
@@ -182,11 +180,11 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
 
     /**
      * @see BaseActivity#sendBugReport()
-     *
+     * <p>
      * tested here because we need a IntentsTestRule based test
      */
     @Test
-    public void sendBugReport() throws IOException, InterruptedException {
+    public void sendBugReport() throws IOException {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_get, "text/html", 200);
 
         // mock the intent to pick an app to send the bug report too
@@ -194,10 +192,7 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
 
         rule.launchActivity(null);
 
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-        
-        Thread.sleep(2000);
-
+        openOptionsMenu();
         onView(withText("Bug Report"))
                 .perform(click());
 

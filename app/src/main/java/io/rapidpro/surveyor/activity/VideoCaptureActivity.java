@@ -138,7 +138,6 @@ public class VideoCaptureActivity extends PermisoActivity {
                                                  }, Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.MODIFY_AUDIO_SETTINGS,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 "android.permission.READ_PROFILE");
 
     }

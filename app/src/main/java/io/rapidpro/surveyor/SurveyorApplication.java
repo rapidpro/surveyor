@@ -197,8 +197,8 @@ public class SurveyorApplication extends Application {
      *
      * @return the directory
      */
-    public File getUserDirectory() throws IOException {
-        return SurveyUtils.mkdir(getExternalFilesDir(null));
+    public File getUserDirectory() {
+        return getExternalFilesDir(null);
     }
 
     /**

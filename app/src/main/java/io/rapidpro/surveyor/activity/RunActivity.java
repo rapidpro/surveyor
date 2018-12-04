@@ -233,13 +233,10 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
                         handleProblem("Can't find camera device", null);
                         return;
                     }
-                    try {
-                        File cameraOutput = getCameraOutput();
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, getSurveyor().getUriForFile(cameraOutput));
-                        startActivityForResult(intent, RESULT_IMAGE);
-                    } catch (IOException e) {
-                        SurveyorApplication.LOG.e("Unable to create temp media", e);
-                    }
+                    File cameraOutput = getCameraOutput();
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, getSurveyor().getUriForFile(cameraOutput));
+                    intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    startActivityForResult(intent, RESULT_IMAGE);
                 }
             }
 
@@ -255,14 +252,10 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
      * Captures a video from the camera
      */
     private void captureVideo() {
-        try {
-            Intent intent = new Intent(this, VideoCaptureActivity.class);
-            intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getVideoOutput().getAbsolutePath());
-
-            startActivityForResult(intent, RESULT_VIDEO);
-        } catch (IOException e) {
-            SurveyorApplication.LOG.e("Unable to create temp media", e);
-        }
+        Intent intent = new Intent(this, VideoCaptureActivity.class);
+        intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getVideoOutput().getAbsolutePath());
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        startActivityForResult(intent, RESULT_VIDEO);
     }
 
     /**
@@ -274,14 +267,10 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             @SuppressWarnings("ResourceType")
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.areAllPermissionsGranted()) {
-                    try {
-                        Intent intent = new Intent(RunActivity.this, AudioCaptureActivity.class);
-                        intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getAudioOutput().getAbsolutePath());
-
-                        startActivityForResult(intent, RESULT_AUDIO);
-                    } catch (IOException e) {
-                        SurveyorApplication.LOG.e("Unable to create temp media", e);
-                    }
+                    Intent intent = new Intent(RunActivity.this, AudioCaptureActivity.class);
+                    intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getAudioOutput().getAbsolutePath());
+                    intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    startActivityForResult(intent, RESULT_AUDIO);
                 }
             }
 
@@ -370,16 +359,16 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         }
     }
 
-    private File getCameraOutput() throws IOException {
-        return new File(getSurveyor().getUserDirectory(), "camera.jpg");
+    private File getCameraOutput() {
+        return new File(getSurveyor().getExternalCacheDir(), "camera.jpg");
     }
 
-    private File getVideoOutput() throws IOException {
-        return new File(getSurveyor().getUserDirectory(), "video.mp4");
+    private File getVideoOutput() {
+        return new File(getSurveyor().getExternalCacheDir(), "video.mp4");
     }
 
-    private File getAudioOutput() throws IOException {
-        return new File(getSurveyor().getUserDirectory(), "audio.m4a");
+    private File getAudioOutput() {
+        return new File(getSurveyor().getExternalCacheDir(), "audio.m4a");
     }
 
     /**

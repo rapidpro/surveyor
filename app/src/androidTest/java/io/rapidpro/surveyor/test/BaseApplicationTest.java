@@ -28,6 +28,8 @@ import io.rapidpro.surveyor.SurveyorPreferences;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
+import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
 
 /**
@@ -121,6 +123,16 @@ public abstract class BaseApplicationTest {
             // install assets.json
             String assetsJSON = readResourceAsString(assetsResId);
             FileUtils.writeStringToFile(new File(dir, "assets.json"), assetsJSON);
+        }
+    }
+
+    protected void openOptionsMenu() {
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        try {
+            // especially on Travis, we need to give the emulator a git of time to actually open the menu
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 

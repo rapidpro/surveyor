@@ -198,7 +198,7 @@ public class TembaServiceTest extends BaseApplicationTest {
     public void uploadMedia() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_media_post, "application/json", 200);
 
-        File upload = new File(getSurveyor().getUserDirectory(), "test.jpg");
+        File upload = new File(getSurveyor().getExternalCacheDir(), "test.jpg");
         FileUtils.write(upload, "I'm an image!");
         Uri uri = getSurveyor().getUriForFile(upload);
 
