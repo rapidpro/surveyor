@@ -24,11 +24,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.greysonparrelli.permiso.Permiso;
@@ -58,7 +53,7 @@ import io.rapidpro.surveyor.utils.ImageUtils;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
 import io.rapidpro.surveyor.widget.IconLinkView;
 
-public class RunActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class RunActivity extends BaseActivity {
 
     // the different types of requests for media
     public static final String REQUEST_IMAGE = "image";
@@ -80,11 +75,6 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
     private Session session;
     private Submission submission;
 
-    private GoogleApiClient googleApi;
-    private android.location.Location lastLocation;
-    private boolean connected;
-    private LocationRequest locationRequest;
-
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,16 +84,6 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
 
         setContentView(R.layout.activity_run);
         initUI();
-
-        if (googleApi == null) {
-            googleApi = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-
-            googleApi.connect();
-        }
 
         try {
             Org org = getSurveyor().getOrgService().get(orgUUID);
@@ -189,13 +169,6 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         return true;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        stopLocationUpdates();
-    }
-
     /**
      * User pressed the media request button
      */
@@ -252,7 +225,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
      * Captures a video from the camera
      */
     private void captureVideo() {
-        Intent intent = new Intent(this, VideoCaptureActivity.class);
+        Intent intent = new Intent(this, CaptureVideoActivity.class);
         intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getVideoOutput().getAbsolutePath());
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         startActivityForResult(intent, RESULT_VIDEO);
@@ -267,7 +240,7 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
             @SuppressWarnings("ResourceType")
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.areAllPermissionsGranted()) {
-                    Intent intent = new Intent(RunActivity.this, AudioCaptureActivity.class);
+                    Intent intent = new Intent(RunActivity.this, CaptureAudioActivity.class);
                     intent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getAudioOutput().getAbsolutePath());
                     intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                     startActivityForResult(intent, RESULT_AUDIO);
@@ -286,77 +259,8 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
      * Captures the current location
      */
     private void captureLocation() {
-        Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
-            @Override
-            @SuppressWarnings("ResourceType")
-            public void onPermissionResult(Permiso.ResultSet resultSet) {
-
-                if (resultSet.areAllPermissionsGranted()) {
-
-                    if (connected) {
-                        lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApi);
-                        startLocationUpdates();
-                        if (lastLocation != null) {
-                            double latitude = lastLocation.getLatitude();
-                            double longitude = lastLocation.getLongitude();
-                            String coords = "geo:" + latitude + "," + longitude;
-
-                            String url = coords + "?q=" + latitude + "," + longitude + "(Location)";
-                            addMediaLink(latitude + "," + longitude, url, R.string.media_location);
-
-                            MsgIn msg = Engine.createMsgIn("", coords);
-                            resumeSession(msg);
-                        } else {
-                            Toast.makeText(RunActivity.this, R.string.location_unavailable, Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(RunActivity.this, R.string.location_unavailable, Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-
-            @Override
-            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                RunActivity.this.showRationaleDialog(R.string.permission_location, callback);
-            }
-        }, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
-    }
-
-    protected LocationRequest getLocationRequest() {
-        if (locationRequest == null) {
-            locationRequest = new LocationRequest();
-            locationRequest.setInterval(10000);
-            locationRequest.setFastestInterval(5000);
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        }
-        return locationRequest;
-    }
-
-    /**
-     * Start updating location until they exit this run
-     */
-    @SuppressWarnings("ResourceType")
-    protected void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApi, getLocationRequest(), new LocationListener() {
-            @Override
-            public void onLocationChanged(android.location.Location location) {
-                lastLocation = location;
-            }
-        });
-    }
-
-    /**
-     * Stop getting location updates
-     */
-    protected void stopLocationUpdates() {
-        if (googleApi.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(googleApi, new LocationListener() {
-                @Override
-                public void onLocationChanged(android.location.Location location) {
-
-                }
-            });
-        }
+        Intent intent = new Intent(this, CaptureLocationActivity.class);
+        startActivityForResult(intent, RESULT_GPS);
     }
 
     private File getCameraOutput() {
@@ -430,6 +334,16 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
 
                     output.delete();
                 }
+            } else if (requestCode == RESULT_GPS) {
+                double latitude = data.getDoubleExtra("latitude", 0.0);
+                double longitude = data.getDoubleExtra("longitude", 0.0);
+
+                String coords = "geo:" + latitude + "," + longitude;
+
+                String url = coords + "?q=" + latitude + "," + longitude + "(Location)";
+                addMediaLink(latitude + "," + longitude, url, R.string.media_location);
+
+                msg = Engine.createMsgIn("", coords);
             }
         } catch (IOException e) {
             handleProblem("Unable capture media", e);
@@ -526,7 +440,8 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
 
             ViewCache cache = getViewCache();
             cache.hide(R.id.chat_box, true);
-            cache.show(R.id.completion_buttons);
+            cache.hide(R.id.container_request_media);
+            cache.show(R.id.completed_session_actions);
         } else {
             waitForInput(session.getWait().mediaHint());
         }
@@ -694,21 +609,5 @@ public class RunActivity extends BaseActivity implements GoogleApiClient.Connect
         }
 
         startActivity(intent);
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        SurveyorApplication.LOG.d("GoogleAPI client connected");
-        connected = true;
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        SurveyorApplication.LOG.d("GoogleAPI client suspended");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        SurveyorApplication.LOG.d("GoogleAPI client failed");
     }
 }

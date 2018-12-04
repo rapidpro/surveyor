@@ -192,7 +192,7 @@ public class RunActivityTest extends BaseApplicationTest {
         intending(toPackage("com.android.camera")).respondWithFunction(mockCamera);
         intending(toPackage("com.android.camera2")).respondWithFunction(mockCamera);
 
-        intending(hasComponent(VideoCaptureActivity.class.getName())).respondWithFunction(new ActivityResultFunction() {
+        intending(hasComponent(CaptureVideoActivity.class.getName())).respondWithFunction(new ActivityResultFunction() {
             @Override
             public Instrumentation.ActivityResult apply(Intent intent) {
                 SurveyorApplication.LOG.d("Handling mocked video capture intent");
@@ -211,7 +211,7 @@ public class RunActivityTest extends BaseApplicationTest {
             }
         });
 
-        intending(hasComponent(AudioCaptureActivity.class.getName())).respondWithFunction(new ActivityResultFunction() {
+        intending(hasComponent(CaptureAudioActivity.class.getName())).respondWithFunction(new ActivityResultFunction() {
             @Override
             public Instrumentation.ActivityResult apply(Intent intent) {
                 SurveyorApplication.LOG.d("Handling mocked audio capture intent");

@@ -61,14 +61,19 @@
             android:label="@string/title_activity_run" >
         </activity>
         <activity
-            android:name=".activity.AudioCaptureActivity"
+            android:name=".activity.CaptureAudioActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_audio">
         </activity>
         <activity
-            android:name=".activity.VideoCaptureActivity"
+            android:name=".activity.CaptureVideoActivity"
             android:theme="@style/RapidTheme.FullScreen"
             android:label="@string/title_activity_video">
+        </activity>
+        <activity
+            android:name=".activity.CaptureLocationActivity"
+            android:theme="@style/RapidTheme.FullScreen"
+            android:label="@string/title_activity_location">
         </activity>
         <activity android:name=".activity.CreateAccountActivity"
                   android:label="@string/title_activity_create_account">

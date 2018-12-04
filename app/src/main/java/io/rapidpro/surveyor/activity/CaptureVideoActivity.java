@@ -32,7 +32,7 @@ import io.rapidpro.surveyor.ui.IconTextView;
 /**
  * Activity for capturing a video message
  */
-public class VideoCaptureActivity extends PermisoActivity {
+public class CaptureVideoActivity extends PermisoActivity {
 
     // camera settings
     public static final int CAMERA_QUALITY = CamcorderProfile.QUALITY_480P;
@@ -68,7 +68,7 @@ public class VideoCaptureActivity extends PermisoActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        setContentView(R.layout.activity_video);
+        setContentView(R.layout.activity_capture_video);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         m_recordButton = (IconTextView) findViewById(R.id.button_capture);
@@ -95,7 +95,7 @@ public class VideoCaptureActivity extends PermisoActivity {
 
                                                                  // if the front facing camera does not exist
                                                                  if (getFrontCamera() < 0) {
-                                                                     Toast.makeText(VideoCaptureActivity.this, "No front facing camera found.", Toast.LENGTH_LONG).show();
+                                                                     Toast.makeText(CaptureVideoActivity.this, "No front facing camera found.", Toast.LENGTH_LONG).show();
                                                                      m_toggleCameraButton.setVisibility(View.GONE);
                                                                  } else if (m_cameraDirection == CameraInfo.CAMERA_FACING_FRONT) {
                                                                      m_cameraId = getFrontCamera();
@@ -133,7 +133,7 @@ public class VideoCaptureActivity extends PermisoActivity {
 
                                                      @Override
                                                      public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                                                         VideoCaptureActivity.this.showRationaleDialog(R.string.permission_camera, callback);
+                                                         CaptureVideoActivity.this.showRationaleDialog(R.string.permission_camera, callback);
                                                      }
                                                  }, Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO,
@@ -266,7 +266,7 @@ public class VideoCaptureActivity extends PermisoActivity {
 
         m_mediaRecorder = createMediaRecorder();
         if (m_mediaRecorder == null) {
-            Toast.makeText(VideoCaptureActivity.this, "Can't record video", Toast.LENGTH_LONG).show();
+            Toast.makeText(CaptureVideoActivity.this, "Can't record video", Toast.LENGTH_LONG).show();
             finish();
         }
 
@@ -323,7 +323,7 @@ public class VideoCaptureActivity extends PermisoActivity {
             if (Camera.getNumberOfCameras() > 1) {
                 toggleCamera();
             } else {
-                Toast toast = Toast.makeText(VideoCaptureActivity.this,
+                Toast toast = Toast.makeText(CaptureVideoActivity.this,
                         "Sorry, your phone has only one camera!", Toast.LENGTH_LONG);
                 toast.show();
             }

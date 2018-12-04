@@ -9,8 +9,9 @@
     <string name="title_activity_org">Organization</string>
     <string name="title_activity_flow">Flow Details</string>
     <string name="title_activity_run">Run Flow</string>
-    <string name="title_activity_audio">Record Audio</string>
+    <string name="title_activity_audio">Capture Audio</string>
     <string name="title_activity_video">Capture Video</string>
+    <string name="title_activity_location">Capture Location</string>
 
     <!-- menu items and buttons -->
     <string name="action_settings">Settings</string>
@@ -37,6 +38,7 @@
     <string name="error_no_orgs">Sorry, your account doesn\'t have access to submit surveys. Check with your system administrator.</string>
     <string name="error_org_refresh">A problem occurred whilst refreshing this org. Please try again later.</string>
     <string name="error_submissions_send">A problem occurred whilst sending submissions to the server. Please try again later.</string>
+    <string name="error_google_api">A problem occurred connecting to the Google API. Please try again later.</string>
 
     <!-- chat log messages -->
     <string name="log_flow_complete">Flow complete</string>
@@ -56,6 +58,8 @@
     <!-- miscellaneous -->
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="latitude_longitude">Lat: %.3f Long: %.3f</string>
+    <string name="accuracy_meters">Accuracy: %d meters</string>
     <plurals name="questions">
         <item quantity="one">%d question</item>
         <item quantity="other">%d questions</item>
@@ -71,6 +75,9 @@
     <string name="icon_cloud_download">\ue0fb</string>
     <string name="icon_folder">\ue101</string>
     <string name="icon_forum">\ue04d</string>
+    <string name="icon_gps_fixed">\ue0a3</string>
+    <string name="icon_gps_off">\ue0a5</string>
+    <string name="icon_gps_not_fixed">\ue0a4</string>
     <string name="icon_mic">\ue00f</string>
     <string name="icon_place">\ue1f7</string>
     <string name="icon_play_arrow">\ue01b</string>
@@ -80,6 +87,10 @@
     <string name="icon_stop">\ue02a</string>
     <string name="icon_videocam">\ue02e</string>
     <string name="icon_volume_up">\ue033</string>
+
+    <!-- media capturing -->
+    <string name="tap_to_record">Tap to Record</string>
+    <string name="tap_to_capture">Tap to Capture</string>
 
     <!-- preferences -->
     <string name="pref_default_host">https://app.rapidpro.io</string>
@@ -114,7 +125,7 @@
     <string name="media_image">media_image</string>
     <string name="media_video">media_video</string>
     <string name="media_audio">media_audio</string>
-    <string name="tap_to_record">Tap to Record</string>
+
     <string name="tap_to_stop">Recording. Tap to stop.</string>
     <string name="quit">Quit</string>
     <string name="settings">Settings</string>
