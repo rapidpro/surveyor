@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -63,6 +64,7 @@ public class RunActivityTest extends BaseApplicationTest {
         login("bob@nyaruka.com", Collections.singleton(ORG_UUID));
     }
 
+    @Ignore // TODO failing on Travis with java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
     @Test
     public void twoQuestions() throws Exception {
         launchForFlow("bdd61538-5f50-4836-a8fb-acaafd64ddb1");
