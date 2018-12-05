@@ -54,6 +54,10 @@ public class OrgActivityTest extends BaseApplicationTest {
 
         onView(withText(R.string.confirm_org_download)).check(matches(isDisplayed()));
 
+        onView(withText("No"))
+                .check(matches(isDisplayed()))
+                .perform(click());
+
         /*
 
         TODO test refresh and list update, maybe https://medium.com/azimolabs/wait-for-it-idlingresource-and-conditionwatcher-602055f32356

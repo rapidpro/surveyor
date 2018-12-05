@@ -28,14 +28,23 @@ public class CaptureAudioActivity extends BaseActivity {
         setContentView(R.layout.activity_capture_audio);
     }
 
+    @Override
+    public boolean requireLogin() {
+        return false;
+    }
+
     public void recordAudio() {
         isRecording = true;
+
+        String output = getIntent().getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE);
+
+        Logger.d("Recording audio to " + output + "...");
 
         try {
             mediaRecorder = new MediaRecorder();
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            mediaRecorder.setOutputFile(getIntent().getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE));
+            mediaRecorder.setOutputFile(output);
             mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             mediaRecorder.prepare();
 

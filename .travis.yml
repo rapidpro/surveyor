@@ -38,7 +38,7 @@ before_script:
   - adb shell settings put global window_animation_scale 0 &
   - adb shell settings put global transition_animation_scale 0 &
   - adb shell settings put global animator_duration_scale 0 &
-  - adb logcat > logcat.log &
+  - adb logcat -v time > logcat.log &
 
 script:
   - ./gradlew build jacocoTestReport assembleAndroidTest
