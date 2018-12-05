@@ -33,6 +33,7 @@ import io.rapidpro.surveyor.ui.ViewCache;
 public class OrgActivity extends BaseSubmissionsActivity implements FlowListFragment.Container {
 
     private Org org;
+    private AlertDialog confirmRefreshDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,15 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
         super.onResume();
 
         refresh();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (confirmRefreshDialog != null) {
+            confirmRefreshDialog.dismiss();
+        }
     }
 
     protected void refresh() {
@@ -108,20 +118,22 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
         int msgId = initial ? R.string.confirm_org_download : R.string.confirm_org_refresh;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(msgId))
-                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+
+        confirmRefreshDialog = builder.setMessage(getString(msgId))
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         doRefresh();
                     }
                 })
-                .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
-                })
-                .show();
+                }).create();
+
+        confirmRefreshDialog.show();
     }
 
     private void doRefresh() {
