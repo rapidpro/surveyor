@@ -40,10 +40,6 @@ before_script:
   - adb shell settings put global animator_duration_scale 0 &
   - adb logcat -v time > logcat.log &
 
-script:
-  - ./gradlew build jacocoTestReport assembleAndroidTest
-  - ./gradlew connectedCheck
-
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
