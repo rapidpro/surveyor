@@ -29,6 +29,7 @@ import com.google.gson.JsonParser;
 import com.greysonparrelli.permiso.Permiso;
 import com.nyaruka.goflow.mobile.Environment;
 import com.nyaruka.goflow.mobile.Event;
+import com.nyaruka.goflow.mobile.Hint;
 import com.nyaruka.goflow.mobile.MsgIn;
 import com.nyaruka.goflow.mobile.Resume;
 import com.nyaruka.goflow.mobile.SessionAssets;
@@ -443,18 +444,19 @@ public class RunActivity extends BaseActivity {
             cache.hide(R.id.container_request_media);
             cache.show(R.id.completed_session_actions);
         } else {
-            waitForInput(session.getWait().mediaHint());
+            waitForInput(session.getWait().hint());
         }
 
         submission.saveSession(session);
         submission.saveNewEvents(events);
     }
 
-    private void waitForInput(String mediaType) {
+    private void waitForInput(Hint hint) {
         ViewCache vc = getViewCache();
         TextView mediaButton = vc.getTextView(R.id.media_icon);
         TextView mediaText = vc.getTextView(R.id.media_text);
 
+        String mediaType = hint != null ? hint.type() : "";
         switch (mediaType) {
             case "image":
                 mediaButton.setText(getString(R.string.icon_photo_camera));
@@ -477,7 +479,7 @@ public class RunActivity extends BaseActivity {
                 vc.hide(R.id.chat_box, true);
                 vc.show(R.id.container_request_media);
                 break;
-            case "gps":
+            case "location":
                 mediaButton.setText(getString(R.string.icon_place));
                 mediaButton.setTag(REQUEST_GPS);
                 mediaText.setText(getString(R.string.request_gps));

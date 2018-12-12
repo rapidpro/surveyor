@@ -25,6 +25,7 @@ import io.rapidpro.surveyor.test.R;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
@@ -136,7 +137,8 @@ public class EngineTest extends BaseApplicationTest {
 
         assertThat(session.getStatus(), is("waiting"));
         assertThat(session.isWaiting(), is(true));
-        assertThat(session.getWait().mediaHint(), is("image"));
+        assertThat(session.getWait().hint(), is(notNullValue()));
+        assertThat(session.getWait().hint().type(), is("image"));
         assertThat(events, hasSize(2));
         assertThat(events.get(0).type(), is("msg_created"));
         assertThat(events.get(1).type(), is("msg_wait"));

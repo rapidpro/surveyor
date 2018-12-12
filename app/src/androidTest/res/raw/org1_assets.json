@@ -480,7 +480,9 @@
           "uuid": "6ab79191-da91-4096-a589-6f3c7f5ecf0c",
           "wait": {
             "type": "msg",
-            "media_hint": "image"
+            "hint": {
+              "type": "image"
+            }
           },
           "router": {
             "type": "switch",
@@ -501,7 +503,9 @@
           "uuid": "f5ba9174-ed8c-41cd-898a-d7449f72b916",
           "wait": {
             "type": "msg",
-            "media_hint": "video"
+            "hint": {
+              "type": "video"
+            }
           },
           "router": {
             "type": "switch",
@@ -522,7 +526,9 @@
           "uuid": "1250d717-bcef-45ed-b63e-e2e8eae953b1",
           "wait": {
             "type": "msg",
-            "media_hint": "audio"
+            "hint": {
+              "type": "audio"
+            }
           },
           "router": {
             "type": "switch",
@@ -543,7 +549,9 @@
           "uuid": "78d1b543-e774-4040-b6dc-53139b5edb60",
           "wait": {
             "type": "msg",
-            "media_hint": "gps"
+            "hint": {
+              "type": "location"
+            }
           },
           "router": {
             "type": "switch",
