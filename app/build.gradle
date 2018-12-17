@@ -14,7 +14,7 @@ android {
         multiDexEnabled = true
 
         testInstrumentationRunner "io.rapidpro.surveyor.test.TestRunner"
-        //testInstrumentationRunnerArgument "notAnnotation", "android.test.suitebuilder.annotation.FlakyTest"
+        testInstrumentationRunnerArgument 'notAnnotation', 'androidx.test.filters.FlakyTest'
     }
     buildTypes {
         release {

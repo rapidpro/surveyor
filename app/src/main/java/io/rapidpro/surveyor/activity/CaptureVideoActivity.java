@@ -39,26 +39,27 @@ public class CaptureVideoActivity extends PermisoActivity {
     public static final int MAX_DURATION = 600000; // 60s max duration
     public static final int MAX_FILESIZE = 50000000; // 50MB max filesize
 
-    private int m_cameraId;
-    private Camera m_camera;
-    private CameraPreview m_preview;
-    private MediaRecorder m_mediaRecorder;
-    private IconTextView m_toggleCameraButton;
-    private IconTextView m_recordButton;
+    private int cameraId;
+    private Camera camera;
+    private CameraPreview preview;
+    private MediaRecorder mediaRecorder;
+    private IconTextView toggleCameraButton;
+    private IconTextView recordButton;
 
-    private int m_cameraDirection = -1;
-    private boolean m_recording = false;
+    private int cameraDirection = -1;
+    private boolean recording = false;
 
     @Override
     protected void onRestoreInstanceState(Bundle bundle) {
         super.onRestoreInstanceState(bundle);
-        m_cameraDirection = bundle.getInt(SurveyorIntent.EXTRA_CAMERA_DIRECTION, -1);
+        
+        cameraDirection = bundle.getInt(SurveyorIntent.EXTRA_CAMERA_DIRECTION, -1);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-        bundle.putInt(SurveyorIntent.EXTRA_CAMERA_DIRECTION, m_cameraDirection);
+        bundle.putInt(SurveyorIntent.EXTRA_CAMERA_DIRECTION, cameraDirection);
     }
 
     @Override
@@ -71,10 +72,10 @@ public class CaptureVideoActivity extends PermisoActivity {
         setContentView(R.layout.activity_capture_video);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        m_recordButton = findViewById(R.id.button_capture);
-        m_toggleCameraButton = findViewById(R.id.button_switch);
-        m_preview = new CameraPreview(this);
-        ((LinearLayout) findViewById(R.id.camera_preview)).addView(m_preview);
+        recordButton = findViewById(R.id.button_capture);
+        toggleCameraButton = findViewById(R.id.button_switch);
+        preview = new CameraPreview(this);
+        ((LinearLayout) findViewById(R.id.camera_preview)).addView(preview);
     }
 
     public void onResume() {
@@ -105,36 +106,36 @@ public class CaptureVideoActivity extends PermisoActivity {
     }
 
     private void startCamera() {
-        if (m_camera == null) {
+        if (camera == null) {
 
-            m_preview.init();
+            preview.init();
 
             // if the front facing camera does not exist
             if (getFrontCamera() < 0) {
                 Toast.makeText(CaptureVideoActivity.this, "No front facing camera found.", Toast.LENGTH_LONG).show();
-                m_toggleCameraButton.setVisibility(View.GONE);
-            } else if (m_cameraDirection == CameraInfo.CAMERA_FACING_FRONT) {
-                m_cameraId = getFrontCamera();
+                toggleCameraButton.setVisibility(View.GONE);
+            } else if (cameraDirection == CameraInfo.CAMERA_FACING_FRONT) {
+                cameraId = getFrontCamera();
             }
 
             // default to the back camera if one isn't set
-            if (m_cameraId == -1) {
-                m_cameraId = getBackCamera();
-                m_cameraDirection = CameraInfo.CAMERA_FACING_BACK;
+            if (cameraId == -1) {
+                cameraId = getBackCamera();
+                cameraDirection = CameraInfo.CAMERA_FACING_BACK;
             }
 
             try {
-                Logger.d("Opening camera: " + m_cameraId);
-                m_camera = Camera.open(m_cameraId);
-                m_preview.refreshCamera(m_camera, m_cameraId);
+                Logger.d("Opening camera: " + cameraId);
+                camera = Camera.open(cameraId);
+                preview.refreshCamera(camera, cameraId);
 
-                if (m_camera != null) {
-                    Camera.Parameters params = m_camera.getParameters();
+                if (camera != null) {
+                    Camera.Parameters params = camera.getParameters();
                     if (params.getSupportedFocusModes().contains(
                             Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
                         params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
                     }
-                    m_camera.setParameters(params);
+                    camera.setParameters(params);
                 }
             } catch (Exception e) {
                 Logger.e("Failed to open camera", e);
@@ -151,22 +152,22 @@ public class CaptureVideoActivity extends PermisoActivity {
         releaseCamera();
 
         // if the camera preview is the front
-        if (m_cameraDirection == CameraInfo.CAMERA_FACING_FRONT) {
-            m_cameraId = getBackCamera();
-            if (m_cameraId >= 0) {
-                m_camera = Camera.open(m_cameraId);
-                m_cameraDirection = CameraInfo.CAMERA_FACING_BACK;
-                m_preview.refreshCamera(m_camera, m_cameraId);
+        if (cameraDirection == CameraInfo.CAMERA_FACING_FRONT) {
+            cameraId = getBackCamera();
+            if (cameraId >= 0) {
+                camera = Camera.open(cameraId);
+                cameraDirection = CameraInfo.CAMERA_FACING_BACK;
+                preview.refreshCamera(camera, cameraId);
 
-                m_toggleCameraButton.setText(getString(R.string.icon_camera_front));
+                toggleCameraButton.setText(getString(R.string.icon_camera_front));
             }
         } else {
-            m_cameraId = getFrontCamera();
-            if (m_cameraId >= 0) {
-                m_camera = Camera.open(m_cameraId);
-                m_cameraDirection = CameraInfo.CAMERA_FACING_FRONT;
-                m_preview.refreshCamera(m_camera, m_cameraId);
-                m_toggleCameraButton.setText(getString(R.string.icon_camera_rear));
+            cameraId = getFrontCamera();
+            if (cameraId >= 0) {
+                camera = Camera.open(cameraId);
+                cameraDirection = CameraInfo.CAMERA_FACING_FRONT;
+                preview.refreshCamera(camera, cameraId);
+                toggleCameraButton.setText(getString(R.string.icon_camera_rear));
             }
         }
     }
@@ -189,8 +190,8 @@ public class CaptureVideoActivity extends PermisoActivity {
     private MediaRecorder createMediaRecorder() {
 
         MediaRecorder mediaRecorder = new MediaRecorder();
-        m_camera.unlock();
-        mediaRecorder.setCamera(m_camera);
+        camera.unlock();
+        mediaRecorder.setCamera(camera);
 
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
@@ -213,7 +214,7 @@ public class CaptureVideoActivity extends PermisoActivity {
         mediaRecorder.setMaxFileSize(MAX_FILESIZE);
 
         // set our orientation hint according ot our rotation
-        mediaRecorder.setOrientationHint(CameraUtil.getRotationDegrees(this, m_cameraId, false));
+        mediaRecorder.setOrientationHint(CameraUtil.getRotationDegrees(this, cameraId, false));
 
         try {
             mediaRecorder.prepare();
@@ -224,19 +225,19 @@ public class CaptureVideoActivity extends PermisoActivity {
     }
 
     private void releaseMediaRecorder() {
-        if (m_mediaRecorder != null) {
-            m_mediaRecorder.reset(); // clear recorder configuration
-            m_mediaRecorder.release(); // release the recorder object
-            m_mediaRecorder = null;
-            m_camera.lock(); // lock camera for later use
+        if (mediaRecorder != null) {
+            mediaRecorder.reset(); // clear recorder configuration
+            mediaRecorder.release(); // release the recorder object
+            mediaRecorder = null;
+            camera.lock(); // lock camera for later use
         }
     }
 
     private void releaseCamera() {
         // stop and release camera
-        if (m_camera != null) {
-            m_camera.release();
-            m_camera = null;
+        if (camera != null) {
+            camera.release();
+            camera = null;
         }
     }
 
@@ -265,28 +266,28 @@ public class CaptureVideoActivity extends PermisoActivity {
      */
     private void startRecording() {
 
-        m_mediaRecorder = createMediaRecorder();
-        if (m_mediaRecorder == null) {
+        mediaRecorder = createMediaRecorder();
+        if (mediaRecorder == null) {
             Toast.makeText(CaptureVideoActivity.this, "Can't record video", Toast.LENGTH_LONG).show();
             finish();
         }
 
         // show our record button as red
-        m_recordButton.setTextColor(getResources().getColor(R.color.recording));
-        m_recordButton.setText(getString(R.string.icon_stop));
+        recordButton.setTextColor(getResources().getColor(R.color.recording));
+        recordButton.setText(getString(R.string.icon_stop));
 
         // work on UiThread for better performance
         runOnUiThread(new Runnable() {
             public void run() {
                 try {
                     // and go!
-                    m_mediaRecorder.start();
+                    mediaRecorder.start();
                 } catch (Exception ignored) {
                 }
             }
         });
 
-        m_recording = true;
+        recording = true;
     }
 
     /**
@@ -294,16 +295,16 @@ public class CaptureVideoActivity extends PermisoActivity {
      */
     private void stopRecording() {
 
-        if (m_mediaRecorder != null) {
+        if (mediaRecorder != null) {
             try {
-                m_mediaRecorder.stop();
+                mediaRecorder.stop();
             } catch (Exception e) {
                 setResult(Activity.RESULT_CANCELED);
                 finish();
             }
         }
         releaseMediaRecorder();
-        m_recording = false;
+        recording = false;
 
         Intent returnIntent = new Intent();
         returnIntent.putExtra(SurveyorIntent.EXTRA_MEDIA_FILE, getIntent().getStringExtra(SurveyorIntent.EXTRA_MEDIA_FILE));
@@ -312,7 +313,7 @@ public class CaptureVideoActivity extends PermisoActivity {
     }
 
     public void toggleRecording(View view) {
-        if (!m_recording) {
+        if (!recording) {
             startRecording();
         } else {
             stopRecording();
@@ -320,7 +321,7 @@ public class CaptureVideoActivity extends PermisoActivity {
     }
 
     public void toggleCameras(View view) {
-        if (!m_recording) {
+        if (!recording) {
             if (Camera.getNumberOfCameras() > 1) {
                 toggleCamera();
             } else {

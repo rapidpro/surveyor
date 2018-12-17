@@ -20,6 +20,7 @@ import java.util.Collections;
 
 import androidx.test.espresso.intent.ActivityResultFunction;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
+import androidx.test.filters.FlakyTest;
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
@@ -64,7 +65,7 @@ public class RunActivityTest extends BaseApplicationTest {
         login("bob@nyaruka.com", Collections.singleton(ORG_UUID));
     }
 
-    @Ignore // TODO failing on Travis with java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
+    @FlakyTest(detail="failing on Travis with java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission")
     @Test
     public void twoQuestions() throws Exception {
         launchForFlow("bdd61538-5f50-4836-a8fb-acaafd64ddb1");

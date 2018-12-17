@@ -2,10 +2,10 @@ package io.rapidpro.surveyor.activity;
 
 import android.app.Instrumentation;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
@@ -20,15 +20,12 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-/**
- * This test can only work after the Maps app has been opened and the T&C accepted
- */
-@Ignore
 public class CaptureLocationActivityTest extends BaseApplicationTest {
 
     @Rule
     public ActivityTestRule<CaptureLocationActivity> rule = new ActivityTestRule<>(CaptureLocationActivity.class);
 
+    @FlakyTest(detail = "This test can only work after the Maps app has been opened and the T&C accepted")
     @Test
     public void capture() {
         onView(withId(R.id.button_capture))

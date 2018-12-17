@@ -4,12 +4,12 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
 
+import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
@@ -23,14 +23,11 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.CoreMatchers.is;
 
-/**
- * Only works on newer emulators with microphone emulation
- */
-@Ignore
 public class CaptureAudioActivityTest extends BaseApplicationTest {
     @Rule
     public ActivityTestRule<CaptureAudioActivity> rule = new ActivityTestRule<>(CaptureAudioActivity.class, true, false);
 
+    @FlakyTest(detail = "Only works on newer emulators with microphone emulation")
     @Test
     public void capture() throws InterruptedException {
         File output = new File(getSurveyor().getExternalCacheDir(), "audio.m4a");
