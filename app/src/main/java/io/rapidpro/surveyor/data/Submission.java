@@ -3,6 +3,7 @@ package io.rapidpro.surveyor.data;
 import android.net.Uri;
 
 import com.nyaruka.goflow.mobile.Event;
+import com.nyaruka.goflow.mobile.Modifier;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -24,7 +25,7 @@ import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.engine.EngineException;
 import io.rapidpro.surveyor.engine.Session;
 import io.rapidpro.surveyor.net.TembaException;
-import io.rapidpro.surveyor.net.requests.SessionAndEvents;
+import io.rapidpro.surveyor.net.requests.SubmissionPayload;
 import io.rapidpro.surveyor.utils.RawJson;
 import io.rapidpro.surveyor.utils.SurveyUtils;
 
@@ -33,6 +34,7 @@ public class Submission {
     static final String INCOMPLETE_DIRECTORY_NAME = "current";
 
     private static final String SESSION_FILE = "session.json";
+    private static final String MODIFIERS_FILE = "modifiers.jsonl";
     private static final String EVENTS_FILE = "events.jsonl";
     private static final String MEDIA_DIR = "media";
 
@@ -103,6 +105,24 @@ public class Submission {
     public void saveSession(Session session) throws IOException, EngineException {
         File file = new File(directory, SESSION_FILE);
         FileUtils.writeStringToFile(file, session.toJSON());
+    }
+
+    /**
+     * Saves new modifiers to this submission
+     *
+     * @param modifiers the modifiers to save
+     */
+    public void saveNewModifiers(List<Modifier> modifiers) throws IOException {
+        File file = new File(directory, MODIFIERS_FILE);
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+
+        for (Modifier mod : modifiers) {
+            writer.write(mod.payload());
+            writer.newLine();
+        }
+
+        writer.close();
     }
 
     /**
@@ -177,6 +197,7 @@ public class Submission {
         Logger.d("Submitting submission " + getUuid() + "...");
 
         String session = FileUtils.readFileToString(new File(directory, SESSION_FILE));
+        List<String> modifiers = FileUtils.readLines(new File(directory, MODIFIERS_FILE));
         List<String> events = FileUtils.readLines(new File(directory, EVENTS_FILE));
 
         // upload all media and get a new remote URL for each item
@@ -192,12 +213,16 @@ public class Submission {
         }
 
         RawJson sessionJson = new RawJson(StringUtils.replaceEach(session, oldUris, newUrls));
+        List<RawJson> modifiersJson = new ArrayList<>(modifiers.size());
+        for (String modifier : modifiers) {
+            modifiersJson.add(new RawJson(modifier));
+        }
         List<RawJson> eventsJson = new ArrayList<>(events.size());
         for (String event : events) {
             eventsJson.add(new RawJson(StringUtils.replaceEach(event, oldUris, newUrls)));
         }
 
-        SessionAndEvents payload = new SessionAndEvents(sessionJson, eventsJson);
+        SubmissionPayload payload = new SubmissionPayload(sessionJson, modifiersJson,  eventsJson);
 
         SurveyorApplication.get().getTembaService().submitSession(org.getToken(), payload);
 

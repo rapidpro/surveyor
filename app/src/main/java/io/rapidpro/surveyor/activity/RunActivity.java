@@ -37,7 +37,6 @@ import com.nyaruka.goflow.mobile.Trigger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
@@ -48,6 +47,7 @@ import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.engine.Engine;
 import io.rapidpro.surveyor.engine.EngineException;
 import io.rapidpro.surveyor.engine.Session;
+import io.rapidpro.surveyor.engine.Sprint;
 import io.rapidpro.surveyor.ui.IconTextView;
 import io.rapidpro.surveyor.ui.ViewCache;
 import io.rapidpro.surveyor.utils.ImageUtils;
@@ -99,8 +99,8 @@ public class RunActivity extends BaseActivity {
             session = new Session(assets);
             submission = getSurveyor().getSubmissionService().newSubmission(org, flow);
 
-            List<Event> events = session.start(trigger);
-            handleEngineOutput(events);
+            Sprint sprint = session.start(trigger);
+            handleEngineSprint(sprint);
 
         } catch (EngineException | IOException e) {
             handleProblem("Unable to start flow", e);
@@ -373,9 +373,9 @@ public class RunActivity extends BaseActivity {
     private void resumeSession(MsgIn msg) {
         try {
             Resume resume = Engine.createMsgResume(null, null, msg);
-            List<Event> events = session.resume(resume);
+            Sprint sprint = session.resume(resume);
 
-            handleEngineOutput(events);
+            handleEngineSprint(sprint);
 
         } catch (EngineException | IOException e) {
             handleProblem("Couldn't handle message", e);
@@ -422,10 +422,10 @@ public class RunActivity extends BaseActivity {
     /**
      * Handles new session state and events after interaction with the flow engine
      *
-     * @param events the new events
+     * @param sprint the sprint from the engine
      */
-    private void handleEngineOutput(List<Event> events) throws IOException, EngineException {
-        for (Event event : events) {
+    private void handleEngineSprint(Sprint sprint) throws IOException, EngineException {
+        for (Event event : sprint.getEvents()) {
             Logger.d("Event: " + event.payload());
 
             JsonObject asObj = new JsonParser().parse(event.payload()).getAsJsonObject();
@@ -448,7 +448,10 @@ public class RunActivity extends BaseActivity {
         }
 
         submission.saveSession(session);
-        submission.saveNewEvents(events);
+        submission.saveNewModifiers(sprint.getModifiers());
+        submission.saveNewEvents(sprint.getEvents());
+
+        Logger.d("Persisted new events and modifiers after engine sprint");
     }
 
     private void waitForInput(Hint hint) {

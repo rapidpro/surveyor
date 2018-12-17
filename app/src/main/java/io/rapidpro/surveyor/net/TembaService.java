@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
-import io.rapidpro.surveyor.net.requests.SessionAndEvents;
+import io.rapidpro.surveyor.net.requests.SubmissionPayload;
 import io.rapidpro.surveyor.net.responses.Boundary;
 import io.rapidpro.surveyor.net.responses.Definitions;
 import io.rapidpro.surveyor.net.responses.Field;
@@ -205,7 +205,7 @@ public class TembaService {
         }
     }
 
-    public void submitSession(String token, SessionAndEvents payload) throws TembaException {
+    public void submitSession(String token, SubmissionPayload payload) throws TembaException {
 
         Logger.d(JsonUtils.marshal(payload));
 

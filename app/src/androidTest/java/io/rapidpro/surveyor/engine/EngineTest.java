@@ -70,39 +70,39 @@ public class EngineTest extends BaseApplicationTest {
         FlowReference flow = Engine.createFlowReference(FLOW_UUID, "Two Questions");
         Trigger trigger = Engine.createManualTrigger(env, contact, flow);
 
-        List<Event> events = session.start(trigger);
+        Sprint sprint = session.start(trigger);
 
         assertThat(session.getStatus(), is("waiting"));
         assertThat(session.isWaiting(), is(true));
-        assertThat(events, hasSize(2));
-        assertThat(events.get(0).type(), is("msg_created"));
-        assertThat(events.get(1).type(), is("msg_wait"));
+        assertThat(sprint.getEvents(), hasSize(2));
+        assertThat(sprint.getEvents().get(0).type(), is("msg_created"));
+        assertThat(sprint.getEvents().get(1).type(), is("msg_wait"));
 
         MsgIn msg1 = Engine.createMsgIn("I like club");
         Resume resume1 = Engine.createMsgResume(null, null, msg1);
 
-        events = session.resume(resume1);
+        sprint = session.resume(resume1);
 
         assertThat(session.getStatus(), is("waiting"));
         assertThat(session.isWaiting(), is(true));
-        assertThat(events, hasSize(4));
-        assertThat(events.get(0).type(), is("msg_received"));
-        assertThat(events.get(0).payload(), containsString("I like club"));
-        assertThat(events.get(1).type(), is("run_result_changed"));
-        assertThat(events.get(2).type(), is("msg_created"));
-        assertThat(events.get(3).type(), is("msg_wait"));
+        assertThat(sprint.getEvents(), hasSize(4));
+        assertThat(sprint.getEvents().get(0).type(), is("msg_received"));
+        assertThat(sprint.getEvents().get(0).payload(), containsString("I like club"));
+        assertThat(sprint.getEvents().get(1).type(), is("run_result_changed"));
+        assertThat(sprint.getEvents().get(2).type(), is("msg_created"));
+        assertThat(sprint.getEvents().get(3).type(), is("msg_wait"));
 
         MsgIn msg2 = Engine.createMsgIn("RED");
         Resume resume2 = Engine.createMsgResume(null, null, msg2);
 
-        events = session.resume(resume2);
+        sprint = session.resume(resume2);
 
         assertThat(session.getStatus(), is("completed"));
         assertThat(session.isWaiting(), is(false));
-        assertThat(events, hasSize(3));
-        assertThat(events.get(0).type(), is("msg_received"));
-        assertThat(events.get(1).type(), is("run_result_changed"));
-        assertThat(events.get(2).type(), is("msg_created"));
+        assertThat(sprint.getEvents(), hasSize(3));
+        assertThat(sprint.getEvents().get(0).type(), is("msg_received"));
+        assertThat(sprint.getEvents().get(1).type(), is("run_result_changed"));
+        assertThat(sprint.getEvents().get(2).type(), is("msg_created"));
 
         // try to marshal to JSON
         String marshaled = session.toJSON();
@@ -133,29 +133,29 @@ public class EngineTest extends BaseApplicationTest {
         Contact contact = Engine.createEmptyContact();
         Trigger trigger = Engine.createManualTrigger(env, contact, flow.toReference());
 
-        List<Event> events = session.start(trigger);
+        Sprint sprint = session.start(trigger);
 
         assertThat(session.getStatus(), is("waiting"));
         assertThat(session.isWaiting(), is(true));
         assertThat(session.getWait().hint(), is(notNullValue()));
         assertThat(session.getWait().hint().type(), is("image"));
-        assertThat(events, hasSize(2));
-        assertThat(events.get(0).type(), is("msg_created"));
-        assertThat(events.get(1).type(), is("msg_wait"));
+        assertThat(sprint.getEvents(), hasSize(2));
+        assertThat(sprint.getEvents().get(0).type(), is("msg_created"));
+        assertThat(sprint.getEvents().get(1).type(), is("msg_wait"));
 
         MsgIn msg1 = Engine.createMsgIn("", "content://io.rapidpro.surveyor/files/selfie.jpg");
         Resume resume1 = Engine.createMsgResume(null, null, msg1);
 
-        events = session.resume(resume1);
+        sprint = session.resume(resume1);
 
         assertThat(session.getStatus(), is("waiting"));
         assertThat(session.isWaiting(), is(true));
-        assertThat(events, hasSize(4));
-        assertThat(events.get(0).type(), is("msg_received"));
-        assertThat(events.get(0).payload(), containsString("content://io.rapidpro.surveyor/files/selfie.jpg"));
-        assertThat(events.get(1).type(), is("run_result_changed"));
-        assertThat(events.get(2).type(), is("msg_created"));
-        assertThat(events.get(3).type(), is("msg_wait"));
+        assertThat(sprint.getEvents(), hasSize(4));
+        assertThat(sprint.getEvents().get(0).type(), is("msg_received"));
+        assertThat(sprint.getEvents().get(0).payload(), containsString("content://io.rapidpro.surveyor/files/selfie.jpg"));
+        assertThat(sprint.getEvents().get(1).type(), is("run_result_changed"));
+        assertThat(sprint.getEvents().get(2).type(), is("msg_created"));
+        assertThat(sprint.getEvents().get(3).type(), is("msg_wait"));
     }
 
     @Test

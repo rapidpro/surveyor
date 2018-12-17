@@ -1,13 +1,10 @@
 package io.rapidpro.surveyor.engine;
 
-import com.nyaruka.goflow.mobile.Event;
 import com.nyaruka.goflow.mobile.Mobile;
 import com.nyaruka.goflow.mobile.Resume;
 import com.nyaruka.goflow.mobile.SessionAssets;
 import com.nyaruka.goflow.mobile.Trigger;
 import com.nyaruka.goflow.mobile.Wait;
-
-import java.util.List;
 
 public class Session {
     private com.nyaruka.goflow.mobile.Session target;
@@ -45,9 +42,9 @@ public class Session {
      * @param trigger the trigger
      * @return the events
      */
-    public List<Event> start(Trigger trigger) throws EngineException {
+    public Sprint start(Trigger trigger) throws EngineException {
         try {
-            return Engine.eventSliceToList(target.start(trigger));
+            return Sprint.fromNative(target.start(trigger));
         } catch (Exception e) {
             throw new EngineException(e);
         }
@@ -59,9 +56,9 @@ public class Session {
      * @param resume the resume
      * @return the events
      */
-    public List<Event> resume(Resume resume) throws EngineException {
+    public Sprint resume(Resume resume) throws EngineException {
         try {
-            return Engine.eventSliceToList(target.resume(resume));
+            return Sprint.fromNative(target.resume(resume));
         } catch (Exception e) {
             throw new EngineException(e);
         }

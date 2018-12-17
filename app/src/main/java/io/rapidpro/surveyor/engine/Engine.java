@@ -166,12 +166,4 @@ public class Engine {
         }
         return slice;
     }
-
-    static List<Event> eventSliceToList(EventSlice slice) {
-        List<Event> events = new ArrayList<>((int) slice.length());
-        for (int e = 0; e < slice.length(); e++) {
-            events.add(slice.get(e));
-        }
-        return events;
-    }
 }

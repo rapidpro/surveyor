@@ -1,5 +1,6 @@
 package io.rapidpro.surveyor.data;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -30,6 +31,7 @@ public class SubmissionTest extends BaseApplicationTest {
         Submission sub = svc.newSubmission(org, flow1);
         File directory = sub.getDirectory();
 
+        FileUtils.write(new File(directory, "modifiers.jsonl"), "");
         copyResource(R.raw.submissions_multimedia_events, new File(directory, "events.jsonl"));
         copyResource(R.raw.submissions_multimedia_session, new File(directory, "session.json"));
         copyResource(R.raw.capture_image, new File(sub.getMediaDirectory(), "0cce52d1-ff59-4074-bf54-39643900e2bf.jpg"));
