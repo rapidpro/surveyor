@@ -79,9 +79,9 @@ public interface TembaAPI {
     );
 
     @POST("/mr/session/submit.json")
-    Call<JsonObject> submitSession(
+    Call<JsonObject> submit(
             @Header("Authorization") String token,
-            @Body JsonElement sessionAndEvents
+            @Body String payload
     );
 
     /* Legacy endpoints to be removed */

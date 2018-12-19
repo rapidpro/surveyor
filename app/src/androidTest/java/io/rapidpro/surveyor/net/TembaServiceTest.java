@@ -188,7 +188,7 @@ public class TembaServiceTest extends BaseApplicationTest {
         List<RawJson> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);
 
         assertThat(definitions, hasSize(3));
-        assertThat(definitions.get(0).toString(), startsWith("{\"entry\":\"c50f7200-2432-4912-897d-d809a2d2ad8d\""));
+        assertThat(definitions.get(0).toString(), startsWith("{\"entry\":\"036901e0-abb8-4979-92cb-f0d43aeb5b68\""));
     }
 
     /**

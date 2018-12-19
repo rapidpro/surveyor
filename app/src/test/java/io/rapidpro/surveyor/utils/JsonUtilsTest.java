@@ -1,5 +1,7 @@
 package io.rapidpro.surveyor.utils;
 
+import com.google.gson.JsonElement;
+
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;

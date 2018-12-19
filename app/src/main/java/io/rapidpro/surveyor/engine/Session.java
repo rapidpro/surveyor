@@ -65,6 +65,15 @@ public class Session {
     }
 
     /**
+     * Gets the assets used by this session
+     *
+     * @return the assets
+     */
+    public SessionAssets getAssets() {
+        return target.assets();
+    }
+
+    /**
      * Gets the status of this session
      *
      * @return the status

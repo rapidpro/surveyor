@@ -85,6 +85,9 @@ public class TembaService {
 
     /**
      * Calls RapidPro's authenticate endpoint to give us the list of tokens and orgs we can access
+     *
+     * @param username the username
+     * @param password the password
      */
     public void authenticate(String username, String password, Callback<TokenResults> callback) {
         api.authenticate(username, password, "S").enqueue(callback);
@@ -92,6 +95,8 @@ public class TembaService {
 
     /**
      * Gets all of the admin boundaries
+     *
+     * @param token the authentication token
      */
     public List<Boundary> getBoundaries(final String token) throws TembaException {
         return fetchAllPages(new PageCaller<Boundary>() {
@@ -104,6 +109,8 @@ public class TembaService {
 
     /**
      * Gets the org associated with the given token
+     *
+     * @param token the authentication token
      */
     public Org getOrg(String token) throws TembaException {
         try {
@@ -118,6 +125,8 @@ public class TembaService {
 
     /**
      * Gets all of the contact fields
+     *
+     * @param token the authentication token
      */
     public List<Field> getFields(final String token) throws TembaException {
         return fetchAllPages(new PageCaller<Field>() {
@@ -130,6 +139,8 @@ public class TembaService {
 
     /**
      * Gets all of the non-archived surveyor flows
+     *
+     * @param token the authentication token
      */
     public List<Flow> getFlows(final String token) throws TembaException {
         return fetchAllPages(new PageCaller<Flow>() {
@@ -142,6 +153,8 @@ public class TembaService {
 
     /**
      * Gets all of the contact groups
+     *
+     * @param token the authentication token
      */
     public List<Group> getGroups(final String token) throws TembaException {
         return fetchAllPages(new PageCaller<Group>() {
@@ -154,6 +167,9 @@ public class TembaService {
 
     /**
      * Gets full definitions for the given flows
+     *
+     * @param token the authentication token
+     * @param flows the list of flows
      */
     public List<RawJson> getDefinitions(final String token, final List<Flow> flows) throws TembaException {
         // gather up flow UUIDs
@@ -176,7 +192,8 @@ public class TembaService {
     /**
      * Uploads a media file and returns the remove URL
      *
-     * @param uri the local file to upload
+     * @param token the authentication token
+     * @param uri   the local file to upload
      * @return the new media URL
      */
     public String uploadMedia(String token, Uri uri) throws TembaException {
@@ -205,11 +222,21 @@ public class TembaService {
         }
     }
 
-    public void submitSession(String token, SubmissionPayload payload) throws TembaException {
+    /**
+     * Submits a submission payload
+     *
+     * @param token      the authentication token
+     * @param submission the payload
+     */
+    public void submit(String token, SubmissionPayload submission) throws TembaException {
+        String payload = JsonUtils.marshal(submission);
 
-        Logger.d(JsonUtils.marshal(payload));
-
-        // TODO
+        try {
+            Response<JsonObject> result = api.submit(asAuth(token), payload).execute();
+            checkResponse(result);
+        } catch (IOException e) {
+            throw new TembaException("Error submitting", e);
+        }
     }
 
     /**
@@ -273,21 +300,14 @@ public class TembaService {
         }
     }
 
-    /**
-     * Utility for fetching all pages of a given type
-     */
-    private interface PageCaller<T> {
-        Call<PaginatedResults<T>> createCall(String cursor);
-    }
-
-    /* Legacy endpoints to be removed */
-
     @Deprecated
     public void legacyAddCreatedFields(String token, HashMap<String, io.rapidpro.flows.runner.Field> fields) {
         for (io.rapidpro.flows.runner.Field field : fields.values()) {
             api.legacyAddCreatedField(asAuth(token), field);
         }
     }
+
+    /* Legacy endpoints to be removed */
 
     @Deprecated
     public io.rapidpro.flows.runner.Contact legacyAddContact(String token, io.rapidpro.flows.runner.Contact contact) throws TembaException {
@@ -330,5 +350,12 @@ public class TembaService {
         } catch (IOException e) {
             throw new TembaException("Error submitting legacy results", e);
         }
+    }
+
+    /**
+     * Utility for fetching all pages of a given type
+     */
+    private interface PageCaller<T> {
+        Call<PaginatedResults<T>> createCall(String cursor);
     }
 }

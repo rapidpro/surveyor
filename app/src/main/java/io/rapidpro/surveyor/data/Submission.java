@@ -210,6 +210,11 @@ public class Submission {
         for (Map.Entry<Uri, String> entry : mediaUrls.entrySet()) {
             oldUris[e] = entry.getKey().toString();
             newUrls[e] = entry.getValue();
+            e++;
+        }
+
+        for (int i = 0; i < oldUris.length; i++) {
+            Logger.d(oldUris[i] + " --> " + newUrls[i]);
         }
 
         RawJson sessionJson = new RawJson(StringUtils.replaceEach(session, oldUris, newUrls));
@@ -224,7 +229,7 @@ public class Submission {
 
         SubmissionPayload payload = new SubmissionPayload(sessionJson, modifiersJson,  eventsJson);
 
-        SurveyorApplication.get().getTembaService().submitSession(org.getToken(), payload);
+        SurveyorApplication.get().getTembaService().submit(org.getToken(), payload);
 
         delete();
     }

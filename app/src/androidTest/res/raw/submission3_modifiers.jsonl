@@ -1,0 +1,4 @@
+{"type":"name","name":"Bob"}
+{"type":"urn","urn":"tel:+593979123456","modification":"append"}
+{"type":"groups","groups":[{"uuid":"11f83067-7c40-49e8-8a35-a1a4e8dd3b69","name":"Testers"}],"modification":"add"}
+{"type":"field","field":{"key":"age","name":"Age"},"value":{"text":"37","number":37}}

@@ -3,13 +3,13 @@
   "site": "https://app.rapidpro.io",
   "flows": [
     {
-      "entry": "c50f7200-2432-4912-897d-d809a2d2ad8d",
+      "entry": "036901e0-abb8-4979-92cb-f0d43aeb5b68",
       "action_sets": [
         {
-          "uuid": "c50f7200-2432-4912-897d-d809a2d2ad8d",
+          "uuid": "036901e0-abb8-4979-92cb-f0d43aeb5b68",
           "x": 100,
           "y": 0,
-          "destination": "dcd9295d-7a25-4a77-abc2-7d692ca6cc1f",
+          "destination": "39fe1ce0-7dee-445e-9945-48c72a05cef5",
           "actions": [
             {
               "type": "reply",
@@ -22,13 +22,13 @@
               "send_all": false
             }
           ],
-          "exit_uuid": "cd1cba4d-ddb6-4491-8f53-19647e193f25"
+          "exit_uuid": "706853c2-831b-4dd8-8073-cd51b21d94d6"
         },
         {
-          "uuid": "dc72d0fd-c918-44e9-a833-31a58f066df5",
+          "uuid": "73dda1a7-9152-45f1-993a-e7d01eb028db",
           "x": 100,
           "y": 175,
-          "destination": "260710c6-f7eb-4dfb-a297-9736b65e7a95",
+          "destination": "1a7612b5-777d-4af3-a657-077c46f242d9",
           "actions": [
             {
               "type": "save",
@@ -48,13 +48,13 @@
               "send_all": false
             }
           ],
-          "exit_uuid": "3c09be15-46a0-4e29-bdbd-e512bf454012"
+          "exit_uuid": "5e7a398e-eebe-4b32-8600-374659f56d9e"
         },
         {
-          "uuid": "b09ed9b4-0d44-4096-bc2d-263e9e3dec93",
+          "uuid": "2d55c61f-384c-4a07-a17e-1e42fc543dd9",
           "x": 102,
           "y": 464,
-          "destination": null,
+          "destination": "52a6784b-f51f-42c7-8c6a-3e5ec42603bb",
           "actions": [
             {
               "type": "save",
@@ -68,19 +68,29 @@
               "uuid": "5126bb19-6ca1-4a9c-a9ef-30f4dd3761f4",
               "groups": [
                 {
-                  "uuid": "11f83067-7c40-49e8-8a35-a1a4e8dd3b69",
+                  "uuid": "6696cabf-eb5e-42bf-bcc6-f0c8be9b1316",
                   "name": "Testers"
                 }
               ]
+            },
+            {
+              "type": "reply",
+              "uuid": "7e198e6b-4640-4123-b3a9-0a44a06bd919",
+              "msg": {
+                "base": "Finally, what is your age?"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
             }
           ],
-          "exit_uuid": "242eb71a-704a-4de5-bbff-e2bcca10d888"
+          "exit_uuid": "4e483159-af9f-48a4-907f-c875fde66c70"
         },
         {
-          "uuid": "76a47c79-bae6-46f7-a43e-89fb67191a7b",
+          "uuid": "8a2e088e-3657-4fa6-86fb-8d788db03709",
           "x": 542,
           "y": 281,
-          "destination": "260710c6-f7eb-4dfb-a297-9736b65e7a95",
+          "destination": "1a7612b5-777d-4af3-a657-077c46f242d9",
           "actions": [
             {
               "type": "reply",
@@ -93,22 +103,67 @@
               "send_all": false
             }
           ],
-          "exit_uuid": "aa6517e2-c06c-49c1-8a6a-acea0a474ecb"
+          "exit_uuid": "edf187b4-d9c1-4aa1-b26e-5c8c5f481a39"
+        },
+        {
+          "uuid": "6d5703f9-938c-4c2f-9cc7-7d1bbe328095",
+          "x": 108,
+          "y": 875,
+          "destination": null,
+          "actions": [
+            {
+              "type": "save",
+              "uuid": "76abbb4a-ab65-4e82-8b6a-7222fa14eb8a",
+              "label": "Age",
+              "field": "age",
+              "value": "@flow.age"
+            },
+            {
+              "type": "reply",
+              "uuid": "40790c5a-4afc-4c80-856d-7414e53d5de8",
+              "msg": {
+                "base": "Thanks @contact.name. You are @contact.age and your phone number is @contact.tel"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "6bab242d-85d5-4afe-b6e7-5fe7c98f187e"
+        },
+        {
+          "uuid": "a500d367-e944-4ba4-ab21-216b702f41c4",
+          "x": 522,
+          "y": 638,
+          "destination": "52a6784b-f51f-42c7-8c6a-3e5ec42603bb",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "2f39296b-37ed-4d16-b5bc-f3bfeb6b7691",
+              "msg": {
+                "base": "Sorry that doesn't look like an age value. Try again."
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "27ffbd14-4345-4588-a41f-683b08ba14e7"
         }
       ],
       "rule_sets": [
         {
-          "uuid": "dcd9295d-7a25-4a77-abc2-7d692ca6cc1f",
+          "uuid": "39fe1ce0-7dee-445e-9945-48c72a05cef5",
           "x": 237,
           "y": 93,
           "label": "Name",
           "rules": [
             {
-              "uuid": "acd7c0cc-bf92-458e-a03c-d563f397e70c",
+              "uuid": "bb999ff8-5eb3-45f6-bec6-a0430105b0ca",
               "category": {
                 "base": "All Responses"
               },
-              "destination": "dc72d0fd-c918-44e9-a833-31a58f066df5",
+              "destination": "73dda1a7-9152-45f1-993a-e7d01eb028db",
               "destination_type": "A",
               "test": {
                 "type": "true"
@@ -123,17 +178,17 @@
           "config": {}
         },
         {
-          "uuid": "260710c6-f7eb-4dfb-a297-9736b65e7a95",
+          "uuid": "1a7612b5-777d-4af3-a657-077c46f242d9",
           "x": 237,
           "y": 361,
           "label": "Phone",
           "rules": [
             {
-              "uuid": "eb2138cb-90a9-4824-ad92-147d59aaa71a",
+              "uuid": "0c047d03-3b61-4ff2-8bc8-43a89cf1087b",
               "category": {
                 "base": "phone"
               },
-              "destination": "b09ed9b4-0d44-4096-bc2d-263e9e3dec93",
+              "destination": "2d55c61f-384c-4a07-a17e-1e42fc543dd9",
               "destination_type": "A",
               "test": {
                 "type": "phone"
@@ -141,11 +196,48 @@
               "label": null
             },
             {
-              "uuid": "ca4748f3-439a-49f6-a3b7-5868653fceb4",
+              "uuid": "6d614e50-ee98-412c-aee6-0916d10ed0ff",
               "category": {
                 "base": "Other"
               },
-              "destination": "76a47c79-bae6-46f7-a43e-89fb67191a7b",
+              "destination": "8a2e088e-3657-4fa6-86fb-8d788db03709",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_message",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        },
+        {
+          "uuid": "52a6784b-f51f-42c7-8c6a-3e5ec42603bb",
+          "x": 228,
+          "y": 712,
+          "label": "Age",
+          "rules": [
+            {
+              "uuid": "34d09b52-ac85-44a4-b4f4-c7a3b489fcf8",
+              "category": {
+                "base": "numeric"
+              },
+              "destination": "6d5703f9-938c-4c2f-9cc7-7d1bbe328095",
+              "destination_type": "A",
+              "test": {
+                "type": "number"
+              },
+              "label": null
+            },
+            {
+              "uuid": "65e0c7b2-ea5f-48ad-a42c-411789155185",
+              "category": {
+                "base": "Other"
+              },
+              "destination": "a500d367-e944-4ba4-ab21-216b702f41c4",
               "destination_type": "A",
               "test": {
                 "type": "true"
@@ -162,11 +254,11 @@
       ],
       "base_language": "base",
       "flow_type": "S",
-      "version": "11.6",
+      "version": "11.7",
       "metadata": {
         "name": "Contact Details",
-        "saved_on": "2018-11-21T16:37:58.273902Z",
-        "revision": 20,
+        "saved_on": "2018-12-18T14:47:55.302852Z",
+        "revision": 16,
         "uuid": "ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec",
         "expires": 10080,
         "contact_creation": "run",
