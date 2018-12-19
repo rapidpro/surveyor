@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.List;
 
 import androidx.test.espresso.intent.ActivityResultFunction;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
@@ -25,9 +24,6 @@ import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
-import io.rapidpro.surveyor.data.Submission;
-import io.rapidpro.surveyor.data.SubmissionService;
-import io.rapidpro.surveyor.net.TembaException;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 import io.rapidpro.surveyor.utils.ImageUtils;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
@@ -50,7 +46,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertThat;
 
@@ -69,7 +64,7 @@ public class RunActivityTest extends BaseApplicationTest {
         login("bob@nyaruka.com", Collections.singleton(ORG_UUID));
     }
 
-    @FlakyTest(detail="failing on Travis with java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission")
+    @FlakyTest(detail = "failing on Travis with java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission")
     @Test
     public void twoQuestions() throws Exception {
         launchForFlow("bdd61538-5f50-4836-a8fb-acaafd64ddb1");
@@ -156,7 +151,7 @@ public class RunActivityTest extends BaseApplicationTest {
     }
 
     @Test
-    public void contactDetails() throws IOException, TembaException {
+    public void contactDetails() {
         launchForFlow("ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec");
 
         onView(allOf(withId(R.id.text_message), withText("Hi there. What's your name?")))
@@ -175,13 +170,6 @@ public class RunActivityTest extends BaseApplicationTest {
         sendTextReply("37");
 
         onView(withText("Save")).check(matches(isDisplayed())).perform(click());
-
-        Org org = getSurveyor().getOrgService().get(ORG_UUID);
-        SubmissionService svc = getSurveyor().getSubmissionService();
-        List<Submission> submissions = svc.getCompleted(org);
-
-        assertThat(submissions, hasSize(1));
-        submissions.get(0).submit();
     }
 
     private void launchForFlow(String flowUuid) {

@@ -1,14 +1,17 @@
 package io.rapidpro.surveyor.net;
 
 import android.net.Uri;
+import android.os.Environment;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -234,6 +237,8 @@ public class TembaService {
         try {
             Response<JsonObject> result = api.submit(asAuth(token), payload).execute();
             checkResponse(result);
+
+            //FileUtils.write(new File(Environment.getExternalStorageDirectory(), "submit.json"), payload);
         } catch (IOException e) {
             throw new TembaException("Error submitting", e);
         }

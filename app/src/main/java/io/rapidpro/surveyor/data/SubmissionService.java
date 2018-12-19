@@ -7,6 +7,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.utils.SurveyUtils;
@@ -39,18 +40,23 @@ public class SubmissionService {
     public Submission newSubmission(Org org, Flow flow) throws IOException {
         File flowDir = SurveyUtils.mkdir(rootDir, org.getUuid(), flow.getUuid());
 
-        // blow away an existing current submission for this flow
-        File directory = new File(flowDir, Submission.INCOMPLETE_DIRECTORY_NAME);
-        if (directory.exists()) {
-            FileUtils.deleteQuietly(directory);
-        }
+        // blow away any existing incomplete submissions for this flow
+        discardIncomplete(org, flow);
 
-        directory = new File(flowDir, Submission.INCOMPLETE_DIRECTORY_NAME);
+        File directory = new File(flowDir, UUID.randomUUID().toString());
         directory.mkdirs();
 
         Logger.d("Creating new submission in " + directory.getPath());
 
         return new Submission(org, directory);
+    }
+
+    private void discardIncomplete(Org org, Flow flow) throws IOException {
+        for (Submission sub : getAll(org, flow)) {
+            if (!sub.isCompleted()) {
+                FileUtils.deleteDirectory(sub.getDirectory());
+            }
+        }
     }
 
     /**
@@ -67,6 +73,23 @@ public class SubmissionService {
         return pending;
     }
 
+    private List<Submission> getAll(Org org, Flow flow) {
+        List<Submission> all = new ArrayList<>();
+        File orgDir = new File(rootDir, org.getUuid());
+        File flowDir = new File(orgDir, flow.getUuid());
+        if (flowDir.exists()) {
+            for (File file : flowDir.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return f.isDirectory();
+                }
+            })) {
+                all.add(new Submission(org, file));
+            }
+        }
+        return all;
+    }
+
     /**
      * Return the pending submissions for the given flow in the given org
      *
@@ -75,20 +98,13 @@ public class SubmissionService {
      * @return the submissions
      */
     public List<Submission> getCompleted(Org org, Flow flow) {
-        List<Submission> pending = new ArrayList<>();
-        File orgDir = new File(rootDir, org.getUuid());
-        File flowDir = new File(orgDir, flow.getUuid());
-        if (flowDir.exists()) {
-            for (File file : flowDir.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File f) {
-                    return f.isDirectory() && !f.getName().equals(Submission.INCOMPLETE_DIRECTORY_NAME);
-                }
-            })) {
-                pending.add(new Submission(org, file));
+        List<Submission> completed = new ArrayList<>();
+        for (Submission sub : getAll(org, flow)) {
+            if (sub.isCompleted()) {
+                completed.add(sub);
             }
         }
-        return pending;
+        return completed;
     }
 
     /**

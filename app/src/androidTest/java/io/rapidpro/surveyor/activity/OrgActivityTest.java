@@ -2,10 +2,12 @@ package io.rapidpro.surveyor.activity;
 
 import android.content.Intent;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
@@ -115,9 +117,9 @@ public class OrgActivityTest extends BaseApplicationTest {
 
         SubmissionService svc = getSurveyor().getSubmissionService();
         Submission sub1 = svc.newSubmission(org, flow1);
-        sub1.complete();
+        sub1.saveStatus("completed");
         Submission sub2 = svc.newSubmission(org, flow1);
-        sub2.complete();
+        sub2.saveStatus("completed");
         svc.newSubmission(org, flow1);
 
         Intent intent = new Intent();

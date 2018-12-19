@@ -1,11 +1,13 @@
 package io.rapidpro.surveyor.data;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -16,7 +18,7 @@ public class SubmissionServiceTest extends BaseApplicationTest {
     private static final String ORG_UUID = "b2ad9e4d-71f1-4d54-8dd6-f7a94b685d06";
 
     @Test
-    public void getPending() throws IOException {
+    public void getCompleted() throws IOException {
         installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows, io.rapidpro.surveyor.test.R.raw.org1_assets);
 
         Org org = getSurveyor().getOrgService().get(ORG_UUID);
@@ -27,11 +29,15 @@ public class SubmissionServiceTest extends BaseApplicationTest {
         SubmissionService svc = getSurveyor().getSubmissionService();
 
         Submission sub1 = svc.newSubmission(org, flow1);
-        sub1.complete();
+        sub1.saveStatus("completed");
+
+        assertThat(sub1.getStatus(), is("completed"));
+        assertThat(sub1.isCompleted(), is(true));
+
         Submission sub2 = svc.newSubmission(org, flow1);
-        sub2.complete();
+        sub2.saveStatus("completed");
         Submission sub3 = svc.newSubmission(org, flow2);
-        sub3.complete();
+        sub3.saveStatus("completed");
         Submission sub4 = svc.newSubmission(org, flow2);
 
         assertThat(sub1.getOrg(), is(org));
@@ -49,6 +55,9 @@ public class SubmissionServiceTest extends BaseApplicationTest {
         assertThat(flow1Dir.exists(), is(true));
 
         File sub1Dir = new File(flow1Dir, sub1.getUuid());
+
+        Logger.d("Checking " + sub1Dir.getAbsolutePath() + "  ....");
+
         assertThat(sub1Dir.exists(), is(true));
 
         assertThat(sub1.getDirectory(), is(sub1Dir));

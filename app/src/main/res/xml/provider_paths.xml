@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <external-files-path name="shared" path="."/>
-    <external-cache-path name="shared" path="."/>
+    <external-cache-path name="cache" path="."/>
 
     <!-- for legacy submissions on the sdcard -->
     <external-path name="external_files" path="."/>

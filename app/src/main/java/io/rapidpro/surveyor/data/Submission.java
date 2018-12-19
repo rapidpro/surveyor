@@ -31,12 +31,14 @@ import io.rapidpro.surveyor.utils.SurveyUtils;
 
 public class Submission {
 
-    static final String INCOMPLETE_DIRECTORY_NAME = "current";
-
     private static final String SESSION_FILE = "session.json";
     private static final String MODIFIERS_FILE = "modifiers.jsonl";
     private static final String EVENTS_FILE = "events.jsonl";
+    private static final String STATUS_FILE = ".status";
     private static final String MEDIA_DIR = "media";
+
+    private static final String STATUS_COMPLETED = "completed";
+    private static final String STATUS_ERRORED = "errored";
 
     private Org org;
     private File directory;
@@ -93,8 +95,8 @@ public class Submission {
      *
      * @return true if complete
      */
-    public boolean isComplete() {
-        return !directory.getName().equals(INCOMPLETE_DIRECTORY_NAME);
+    public boolean isCompleted() {
+        return getStatus().equals(STATUS_COMPLETED);
     }
 
     /**
@@ -103,8 +105,9 @@ public class Submission {
      * @param session the current session
      */
     public void saveSession(Session session) throws IOException, EngineException {
-        File file = new File(directory, SESSION_FILE);
-        FileUtils.writeStringToFile(file, session.toJSON());
+        FileUtils.writeStringToFile(new File(directory, SESSION_FILE), session.toJSON());
+
+        saveStatus(session.getStatus());
     }
 
     /**
@@ -170,14 +173,24 @@ public class Submission {
     }
 
     /**
-     * Completes an incomplete submission
+     * Saves the current status of this submission
+     *
+     * @param status the status
      */
-    public void complete() throws IOException {
-        File dest = new File(directory.getParentFile(), UUID.randomUUID().toString());
+    public void saveStatus(String status) throws IOException {
+        FileUtils.writeStringToFile(new File(directory, STATUS_FILE), status);
+    }
 
-        if (!isComplete()) {
-            FileUtils.moveDirectory(directory, dest);
-            directory = dest;
+    /**
+     * Gets the status of this submission
+     *
+     * @return the status
+     */
+    public String getStatus() {
+        try {
+            return FileUtils.readFileToString(new File(directory, STATUS_FILE));
+        } catch (IOException e) {
+            return STATUS_ERRORED;
         }
     }
 
@@ -227,7 +240,7 @@ public class Submission {
             eventsJson.add(new RawJson(StringUtils.replaceEach(event, oldUris, newUrls)));
         }
 
-        SubmissionPayload payload = new SubmissionPayload(sessionJson, modifiersJson,  eventsJson);
+        SubmissionPayload payload = new SubmissionPayload(sessionJson, modifiersJson, eventsJson);
 
         SurveyorApplication.get().getTembaService().submit(org.getToken(), payload);
 
