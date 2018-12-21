@@ -543,8 +543,13 @@ public class RunActivity extends BaseActivity {
      * @param view the button
      */
     public void onActionSave(View view) {
-        // nothing to do... submission is already on disk
-        finish();
+        try {
+            submission.complete();
+
+            finish();
+        } catch (IOException e) {
+            Logger.e("unable to complete submission", e);
+        }
     }
 
     /**

@@ -40,7 +40,7 @@ public class SubmissionTest extends BaseApplicationTest {
         copyResource(R.raw.capture_video, new File(sub.getMediaDirectory(), "93c0cde7-3330-400b-9f3d-c9922ba11aa3.mp4"));
         copyResource(R.raw.capture_audio, new File(sub.getMediaDirectory(), "ed8f2572-ed00-47f4-9011-3bbb8a6cc70f.m4a"));
 
-        FileUtils.write(new File(directory, ".status"), "completed");
+        sub.complete();
         assertThat(sub.isCompleted(), is(true));
 
         mockServerResponse("{\"location\":\"http://uploads.rapidpro.io/0cce52d1.jpg\"}", "application/json", 200);

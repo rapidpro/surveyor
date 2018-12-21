@@ -29,15 +29,14 @@ public class SubmissionServiceTest extends BaseApplicationTest {
         SubmissionService svc = getSurveyor().getSubmissionService();
 
         Submission sub1 = svc.newSubmission(org, flow1);
-        sub1.saveStatus("completed");
+        sub1.complete();
 
-        assertThat(sub1.getStatus(), is("completed"));
         assertThat(sub1.isCompleted(), is(true));
 
         Submission sub2 = svc.newSubmission(org, flow1);
-        sub2.saveStatus("completed");
+        sub2.complete();
         Submission sub3 = svc.newSubmission(org, flow2);
-        sub3.saveStatus("completed");
+        sub3.complete();
         Submission sub4 = svc.newSubmission(org, flow2);
 
         assertThat(sub1.getOrg(), is(org));

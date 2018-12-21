@@ -19,7 +19,6 @@ import java.util.Collections;
 
 import androidx.test.espresso.intent.ActivityResultFunction;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
-import androidx.test.filters.FlakyTest;
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
@@ -64,9 +63,8 @@ public class RunActivityTest extends BaseApplicationTest {
         login("bob@nyaruka.com", Collections.singleton(ORG_UUID));
     }
 
-    @FlakyTest(detail = "failing on Travis with java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission")
     @Test
-    public void twoQuestions() throws Exception {
+    public void twoQuestions() throws IOException {
         launchForFlow("bdd61538-5f50-4836-a8fb-acaafd64ddb1");
 
         onView(allOf(withParent(withId(R.id.chat_history)), withClassName(is(ChatBubbleView.class.getName()))))
@@ -183,7 +181,8 @@ public class RunActivityTest extends BaseApplicationTest {
     }
 
     private void sendTextReply(String text) {
-        onView(withId(R.id.chat_compose)).perform(click(), typeText(text));
+        onView(withId(R.id.chat_compose)).perform(click(), typeText(text), closeSoftKeyboard());
+        sleep(1000);
         onView(withId(R.id.button_send)).perform(click());
     }
 

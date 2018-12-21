@@ -129,12 +129,9 @@ public abstract class BaseApplicationTest {
     protected void openOptionsMenu() {
         openContextualActionModeOverflowMenu();
         //openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-        try {
-            // especially on Travis, we need to give the emulator a git of time to actually open the menu
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
+        // especially on Travis, we need to give the emulator a git of time to actually open the menu
+        sleep(5000);
     }
 
     /**
@@ -220,6 +217,14 @@ public abstract class BaseApplicationTest {
             }
         } finally {
             zis.close();
+        }
+    }
+
+    protected void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }

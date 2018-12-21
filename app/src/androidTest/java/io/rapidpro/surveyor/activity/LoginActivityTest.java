@@ -36,7 +36,7 @@ public class LoginActivityTest extends BaseApplicationTest {
     }
 
     @Test
-    public void showErrorIfAuthenticationFails() throws InterruptedException {
+    public void showErrorIfAuthenticationFails() {
         rule.launchActivity(null);
 
         mockServerResponse("", "text/html", 502);
@@ -48,7 +48,7 @@ public class LoginActivityTest extends BaseApplicationTest {
         onView(withId(R.id.password)).perform(click(), typeText("Qwerty123"), closeSoftKeyboard());
         onView(withId(R.id.email_sign_in_button)).perform(click());
 
-        Thread.sleep(2000);
+        sleep(2000);
 
         onView(withId(R.id.text_error_message))
                 .check(matches(isDisplayed()))

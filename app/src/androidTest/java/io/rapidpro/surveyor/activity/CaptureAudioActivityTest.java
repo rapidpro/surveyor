@@ -29,7 +29,7 @@ public class CaptureAudioActivityTest extends BaseApplicationTest {
 
     @FlakyTest(detail = "Only works on newer emulators with microphone emulation")
     @Test
-    public void capture() throws InterruptedException {
+    public void capture() {
         File output = new File(getSurveyor().getExternalCacheDir(), "audio.m4a");
 
         Intent intent = new Intent();
@@ -41,7 +41,7 @@ public class CaptureAudioActivityTest extends BaseApplicationTest {
                 .check(matches(isDisplayed()))
                 .perform(click());
 
-        Thread.sleep(2000);
+        sleep(2000);
 
         // stop recording
         onView(withId(R.id.button_capture)).perform(click());

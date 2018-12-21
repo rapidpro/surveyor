@@ -34,11 +34,8 @@ public class Submission {
     private static final String SESSION_FILE = "session.json";
     private static final String MODIFIERS_FILE = "modifiers.jsonl";
     private static final String EVENTS_FILE = "events.jsonl";
-    private static final String STATUS_FILE = ".status";
+    private static final String COMPLETION_FILE = ".completed";
     private static final String MEDIA_DIR = "media";
-
-    private static final String STATUS_COMPLETED = "completed";
-    private static final String STATUS_ERRORED = "errored";
 
     private Org org;
     private File directory;
@@ -96,7 +93,7 @@ public class Submission {
      * @return true if complete
      */
     public boolean isCompleted() {
-        return getStatus().equals(STATUS_COMPLETED);
+        return new File(directory, COMPLETION_FILE).exists();
     }
 
     /**
@@ -106,8 +103,6 @@ public class Submission {
      */
     public void saveSession(Session session) throws IOException, EngineException {
         FileUtils.writeStringToFile(new File(directory, SESSION_FILE), session.toJSON());
-
-        saveStatus(session.getStatus());
     }
 
     /**
@@ -173,25 +168,10 @@ public class Submission {
     }
 
     /**
-     * Saves the current status of this submission
-     *
-     * @param status the status
+     * Marks this submission as completed
      */
-    public void saveStatus(String status) throws IOException {
-        FileUtils.writeStringToFile(new File(directory, STATUS_FILE), status);
-    }
-
-    /**
-     * Gets the status of this submission
-     *
-     * @return the status
-     */
-    public String getStatus() {
-        try {
-            return FileUtils.readFileToString(new File(directory, STATUS_FILE));
-        } catch (IOException e) {
-            return STATUS_ERRORED;
-        }
+    public void complete() throws IOException {
+        FileUtils.writeStringToFile(new File(directory, COMPLETION_FILE), "");
     }
 
     /**
