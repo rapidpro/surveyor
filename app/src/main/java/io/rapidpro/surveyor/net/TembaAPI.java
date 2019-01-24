@@ -78,7 +78,7 @@ public interface TembaAPI {
             @PartMap Map<String, RequestBody> params
     );
 
-    @POST("/mr/session/submit.json")
+    @POST("/mr/surveyor/submit")
     Call<JsonObject> submit(
             @Header("Authorization") String token,
             @Body String payload

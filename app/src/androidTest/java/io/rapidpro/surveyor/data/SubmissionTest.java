@@ -62,7 +62,7 @@ public class SubmissionTest extends BaseApplicationTest {
         assertThat(request3.getRequestLine(), is("POST /api/v2/media.json HTTP/1.1"));
 
         RecordedRequest request4 = mockServer.takeRequest();
-        assertThat(request4.getRequestLine(), is("POST /mr/session/submit.json HTTP/1.1"));
+        assertThat(request4.getRequestLine(), is("POST /mr/surveyor/submit HTTP/1.1"));
 
         // check that the submission payload doesn't contain the old local media paths, but does include the uploaded URLs
         String body = request4.getBody().readString(StandardCharsets.UTF_8);
@@ -101,6 +101,6 @@ public class SubmissionTest extends BaseApplicationTest {
         assertThat(directory.exists(), is(false));
 
         RecordedRequest request = mockServer.takeRequest();
-        assertThat(request.getRequestLine(), is("POST /mr/session/submit.json HTTP/1.1"));
+        assertThat(request.getRequestLine(), is("POST /mr/surveyor/submit HTTP/1.1"));
     }
 }
