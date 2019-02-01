@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
 
+import io.rapidpro.surveyor.net.requests.SubmissionPayload;
 import io.rapidpro.surveyor.net.responses.Boundary;
 import io.rapidpro.surveyor.net.responses.Definitions;
 import io.rapidpro.surveyor.net.responses.Field;
@@ -81,7 +82,7 @@ public interface TembaAPI {
     @POST("/mr/surveyor/submit")
     Call<JsonObject> submit(
             @Header("Authorization") String token,
-            @Body String payload
+            @Body SubmissionPayload submission
     );
 
     /* Legacy endpoints to be removed */
