@@ -9,8 +9,8 @@ android {
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 1153
-        versionName "11.5.3"
+        versionCode 1200
+        versionName "12.0.0"
         multiDexEnabled = true
 
         testInstrumentationRunner "io.rapidpro.surveyor.test.TestRunner"
@@ -65,8 +65,8 @@ dependencies {
     implementation 'com.android.support:support-v4:27.1.1'
 
     // rest api
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.1'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
 
