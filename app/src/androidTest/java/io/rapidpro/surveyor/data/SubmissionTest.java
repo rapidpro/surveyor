@@ -73,7 +73,7 @@ public class SubmissionTest extends BaseApplicationTest {
 
         assertThat(body, containsString("image/jpeg:http://uploads.rapidpro.io/0cce52d1.jpg"));
         assertThat(body, containsString("video/mp4:http://uploads.rapidpro.io/6c519989.mp4"));
-        assertThat(body, containsString("audio/m4a:http://uploads.rapidpro.io/fce55c47.m4a"));
+        assertThat(body, containsString("audio/mp4:http://uploads.rapidpro.io/fce55c47.m4a"));
     }
 
     @Test

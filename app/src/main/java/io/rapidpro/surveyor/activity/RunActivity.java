@@ -331,7 +331,7 @@ public class RunActivity extends BaseActivity {
 
                     addMediaLink(getString(R.string.made_recording), uri.toString(), R.string.media_audio);
 
-                    msg = Engine.createMsgIn("", "audio/m4a:" + uri);
+                    msg = Engine.createMsgIn("", "audio/mp4:" + uri);
 
                     output.delete();
                 }
