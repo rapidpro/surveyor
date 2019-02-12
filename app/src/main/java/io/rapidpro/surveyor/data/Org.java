@@ -15,6 +15,7 @@ import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.engine.OrgAssets;
 import io.rapidpro.surveyor.net.TembaException;
 import io.rapidpro.surveyor.net.TembaService;
+import io.rapidpro.surveyor.net.responses.Boundary;
 import io.rapidpro.surveyor.net.responses.Field;
 import io.rapidpro.surveyor.net.responses.Group;
 import io.rapidpro.surveyor.utils.JsonUtils;
@@ -270,7 +271,11 @@ public class Org {
 
         progress.reportProgress(60);
 
-        OrgAssets assets = OrgAssets.fromTemba(fields, groups, definitions);
+        List<Boundary> boundaries = SurveyorApplication.get().getTembaService().getBoundaries(getToken());
+
+        progress.reportProgress(70);
+
+        OrgAssets assets = OrgAssets.fromTemba(fields, groups, boundaries, definitions);
         String assetsJSON = JsonUtils.marshal(assets);
 
         FileUtils.writeStringToFile(new File(directory, ASSETS_FILE), assetsJSON);

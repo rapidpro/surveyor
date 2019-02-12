@@ -354,7 +354,7 @@ public class RunActivity extends BaseActivity {
 
                 String coords = "geo:" + latitude + "," + longitude;
 
-                String url = coords + "?q=" + latitude + "," + longitude + "(Location)";
+                String url = coords + "?q=" + latitude + "," + longitude + "(LocationHierarchyAsset)";
                 addMediaLink(latitude + "," + longitude, url, R.string.media_location);
 
                 msg = Engine.createMsgIn("", coords);
