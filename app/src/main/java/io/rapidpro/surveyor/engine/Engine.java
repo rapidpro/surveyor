@@ -1,10 +1,7 @@
 package io.rapidpro.surveyor.engine;
 
 import com.nyaruka.goflow.mobile.AssetsSource;
-import com.nyaruka.goflow.mobile.Contact;
 import com.nyaruka.goflow.mobile.Environment;
-import com.nyaruka.goflow.mobile.Event;
-import com.nyaruka.goflow.mobile.EventSlice;
 import com.nyaruka.goflow.mobile.FlowReference;
 import com.nyaruka.goflow.mobile.Mobile;
 import com.nyaruka.goflow.mobile.MsgIn;
@@ -13,7 +10,6 @@ import com.nyaruka.goflow.mobile.SessionAssets;
 import com.nyaruka.goflow.mobile.StringSlice;
 import com.nyaruka.goflow.mobile.Trigger;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +21,24 @@ import io.rapidpro.surveyor.data.Org;
  * Wraps functionality in the goflow mobile library module
  */
 public class Engine {
+    /**
+     * The engine singleton
+     */
+    private static Engine engine = new Engine();
+
+    private com.nyaruka.goflow.mobile.Engine target;
+
+    public static Engine getInstance() {
+        return engine;
+    }
+
+    /**
+     * Creates a new engine
+     */
+    private Engine() {
+        this.target = new com.nyaruka.goflow.mobile.Engine(null);
+    }
+
     /**
      * Migrates a legacy flow definition to the new engine format
      *
@@ -60,16 +74,7 @@ public class Engine {
         String timeformat = "tt:mm";
         StringSlice languages = listToSlice(Arrays.asList(org.getLanguages()));
         String redactionPolicy = org.isAnon() ? "urns" : "none";
-        return new Environment(dateFormat, timeformat, org.getTimezone(), org.getPrimaryLanguage(), languages, redactionPolicy);
-    }
-
-    /**
-     * Creates a new empty contact
-     *
-     * @return the contact
-     */
-    public static Contact createEmptyContact() {
-        return Mobile.newEmptyContact();
+        return new Environment(dateFormat, timeformat, org.getTimezone(), org.getPrimaryLanguage(), languages, org.getCountry(), redactionPolicy);
     }
 
     /**
@@ -98,17 +103,6 @@ public class Engine {
         } catch (Exception e) {
             throw new EngineException(e);
         }
-    }
-
-    /**
-     * Creates a new flow reference
-     *
-     * @param uuid the flow UUID
-     * @param name the flow name
-     * @return the reference
-     */
-    public static FlowReference createFlowReference(String uuid, String name) {
-        return new FlowReference(uuid, name);
     }
 
     /**
@@ -141,7 +135,7 @@ public class Engine {
      * @return the trigger
      */
     public static Trigger createManualTrigger(Environment env, Contact contact, FlowReference flow) {
-        return Mobile.newManualTrigger(env, contact, flow);
+        return Mobile.newManualTrigger(env, contact != null ? contact.target : null, flow);
     }
 
     /**
@@ -153,7 +147,7 @@ public class Engine {
      * @return the resume
      */
     public static Resume createMsgResume(Environment env, Contact contact, MsgIn msg) {
-        return Mobile.newMsgResume(env, contact, msg);
+        return Mobile.newMsgResume(env, contact != null ? contact.target : null, msg);
     }
 
     static StringSlice listToSlice(List<String> items) {
@@ -165,5 +159,28 @@ public class Engine {
             slice.add(item);
         }
         return slice;
+    }
+
+    /**
+     * Creates a new session
+     *
+     * @param assets the session assets
+     */
+    public Session newSession(SessionAssets assets) {
+        return new Session(this.target.newSession(assets));
+    }
+
+    /**
+     * Reads an existing session from JSON
+     *
+     * @param assets the session assets
+     * @param json   the JSON
+     */
+    public Session readSession(SessionAssets assets, String json) throws EngineException {
+        try {
+            return new Session(this.target.readSession(assets, json));
+        } catch (Exception e) {
+            throw new EngineException(e);
+        }
     }
 }

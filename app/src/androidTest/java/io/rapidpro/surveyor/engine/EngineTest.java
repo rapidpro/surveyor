@@ -1,7 +1,6 @@
 package io.rapidpro.surveyor.engine;
 
 import com.nyaruka.goflow.mobile.AssetsSource;
-import com.nyaruka.goflow.mobile.Contact;
 import com.nyaruka.goflow.mobile.Environment;
 import com.nyaruka.goflow.mobile.MsgIn;
 import com.nyaruka.goflow.mobile.Resume;
@@ -94,7 +93,7 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(marshaled.substring(0, 50), is("{\"type\":\"messaging_offline\",\"environment\":{\"date_f"));
 
         // and unmarshal back
-        Session session2 = Session.fromJson(session.getAssets(), marshaled);
+        Session session2 = Engine.getInstance().readSession(session.getAssets(), marshaled);
         assertThat(session2.getStatus(), is("completed"));
     }
 
@@ -218,10 +217,10 @@ public class EngineTest extends BaseApplicationTest {
 
         AssetsSource source = Engine.loadAssets(assetsJson);
         SessionAssets assets = Engine.createSessionAssets(source);
-        Session session = new Session(assets);
+        Session session = Engine.getInstance().newSession(assets);
 
         Environment env = Engine.createEnvironment(org);
-        Contact contact = Engine.createEmptyContact();
+        Contact contact = Contact.createEmpty(assets);
         Trigger trigger = Engine.createManualTrigger(env, contact, flow.toReference());
 
         Sprint sprint = session.start(trigger);

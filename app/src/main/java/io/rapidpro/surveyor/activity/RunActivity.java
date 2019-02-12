@@ -44,6 +44,7 @@ import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.Submission;
+import io.rapidpro.surveyor.engine.Contact;
 import io.rapidpro.surveyor.engine.Engine;
 import io.rapidpro.surveyor.engine.EngineException;
 import io.rapidpro.surveyor.engine.Session;
@@ -94,9 +95,9 @@ public class RunActivity extends BaseActivity {
             Flow flow = org.getFlow(flowUUID);
             setTitle(flow.getName());
 
-            Trigger trigger = Engine.createManualTrigger(environment, Engine.createEmptyContact(), flow.toReference());
+            Trigger trigger = Engine.createManualTrigger(environment, Contact.createEmpty(assets), flow.toReference());
 
-            session = new Session(assets);
+            session = Engine.getInstance().newSession(assets);
             submission = getSurveyor().getSubmissionService().newSubmission(org, flow);
 
             Sprint sprint = session.start(trigger);

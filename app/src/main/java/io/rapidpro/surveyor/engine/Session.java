@@ -1,6 +1,5 @@
 package io.rapidpro.surveyor.engine;
 
-import com.nyaruka.goflow.mobile.Mobile;
 import com.nyaruka.goflow.mobile.Resume;
 import com.nyaruka.goflow.mobile.SessionAssets;
 import com.nyaruka.goflow.mobile.Trigger;
@@ -11,29 +10,9 @@ public class Session {
 
     /**
      * Creates a new session
-     *
-     * @param assets the session assets
      */
-    public Session(SessionAssets assets) {
-        this(new com.nyaruka.goflow.mobile.Session(assets, null));
-    }
-
-    private Session(com.nyaruka.goflow.mobile.Session target) {
+    Session(com.nyaruka.goflow.mobile.Session target) {
         this.target = target;
-    }
-
-    /**
-     * Reads an existing session from JSON
-     *
-     * @param assets the session assets
-     * @param json   the JSON
-     */
-    public static Session fromJson(SessionAssets assets, String json) throws EngineException {
-        try {
-            return new Session(Mobile.readSession(assets, null, json));
-        } catch (Exception e) {
-            throw new EngineException(e);
-        }
     }
 
     /**
