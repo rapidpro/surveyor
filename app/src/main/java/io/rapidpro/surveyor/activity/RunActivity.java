@@ -111,6 +111,13 @@ public class RunActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        initUI();
+    }
+
     private void initUI() {
         chatHistory = findViewById(R.id.chat_history);
         chatCompose = findViewById(R.id.chat_compose);

@@ -203,7 +203,7 @@ public class RunActivityTest extends BaseApplicationTest {
     }
 
     private void sendTextReply(String text) {
-        onView(withId(R.id.chat_compose)).perform(click(), typeText(text), closeSoftKeyboard());
+        onView(withId(R.id.chat_compose)).perform(closeSoftKeyboard(), click(), typeText(text), closeSoftKeyboard());
         sleep(1000);
         onView(withId(R.id.button_send)).perform(click());
     }

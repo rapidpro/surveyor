@@ -56,6 +56,7 @@
     <string name="permission_storage">We need access to your storage in order to save your surveys that are in progress.</string>
 
     <!-- media capturing -->
+    <string name="send_message">Send message</string>
     <string name="tap_to_record">Tap to Record</string>
     <string name="tap_to_capture">Tap to Capture</string>
     <string name="waiting_for_gps">Waiting for GPS…</string>
