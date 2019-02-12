@@ -69,6 +69,9 @@ public class RunActivity extends BaseActivity {
     private static final int RESULT_AUDIO = 3;
     private static final int RESULT_GPS = 4;
 
+    private static final int MAX_IMAGE_DIMENSION = 1024;
+    private static final int MAX_THUMB_DIMENSION = 600;
+
     private LinearLayout chatHistory;
     private IconTextView sendButtom;
     private EditText chatCompose;
@@ -202,12 +205,12 @@ public class RunActivity extends BaseActivity {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     ComponentName cameraPkg = intent.resolveActivity(getPackageManager());
 
-                    Logger.d("Camera package is " + cameraPkg.toString());
-
                     if (cameraPkg == null) {
                         handleProblem("Can't find camera device", null);
                         return;
                     }
+                    Logger.d("Camera package is " + cameraPkg.toString());
+
                     File cameraOutput = getCameraOutput();
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, getSurveyor().getUriForFile(cameraOutput));
                     intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -293,16 +296,25 @@ public class RunActivity extends BaseActivity {
                 File output = getCameraOutput();
                 if (output.exists()) {
                     Bitmap full = BitmapFactory.decodeFile(output.getAbsolutePath());
-                    Bitmap scaled = ImageUtils.scaleToMax(full, 1024);
-                    Bitmap thumb = ImageUtils.scaleToMax(scaled, 600);
+                    Bitmap scaled = ImageUtils.scaleToMax(full, MAX_IMAGE_DIMENSION);
 
+                    // correct rotation if necessary
+                    int rotation = ImageUtils.getExifRotation(output.getAbsolutePath());
+                    if (rotation != 0) {
+                        Logger.d("Correcting EXIF rotation of " + rotation + " degrees");
+
+                        scaled = ImageUtils.rotateImage(scaled, rotation);
+                    }
+
+                    // encode as JPEG and save to submission
                     byte[] asJpg = ImageUtils.convertToJPEG(scaled);
-
                     Uri uri = submission.saveMedia(asJpg, "jpg");
 
-                    addMedia(thumb, uri.toString(), R.string.media_image);
-
                     Logger.d("Saved image capture to " + uri);
+
+                    // create thumbnail and add to chat
+                    Bitmap thumb = ImageUtils.scaleToMax(scaled, MAX_THUMB_DIMENSION);
+                    addMedia(thumb, uri.toString(), R.string.media_image);
 
                     msg = Engine.createMsgIn("", "image/jpeg:" + uri);
 

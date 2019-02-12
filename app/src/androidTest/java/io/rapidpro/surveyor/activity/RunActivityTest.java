@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.collection.IsArrayWithSize;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,10 +22,12 @@ import androidx.test.espresso.intent.ActivityResultFunction;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 import io.rapidpro.surveyor.utils.ImageUtils;
+import io.rapidpro.surveyor.utils.SurveyUtils;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -43,8 +46,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertThat;
 
@@ -112,7 +117,7 @@ public class RunActivityTest extends BaseApplicationTest {
     }
 
     @Test
-    public void multimedia() {
+    public void multimedia() throws IOException {
         launchForFlow("e54809ba-2f28-439b-b90b-c623eafa05ae");
 
         mockMediaCapturing();
@@ -123,6 +128,23 @@ public class RunActivityTest extends BaseApplicationTest {
         onView(withId(R.id.container_request_media))
                 .check(matches(isDisplayed()))
                 .perform(click());
+
+        // should have a single incomplete submission
+        File flowDir = SurveyUtils.mkdir(getSurveyor().getUserDirectory(), "test_submissions", ORG_UUID, "e54809ba-2f28-439b-b90b-c623eafa05ae");
+        File[] submissionDirs = flowDir.listFiles();
+        assertThat(submissionDirs, arrayWithSize(1));
+
+        // with a single media file
+        File mediaDir = new File(submissionDirs[0], "media");
+        assertThat(mediaDir.listFiles(), arrayWithSize(1));
+
+        File capturedImage = mediaDir.listFiles()[0];
+        assertThat(capturedImage.getAbsolutePath(), endsWith(".jpg"));
+
+        // check that image was scaled and rotated
+        Bitmap capturedBitmap = BitmapFactory.decodeFile(capturedImage.getAbsolutePath());
+        assertThat(capturedBitmap.getWidth(), is(1024));
+        assertThat(capturedBitmap.getHeight(), is(682));
 
         onView(allOf(withId(R.id.text_message), withText("Now send a video")))
                 .check(matches(isDisplayed()));
@@ -197,17 +219,17 @@ public class RunActivityTest extends BaseApplicationTest {
             public Instrumentation.ActivityResult apply(Intent intent) {
                 Logger.d("Handling mocked image capture intent");
 
-                // create a bitmap we can use for our simulated camera image
-                Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), imageResId);
-
-                byte[] asJpg = ImageUtils.convertToJPEG(bmp);
-
+                // copy JPEG file over directly (want to preserve EXIF data)
+                InputStream input = context.getResources().openRawResource(imageResId);
                 try {
                     File output = new File(getSurveyor().getExternalCacheDir(), "camera.jpg");
-                    FileUtils.writeByteArrayToFile(output, asJpg);
+                    FileUtils.copyInputStreamToFile(input, output);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                // but also decode bitmap data
+                Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), imageResId);
 
                 // create an activity result to look like the camera returning an image
                 Intent resultData = new Intent();

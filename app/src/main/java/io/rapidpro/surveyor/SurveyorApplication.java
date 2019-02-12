@@ -223,7 +223,6 @@ public class SurveyorApplication extends Application {
      */
     public Uri getUriForFile(File file) {
         Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file);
-        Logger.d("getUriForFile(" + file.getAbsolutePath() + ") => " + uri.toString());
         return uri;
     }
 }
