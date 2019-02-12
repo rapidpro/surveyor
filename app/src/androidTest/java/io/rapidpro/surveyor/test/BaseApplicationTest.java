@@ -160,7 +160,7 @@ public abstract class BaseApplicationTest {
     protected void mockServerRedirect(String location) {
         MockResponse response = new MockResponse()
                 .setResponseCode(HTTP_MOVED_TEMP)
-                .setHeader("LocationHierarchyAsset", location);
+                .setHeader("Location", location);
 
         mockServer.enqueue(response);
     }
