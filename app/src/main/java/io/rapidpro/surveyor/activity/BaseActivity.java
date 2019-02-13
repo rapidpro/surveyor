@@ -202,33 +202,30 @@ public abstract class BaseActivity extends PermisoActivity {
     }
 
     private void sendBugReport() {
-
-        // Log our build and device details
-        StringBuilder info = new StringBuilder();
-        info.append("Version: " + BuildConfig.VERSION_NAME + "; " + BuildConfig.VERSION_CODE);
-        info.append("\n  OS: " + System.getProperty("os.version") + " (API " + Build.VERSION.SDK_INT + ")");
-        info.append("\n  Model: " + android.os.Build.MODEL + " (" + android.os.Build.DEVICE + ")");
-        Logger.d(info.toString());
+        // log our build and device details
+        Logger.d("Version: " + BuildConfig.VERSION_NAME + "; " + BuildConfig.VERSION_CODE);
+        Logger.d("OS: " + System.getProperty("os.version") + " (API " + Build.VERSION.SDK_INT + ")");
+        Logger.d("Model: " + android.os.Build.MODEL + " (" + android.os.Build.DEVICE + ")");
 
         // generate a dump file
         try {
             File outputFile = new File(getSurveyor().getUserDirectory(), "bug-report.txt");
 
-            Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E SurveyorApplication:*\" ");
+            Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E Surveyor:*\" ");
 
             Uri outputUri = getSurveyor().getUriForFile(outputFile);
 
             ShareCompat.IntentBuilder.from(this)
                     .setType("message/rfc822")
                     .addEmailTo(getString(R.string.support_email))
-                    .setSubject("SurveyorApplication Bug Report")
+                    .setSubject("Surveyor Bug Report")
                     .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
                     .setStream(outputUri)
                     .setChooserTitle("Send Email")
                     .startChooser();
 
         } catch (IOException e) {
-            Logger.e("Failed to generate report", e);
+            Logger.e("Failed to generate bug report", e);
         }
     }
 
