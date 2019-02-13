@@ -44,6 +44,8 @@ public class OrgChooseActivity extends BaseActivity implements OrgListFragment.C
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setTitle(R.string.title_activity_org_choose);
+
         // the base activity may have logged us out and sent us to the login page
         if (!isLoggedIn()) {
             return;
