@@ -1,0 +1,737 @@
+{
+  "version": "11.6",
+  "site": "https://app.rapidpro.io",
+  "flows": [
+    {
+      "entry": "036901e0-abb8-4979-92cb-f0d43aeb5b68",
+      "action_sets": [
+        {
+          "uuid": "036901e0-abb8-4979-92cb-f0d43aeb5b68",
+          "x": 100,
+          "y": 0,
+          "destination": "39fe1ce0-7dee-445e-9945-48c72a05cef5",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "67aafaf6-b375-461c-8357-fd760423f96c",
+              "msg": {
+                "base": "Hi there. What's your name?"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "706853c2-831b-4dd8-8073-cd51b21d94d6"
+        },
+        {
+          "uuid": "73dda1a7-9152-45f1-993a-e7d01eb028db",
+          "x": 100,
+          "y": 175,
+          "destination": "1a7612b5-777d-4af3-a657-077c46f242d9",
+          "actions": [
+            {
+              "type": "save",
+              "uuid": "fac97ece-b9ab-4480-a6dd-9968cb5ebe79",
+              "label": "Contact Name",
+              "field": "name",
+              "value": "@flow.name"
+            },
+            {
+              "type": "reply",
+              "uuid": "a5141d43-14a1-4e40-914c-f2b33b3645de",
+              "msg": {
+                "base": "Thanks @contact.name. What's your phone number?"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "5e7a398e-eebe-4b32-8600-374659f56d9e"
+        },
+        {
+          "uuid": "2d55c61f-384c-4a07-a17e-1e42fc543dd9",
+          "x": 102,
+          "y": 464,
+          "destination": "52a6784b-f51f-42c7-8c6a-3e5ec42603bb",
+          "actions": [
+            {
+              "type": "save",
+              "uuid": "a3bea28b-b1b0-4db1-af75-090973f9eb63",
+              "label": "Phone Number",
+              "field": "tel_e164",
+              "value": "@flow.phone"
+            },
+            {
+              "type": "add_group",
+              "uuid": "5126bb19-6ca1-4a9c-a9ef-30f4dd3761f4",
+              "groups": [
+                {
+                  "uuid": "6696cabf-eb5e-42bf-bcc6-f0c8be9b1316",
+                  "name": "Testers"
+                }
+              ]
+            },
+            {
+              "type": "reply",
+              "uuid": "7e198e6b-4640-4123-b3a9-0a44a06bd919",
+              "msg": {
+                "base": "Finally, what is your age?"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "4e483159-af9f-48a4-907f-c875fde66c70"
+        },
+        {
+          "uuid": "8a2e088e-3657-4fa6-86fb-8d788db03709",
+          "x": 542,
+          "y": 281,
+          "destination": "1a7612b5-777d-4af3-a657-077c46f242d9",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "bde2299b-7f35-4ad9-98c3-7e8db18c34ac",
+              "msg": {
+                "base": "Sorry that doesn't look like a phone number. Try again."
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "edf187b4-d9c1-4aa1-b26e-5c8c5f481a39"
+        },
+        {
+          "uuid": "6d5703f9-938c-4c2f-9cc7-7d1bbe328095",
+          "x": 108,
+          "y": 875,
+          "destination": null,
+          "actions": [
+            {
+              "type": "save",
+              "uuid": "76abbb4a-ab65-4e82-8b6a-7222fa14eb8a",
+              "label": "Age",
+              "field": "age",
+              "value": "@flow.age"
+            },
+            {
+              "type": "reply",
+              "uuid": "40790c5a-4afc-4c80-856d-7414e53d5de8",
+              "msg": {
+                "base": "Thanks @contact.name. You are @contact.age and your phone number is @contact.tel"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "6bab242d-85d5-4afe-b6e7-5fe7c98f187e"
+        },
+        {
+          "uuid": "a500d367-e944-4ba4-ab21-216b702f41c4",
+          "x": 522,
+          "y": 638,
+          "destination": "52a6784b-f51f-42c7-8c6a-3e5ec42603bb",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "2f39296b-37ed-4d16-b5bc-f3bfeb6b7691",
+              "msg": {
+                "base": "Sorry that doesn't look like an age value. Try again."
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "27ffbd14-4345-4588-a41f-683b08ba14e7"
+        }
+      ],
+      "rule_sets": [
+        {
+          "uuid": "39fe1ce0-7dee-445e-9945-48c72a05cef5",
+          "x": 237,
+          "y": 93,
+          "label": "Name",
+          "rules": [
+            {
+              "uuid": "bb999ff8-5eb3-45f6-bec6-a0430105b0ca",
+              "category": {
+                "base": "All Responses"
+              },
+              "destination": "73dda1a7-9152-45f1-993a-e7d01eb028db",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_message",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        },
+        {
+          "uuid": "1a7612b5-777d-4af3-a657-077c46f242d9",
+          "x": 237,
+          "y": 361,
+          "label": "Phone",
+          "rules": [
+            {
+              "uuid": "0c047d03-3b61-4ff2-8bc8-43a89cf1087b",
+              "category": {
+                "base": "phone"
+              },
+              "destination": "2d55c61f-384c-4a07-a17e-1e42fc543dd9",
+              "destination_type": "A",
+              "test": {
+                "type": "phone"
+              },
+              "label": null
+            },
+            {
+              "uuid": "6d614e50-ee98-412c-aee6-0916d10ed0ff",
+              "category": {
+                "base": "Other"
+              },
+              "destination": "8a2e088e-3657-4fa6-86fb-8d788db03709",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_message",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        },
+        {
+          "uuid": "52a6784b-f51f-42c7-8c6a-3e5ec42603bb",
+          "x": 228,
+          "y": 712,
+          "label": "Age",
+          "rules": [
+            {
+              "uuid": "34d09b52-ac85-44a4-b4f4-c7a3b489fcf8",
+              "category": {
+                "base": "numeric"
+              },
+              "destination": "6d5703f9-938c-4c2f-9cc7-7d1bbe328095",
+              "destination_type": "A",
+              "test": {
+                "type": "number"
+              },
+              "label": null
+            },
+            {
+              "uuid": "65e0c7b2-ea5f-48ad-a42c-411789155185",
+              "category": {
+                "base": "Other"
+              },
+              "destination": "a500d367-e944-4ba4-ab21-216b702f41c4",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_message",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        }
+      ],
+      "base_language": "base",
+      "flow_type": "S",
+      "version": "11.7",
+      "metadata": {
+        "name": "Contact Details",
+        "saved_on": "2018-12-18T14:47:55.302852Z",
+        "revision": 16,
+        "uuid": "ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec",
+        "expires": 10080,
+        "contact_creation": "run",
+        "ivr_retry_failed_events": null
+      }
+    },
+    {
+      "entry": "6f26e808-c1a2-4e52-b6f3-4d2dd79ffb24",
+      "action_sets": [
+        {
+          "uuid": "6f26e808-c1a2-4e52-b6f3-4d2dd79ffb24",
+          "x": 100,
+          "y": 0,
+          "destination": "e1dbee2c-17df-471d-9768-eec94a3343c0",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "450d2c77-a2d2-4cec-8a97-a96c5d7bf126",
+              "msg": {
+                "base": "What is your favorite beer?"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "bf56b8cc-3801-4a15-a307-73d277694896"
+        },
+        {
+          "uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
+          "x": 118,
+          "y": 205,
+          "destination": "7854b048-038c-44fe-88c5-f62fd599b556",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "4c3be4d2-c994-4e28-946c-5ea9ee33659a",
+              "msg": {
+                "base": "@flow.beer.category is a great beer! What is your favorite color?"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "99ac70fb-2d81-4d24-94a3-d031123e137b"
+        },
+        {
+          "uuid": "6980dc8d-7787-4a83-a603-5b84fd8e87f9",
+          "x": 689,
+          "y": 144,
+          "destination": "e1dbee2c-17df-471d-9768-eec94a3343c0",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "5e5b8b5a-b638-4a58-94a6-bb79814f4712",
+              "msg": {
+                "base": "I didn't recognize that beer. Please try again."
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "9257e3e9-ff08-4707-ad86-398e8e34bb7c"
+        },
+        {
+          "uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
+          "x": 161,
+          "y": 459,
+          "destination": null,
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "a3ad6679-a32c-4af0-babc-2def65adc185",
+              "msg": {
+                "base": "Ok let's go get some @flow.color.category @flow.beer.category!"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "7b4ede52-3fa2-451c-955e-f5b0cb4c7030"
+        },
+        {
+          "uuid": "504f5813-b500-431f-b7db-244606c9696b",
+          "x": 721,
+          "y": 369,
+          "destination": "7854b048-038c-44fe-88c5-f62fd599b556",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "5ed80e3b-d6ec-4b25-bbbf-39ae8935ab00",
+              "msg": {
+                "base": "@flow.color.text isn't a color I know. Please try again."
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "91e8b04d-8412-419e-9062-1877a23e377a"
+        }
+      ],
+      "rule_sets": [
+        {
+          "uuid": "e1dbee2c-17df-471d-9768-eec94a3343c0",
+          "x": 228,
+          "y": 78,
+          "label": "Beer",
+          "rules": [
+            {
+              "uuid": "9f484724-9adb-40da-9da3-d99973591e27",
+              "category": {
+                "base": "Club"
+              },
+              "destination": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
+              "destination_type": "A",
+              "test": {
+                "type": "contains_any",
+                "test": {
+                  "base": "Club"
+                }
+              },
+              "label": null
+            },
+            {
+              "uuid": "7993051a-a2d9-4387-9cdb-bd0f48c288a3",
+              "category": {
+                "base": "Pilsner"
+              },
+              "destination": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
+              "destination_type": "A",
+              "test": {
+                "type": "contains_any",
+                "test": {
+                  "base": "Pilsner"
+                }
+              },
+              "label": null
+            },
+            {
+              "uuid": "447b17a3-9f22-4267-b9bc-754036f842ce",
+              "category": {
+                "base": "Mutzig"
+              },
+              "destination": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
+              "destination_type": "A",
+              "test": {
+                "type": "contains_any",
+                "test": {
+                  "base": "Mutzig"
+                }
+              },
+              "label": null
+            },
+            {
+              "uuid": "c0d4fdd1-ec6c-4b6d-927d-c7f532989274",
+              "category": {
+                "base": "Other"
+              },
+              "destination": "6980dc8d-7787-4a83-a603-5b84fd8e87f9",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_message",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        },
+        {
+          "uuid": "7854b048-038c-44fe-88c5-f62fd599b556",
+          "x": 293,
+          "y": 330,
+          "label": "Color",
+          "rules": [
+            {
+              "uuid": "46f73b0a-5845-4392-b5bf-f74c07bb1217",
+              "category": {
+                "base": "Red"
+              },
+              "destination": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
+              "destination_type": "A",
+              "test": {
+                "type": "contains_any",
+                "test": {
+                  "base": "red"
+                }
+              },
+              "label": null
+            },
+            {
+              "uuid": "26d3ec68-245c-49d9-b33f-35d590041827",
+              "category": {
+                "base": "Blue"
+              },
+              "destination": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
+              "destination_type": "A",
+              "test": {
+                "type": "contains_any",
+                "test": {
+                  "base": "blue"
+                }
+              },
+              "label": null
+            },
+            {
+              "uuid": "646d954d-9e6e-4e38-9a78-0df08b38b7ac",
+              "category": {
+                "base": "Green"
+              },
+              "destination": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
+              "destination_type": "A",
+              "test": {
+                "type": "contains_any",
+                "test": {
+                  "base": "green"
+                }
+              },
+              "label": null
+            },
+            {
+              "uuid": "a45d84cc-725b-4626-98fd-54c64eff0e20",
+              "category": {
+                "base": "Other"
+              },
+              "destination": "504f5813-b500-431f-b7db-244606c9696b",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_message",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        }
+      ],
+      "base_language": "base",
+      "flow_type": "S",
+      "version": "11.6",
+      "metadata": {
+        "name": "Two Questions",
+        "saved_on": "2018-11-14T21:18:03.053214Z",
+        "revision": 24,
+        "uuid": "bdd61538-5f50-4836-a8fb-acaafd64ddb1",
+        "expires": 10080,
+        "contact_creation": "run",
+        "ivr_retry_failed_events": null
+      }
+    },
+    {
+      "entry": "3d02c74d-e5c2-4590-b679-03f988592013",
+      "action_sets": [
+        {
+          "uuid": "3d02c74d-e5c2-4590-b679-03f988592013",
+          "x": 100,
+          "y": 0,
+          "destination": "6ab79191-da91-4096-a589-6f3c7f5ecf0c",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "58f8384d-92b3-41d2-804f-8c4c6240924e",
+              "msg": {
+                "base": "Hi there, please send a selfie"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "d7de8701-2c58-4108-89a9-ec74e9ea619b"
+        },
+        {
+          "uuid": "8befaab2-63cb-4fdc-b44b-62d4a00a40e9",
+          "x": 103,
+          "y": 164,
+          "destination": "f5ba9174-ed8c-41cd-898a-d7449f72b916",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "dce3e627-65f5-4396-b5d3-67ed6f0b95ef",
+              "msg": {
+                "base": "Now send a video"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "7ec846f0-a0f1-48c5-bf8f-5f941558c673"
+        },
+        {
+          "uuid": "8de09049-f474-4fed-a079-b0e559a8ac59",
+          "x": 101,
+          "y": 334,
+          "destination": "1250d717-bcef-45ed-b63e-e2e8eae953b1",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "6c21c268-759e-4156-b074-e4a3fed0dda3",
+              "msg": {
+                "base": "Now send an audio recording"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "1b3972b7-e926-46c5-ae30-017038be36c4"
+        },
+        {
+          "uuid": "68829693-c442-4c16-9b77-ed384fd607b5",
+          "x": 101,
+          "y": 516,
+          "destination": "78d1b543-e774-4040-b6dc-53139b5edb60",
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "f210c97b-9020-43d6-99e2-631e2e62e97b",
+              "msg": {
+                "base": "Finally please send your location"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "ad0699ae-d489-4a63-96eb-716c42669321"
+        },
+        {
+          "uuid": "a2d7e973-4499-48d2-852a-cf46f6c69405",
+          "x": 102,
+          "y": 709,
+          "destination": null,
+          "actions": [
+            {
+              "type": "reply",
+              "uuid": "1f30ac69-69d6-41bb-8e53-56d380704e37",
+              "msg": {
+                "base": "Thanks!"
+              },
+              "media": {},
+              "quick_replies": [],
+              "send_all": false
+            }
+          ],
+          "exit_uuid": "68ab09e3-3522-4411-87af-f444e00f033d"
+        }
+      ],
+      "rule_sets": [
+        {
+          "uuid": "6ab79191-da91-4096-a589-6f3c7f5ecf0c",
+          "x": 231,
+          "y": 88,
+          "label": "Selfie",
+          "rules": [
+            {
+              "uuid": "5736d5b0-8ded-4755-a6a3-83bf593af87d",
+              "category": {
+                "base": "All Responses"
+              },
+              "destination": "8befaab2-63cb-4fdc-b44b-62d4a00a40e9",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_photo",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        },
+        {
+          "uuid": "f5ba9174-ed8c-41cd-898a-d7449f72b916",
+          "x": 234,
+          "y": 255,
+          "label": "Vlog",
+          "rules": [
+            {
+              "uuid": "79ab9eb5-1d5d-4c8b-9e7d-7b02f624fa23",
+              "category": {
+                "base": "All Responses"
+              },
+              "destination": "8de09049-f474-4fed-a079-b0e559a8ac59",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_video",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        },
+        {
+          "uuid": "1250d717-bcef-45ed-b63e-e2e8eae953b1",
+          "x": 232,
+          "y": 436,
+          "label": "Recording",
+          "rules": [
+            {
+              "uuid": "07662cfe-1270-40ee-b593-c93b4e0a2949",
+              "category": {
+                "base": "All Responses"
+              },
+              "destination": "68829693-c442-4c16-9b77-ed384fd607b5",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_audio",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        },
+        {
+          "uuid": "78d1b543-e774-4040-b6dc-53139b5edb60",
+          "x": 226,
+          "y": 626,
+          "label": "Location",
+          "rules": [
+            {
+              "uuid": "88836f88-82f0-405c-a2f7-dac7b950e198",
+              "category": {
+                "base": "All Responses"
+              },
+              "destination": "a2d7e973-4499-48d2-852a-cf46f6c69405",
+              "destination_type": "A",
+              "test": {
+                "type": "true"
+              },
+              "label": null
+            }
+          ],
+          "finished_key": null,
+          "ruleset_type": "wait_gps",
+          "response_type": "",
+          "operand": "@step.value",
+          "config": {}
+        }
+      ],
+      "base_language": "base",
+      "flow_type": "S",
+      "version": "11.6",
+      "metadata": {
+        "name": "Multimedia",
+        "saved_on": "2018-11-21T16:32:02.741357Z",
+        "revision": 24,
+        "uuid": "e54809ba-2f28-439b-b90b-c623eafa05ae",
+        "expires": 10080
+      }
+    }
+  ],
+  "campaigns": [],
+  "triggers": []
+}

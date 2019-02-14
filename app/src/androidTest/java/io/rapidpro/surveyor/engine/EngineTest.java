@@ -32,16 +32,18 @@ public class EngineTest extends BaseApplicationTest {
 
     @Test
     public void isSpecVersionSupported() {
-        assertThat(Engine.isSpecVersionSupported("11.5"), is(false));
+        assertThat(Engine.isSpecVersionSupported("11.5"), is(true));
         assertThat(Engine.isSpecVersionSupported("12.0"), is(true));
+        assertThat(Engine.isSpecVersionSupported("12.5"), is(true));
+        assertThat(Engine.isSpecVersionSupported("13.0"), is(false));
     }
 
     @Test
-    public void migrateFlow() throws Exception {
+    public void migrateLegacyDefinition() {
         String legacyFlow = "{\"action_sets\":[],\"rule_sets\":[],\"base_language\":\"eng\",\"metadata\":{\"uuid\":\"061be894-4507-470c-a20b-34273bf915be\",\"name\":\"Survey\"}}";
-        String migrated = Engine.migrateFlow(legacyFlow);
+        String migrated = Engine.migrateLegacyDefinition(legacyFlow);
 
-        assertThat(migrated, is("{\"uuid\":\"061be894-4507-470c-a20b-34273bf915be\",\"name\":\"Survey\",\"spec_version\":\"12.0\",\"language\":\"eng\",\"type\":\"\",\"revision\":0,\"expire_after_minutes\":0,\"localization\":{},\"nodes\":[]}"));
+        assertThat(migrated, is("{\"uuid\":\"061be894-4507-470c-a20b-34273bf915be\",\"name\":\"Survey\",\"spec_version\":\"12.0.0\",\"language\":\"eng\",\"type\":\"\",\"revision\":0,\"expire_after_minutes\":0,\"localization\":{},\"nodes\":[],\"_ui\":{\"nodes\":{},\"stickies\":{}}}"));
     }
 
     @Test(expected = EngineException.class)

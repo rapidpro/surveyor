@@ -45,12 +45,22 @@ public class Engine {
      * @param definition the legacy definition
      * @return the new definition
      */
-    public static String migrateFlow(String definition) {
+    public static String migrateLegacyDefinition(String definition) {
         try {
-            return Mobile.migrateLegacyFlow(definition);
+            return Mobile.migrateLegacyDefinition(definition);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Determines whether the given flow definition is in legacy format
+     *
+     * @param definition the definition
+     * @return true if definition is legacy format
+     */
+    public static boolean isLegacyDefinition(String definition) {
+        return Mobile.isLegacyDefinition(definition);
     }
 
     /**

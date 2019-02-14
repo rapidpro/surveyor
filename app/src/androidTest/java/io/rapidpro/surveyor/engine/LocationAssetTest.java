@@ -1,10 +1,7 @@
 package io.rapidpro.surveyor.engine;
 
-import android.location.Location;
-
 import com.google.gson.reflect.TypeToken;
 
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -26,7 +23,8 @@ public class LocationAssetTest extends BaseApplicationTest {
     public void fromTemba() throws IOException {
         // load the sample api/v2/boundaries.json response as a list of boundaries
         String boundaryResponse = readResourceAsString(io.rapidpro.surveyor.test.R.raw.api_v2_boundaries_get);
-        TypeToken type = new TypeToken<PaginatedResults<Boundary>>() {};
+        TypeToken type = new TypeToken<PaginatedResults<Boundary>>() {
+        };
         PaginatedResults<Boundary> boundaryResults = JsonUtils.unmarshal(boundaryResponse, type);
         List<Boundary> boundaries = boundaryResults.getResults();
 

@@ -180,6 +180,22 @@ public class TembaServiceTest extends BaseApplicationTest {
      * @see TembaService#getDefinitions(String, List)
      */
     @Test
+    public void getDefinitions_inLegacyFormat() throws Exception {
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_flows_get, "application/json", 200);
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get_legacy, "application/json", 200);
+
+        List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
+        List<RawJson> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);
+
+        // check flow definitions have been migrated
+        assertThat(definitions, hasSize(3));
+        assertThat(definitions.get(0).toString(), startsWith("{\"uuid\":\"ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec\",\"name\":\"Contact Details\""));
+    }
+
+    /**
+     * @see TembaService#getDefinitions(String, List)
+     */
+    @Test
     public void getDefinitions() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_flows_get, "application/json", 200);
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get, "application/json", 200);
@@ -188,7 +204,7 @@ public class TembaServiceTest extends BaseApplicationTest {
         List<RawJson> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);
 
         assertThat(definitions, hasSize(3));
-        assertThat(definitions.get(0).toString(), startsWith("{\"entry\":\"036901e0-abb8-4979-92cb-f0d43aeb5b68\""));
+        assertThat(definitions.get(0).toString(), startsWith("{\"uuid\":\"ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec\",\"name\":\"Contact Details\""));
     }
 
     /**

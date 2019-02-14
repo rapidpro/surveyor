@@ -16,14 +16,20 @@ public class OrgAssets {
     private List<LocationAsset> locations;
     private List<RawJson> flows;
 
-    public OrgAssets(List<FieldAsset> fields, List<GroupAsset> groups, List<LocationAsset> locations, List<RawJson> flows) {
+    /**
+     * Constructs a new set of org assets (fields, groups, locations and flows)
+     */
+    private OrgAssets(List<FieldAsset> fields, List<GroupAsset> groups, List<LocationAsset> locations, List<RawJson> flows) {
         this.fields = fields;
         this.groups = groups;
         this.locations = locations;
         this.flows = flows;
     }
 
-    public static OrgAssets fromTemba(List<Field> fields, List<Group> groups, List<Boundary> boundaries, List<RawJson> legacyFlows) {
+    /**
+     * Constructs a new set of org assets from the data returned from the Temba API
+     */
+    public static OrgAssets fromTemba(List<Field> fields, List<Group> groups, List<Boundary> boundaries, List<RawJson> flows) {
         List<FieldAsset> fieldAssets = new ArrayList<>(fields.size());
         for (Field field : fields) {
             fieldAssets.add(FieldAsset.fromTemba(field));
@@ -40,15 +46,12 @@ public class OrgAssets {
             locationAssets = Collections.singletonList(location);
         }
 
-        List<RawJson> flowAssets = new ArrayList<>(legacyFlows.size());
-        for (RawJson legacyJSON : legacyFlows) {
-            String migratedJSON = Engine.migrateFlow(legacyJSON.toString());
-            flowAssets.add(new RawJson(migratedJSON));
-        }
-
-        return new OrgAssets(fieldAssets, groupAssets, locationAssets, flowAssets);
+        return new OrgAssets(fieldAssets, groupAssets, locationAssets, flows);
     }
 
+    /**
+     * Extract the flow summaries from this set of org assets
+     */
     public List<Flow> getFlows() {
         List<Flow> summaries = new ArrayList<>(this.flows.size());
         for (RawJson flow : this.flows) {

@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import io.rapidpro.surveyor.BuildConfig;
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.engine.Engine;
 import io.rapidpro.surveyor.net.requests.SubmissionPayload;
 import io.rapidpro.surveyor.net.responses.Boundary;
 import io.rapidpro.surveyor.net.responses.Definitions;
@@ -181,6 +182,18 @@ public class TembaService {
         try {
             Response<Definitions> response = api.getDefinitions(asAuth(token), flowUUIDs, "none").execute();
             checkResponse(response);
+
+            Definitions definitions = response.body();
+            String specVersion = definitions.getVersion();
+
+            if (specVersion.equals("11") || specVersion.startsWith("11.")) {
+                List<RawJson> migratedFlows = new ArrayList<>(definitions.getFlows().size());
+                for (RawJson legacyFlow : definitions.getFlows()) {
+                    String migrated = Engine.migrateLegacyDefinition(legacyFlow.toString());
+                    migratedFlows.add(new RawJson(migrated));
+                }
+                return migratedFlows;
+            }
 
             return response.body().getFlows();
 
