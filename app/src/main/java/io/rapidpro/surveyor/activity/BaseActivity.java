@@ -202,18 +202,8 @@ public abstract class BaseActivity extends PermisoActivity {
     }
 
     private void sendBugReport() {
-        // log our build and device details
-        Logger.d("Version: " + BuildConfig.VERSION_NAME + "; " + BuildConfig.VERSION_CODE);
-        Logger.d("OS: " + System.getProperty("os.version") + " (API " + Build.VERSION.SDK_INT + ")");
-        Logger.d("Model: " + android.os.Build.MODEL + " (" + android.os.Build.DEVICE + ")");
-
-        // generate a dump file
         try {
-            File outputFile = new File(getSurveyor().getUserDirectory(), "bug-report.txt");
-
-            Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E Surveyor:*\" ");
-
-            Uri outputUri = getSurveyor().getUriForFile(outputFile);
+            Uri outputUri = getSurveyor().generateLogDump();
 
             ShareCompat.IntentBuilder.from(this)
                     .setType("message/rfc822")

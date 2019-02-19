@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.support.v4.content.FileProvider;
 
@@ -222,7 +223,23 @@ public class SurveyorApplication extends Application {
      * @return the URI
      */
     public Uri getUriForFile(File file) {
-        Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file);
-        return uri;
+        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file);
+    }
+
+    /**
+     * Generate dump of the Android log
+     *
+     * @return the URI of the dump file
+     */
+    public Uri generateLogDump() throws IOException {
+        // log our build and device details
+        Logger.d("Version: " + BuildConfig.VERSION_NAME + "; " + BuildConfig.VERSION_CODE);
+        Logger.d("OS: " + System.getProperty("os.version") + " (API " + Build.VERSION.SDK_INT + ")");
+        Logger.d("Model: " + android.os.Build.MODEL + " (" + android.os.Build.DEVICE + ")");
+
+        // dump log to file and return URI
+        File outputFile = new File(getUserDirectory(), "bug-report.txt");
+        Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + " \"Surveyor:* *:E\"");
+        return getUriForFile(outputFile);
     }
 }
