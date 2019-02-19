@@ -112,7 +112,7 @@
             {
               "type": "send_msg",
               "uuid": "40790c5a-4afc-4c80-856d-7414e53d5de8",
-              "text": "Thanks @contact.name. You are @contact.fields.age and your phone number is @contact.urns.tel.0.display"
+              "text": "Thanks @contact.name. You are @contact.fields.age and your phone number is @(contact.urns.tel[0].display)"
             }
           ],
           "exits": [
