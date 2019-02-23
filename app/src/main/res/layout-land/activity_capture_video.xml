@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal"
+    tools:context=".activity.CaptureVideoActivity">
+
+    <LinearLayout
+        android:id="@+id/camera_preview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal" />
+
+    <RelativeLayout
+        android:id="@+id/buttonsLayout"
+        android:background="#b7565656"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="20dp"
+        android:layout_alignEnd="@id/camera_preview" >
+
+        <io.rapidpro.surveyor.ui.IconTextView
+            android:id="@+id/button_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:textColor="#ffffff"
+            android:layout_centerHorizontal="true"
+            android:clickable="true"
+            android:onClick="toggleCameras"
+            android:text="@string/icon_camera_front" />
+
+        <io.rapidpro.surveyor.ui.IconTextView
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/button_capture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="40dp"
+            android:onClick="toggleRecording"
+            android:textColor="#ffffff"
+            android:clickable="true"
+            android:text="@string/icon_videocam" />
+    </RelativeLayout>
+
+</RelativeLayout>

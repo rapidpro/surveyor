@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
 import io.rapidpro.surveyor.ui.CachedLinearLayout;
 import io.rapidpro.surveyor.ui.IconTextView;
 
@@ -19,8 +18,6 @@ import io.rapidpro.surveyor.ui.IconTextView;
  * outbound messages
  */
 public class ChatBubbleView extends CachedLinearLayout {
-
-    private ViewGroup m_root;
 
     public ChatBubbleView(Context context) {
         super(context);
@@ -37,15 +34,11 @@ public class ChatBubbleView extends CachedLinearLayout {
         init();
     }
 
-    protected void init() {
-        super.init();
-        // m_root = (ViewGroup) findViewById(R.id.chat_bubble);
-    }
-
     /**
      * Set the message to show in our chat bubble
+     *
      * @param inbound true if it is coming from the flow engine
-     * @param text the message to set on the view
+     * @param text    the message to set on the view
      */
     public void setMessage(String text, boolean inbound) {
         TextView tv = getTextView(R.id.text_message);
@@ -70,8 +63,6 @@ public class ChatBubbleView extends CachedLinearLayout {
 
         View mediaView = getView(R.id.media_view);
         mediaView.setVisibility(VISIBLE);
-
-        Surveyor.LOG.d("URL: "+ url);
 
         mediaView.setTag(R.string.tag_url, url);
         mediaView.setTag(R.string.tag_media_type, type);

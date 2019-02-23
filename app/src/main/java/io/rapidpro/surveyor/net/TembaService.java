@@ -2,318 +2,62 @@ package io.rapidpro.surveyor.net;
 
 import android.net.Uri;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import io.rapidpro.flows.runner.Contact;
-import io.rapidpro.flows.runner.Field;
-import io.rapidpro.flows.utils.JsonUtils;
 import io.rapidpro.surveyor.BuildConfig;
-import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.ResponseException;
-import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.TembaException;
-import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.data.DBLocation;
-import io.rapidpro.surveyor.data.DBOrg;
-import io.rapidpro.surveyor.data.Submission;
-import io.realm.Realm;
-import io.realm.RealmObject;
+import io.rapidpro.surveyor.Logger;
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.engine.Engine;
+import io.rapidpro.surveyor.net.requests.SubmissionPayload;
+import io.rapidpro.surveyor.net.responses.Boundary;
+import io.rapidpro.surveyor.net.responses.Definitions;
+import io.rapidpro.surveyor.net.responses.Field;
+import io.rapidpro.surveyor.net.responses.Flow;
+import io.rapidpro.surveyor.net.responses.Group;
+import io.rapidpro.surveyor.net.responses.Org;
+import io.rapidpro.surveyor.net.responses.PaginatedResults;
+import io.rapidpro.surveyor.net.responses.TokenResults;
+import io.rapidpro.surveyor.utils.JsonUtils;
+import io.rapidpro.surveyor.utils.RawJson;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TembaService {
 
-    private TembaAPI m_api;
-    private Retrofit m_retrofit;
-    private String m_token;
-    private FlowList m_flowList;
+    private TembaAPI api;
 
     public TembaService(String host) {
-        m_api = getAPIAccessor(host);
-    }
-
-    public FlowList getLastFlows() { return m_flowList; }
-
-    public void setToken(String token) {
-        m_token = "Token " + token;
-    }
-
-    public String getToken() {
-        return m_token;
-    }
-
-    public void getOrgs(String email, String password, Callback<List<DBOrg>> callback) {
-        m_api.getOrgs(email, password, "S").enqueue(callback);
-    }
-
-    public DBOrg getOrg() {
-        try {
-            Response<DBOrg> response = m_api.getOrg(getToken()).execute();
-            checkResponse(response);
-            return response.body();
-        } catch (IOException e) {
-            throw new TembaException(e);
-        }
-    }
-
-    public void getFlows(final Callback<FlowList> callback) {
-        m_api.getFlows(getToken(), "S", false).enqueue(new Callback<FlowList>() {
-            @Override
-            public void onResponse(Call<FlowList> call, Response<FlowList> response) {
-                checkResponse(response);
-                m_flowList = response.body();
-                callback.onResponse(call, response);
-            }
-
-            @Override
-            public void onFailure(Call<FlowList> call, Throwable t) {
-                callback.onFailure(call, t);
-            }
-        });
-    }
-
-
-    /**
-     * Get the flow definition, or null if it fails
-     */
-    public Definitions getLegacyFlowDefinition(String flowUuid) {
-        try {
-            Response<FlowDefinition> flowDefinitionResponse = m_api.getLegacyFlowDefinition(getToken(), flowUuid).execute();
-            checkResponse(flowDefinitionResponse);
-            FlowDefinition def = flowDefinitionResponse.body();
-            Definitions definitions = new Definitions();
-            definitions.version = def.version;
-            definitions.flows = new ArrayList<>();
-            definitions.flows.add(def);
-            return definitions;
-        } catch (IOException e) {
-            Surveyor.LOG.e("Error fetching flow definition", e);
-        }
-        return null;
-    }
-
-    public void getFlowDefinition(final DBFlow flow, final Callback<Definitions> callback) {
-
-        final Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        flow.setFetching(true);
-        realm.commitTransaction();
-
-        m_api.getFlowDefinition(getToken(), flow.getUuid()).enqueue(new Callback<Definitions>() {
-            @Override
-            public void onResponse(final Call<Definitions> call, final Response<Definitions> response) {
-                checkResponse(response);
-
-                realm.beginTransaction();
-                flow.setFetching(false);
-                realm.commitTransaction();
-                realm.close();
-                callback.onResponse(call, response);
-            }
-
-            @Override
-            public void onFailure(Call<Definitions> call, Throwable t) {
-                realm.beginTransaction();
-                flow.setFetching(false);
-                realm.commitTransaction();
-                realm.close();
-                callback.onFailure(call, t);
-            }
-        });
-    }
-
-    public Contact addContact(final Contact contact) {
-
-        if ("base".equals(contact.getLanguage())) {
-            contact.setLanguage(null);
-        }
-
-        try {
-            Response<JsonObject> result = m_api.addContact(getToken(), contact.toJson()).execute();
-
-            checkResponse(result);
-
-            String uuid = result.body().get("uuid").getAsString();
-            contact.setUuid(uuid);
-            return contact;
-
-        } catch (IOException e) {
-            throw new TembaException(e);
-        }
-    }
-
-    public void checkResponse(Response<?> response) {
-
-        if (!response.isSuccessful()) {
-
-            String errorBody;
-            try {
-                errorBody = response.errorBody().string();
-            } catch (Exception e) {
-                throw new TembaException(e);
-            }
-
-            // make a note of the error in our log
-            Surveyor.LOG.d(errorBody);
-
-            // see if the server had anything interesting to say
-            JsonObject error = JsonUtils.getGson().fromJson(errorBody, JsonObject.class);
-            if (error != null) {
-                JsonElement detail = error.get("detail");
-                if (detail != null) {
-
-                    String message = detail.getAsString();
-                    if (message.equals("Invalid token")) {
-                        message = "Login failure, please logout and try again.";
-                    }
-                    throw new ResponseException(message);
-                }
-            }
-
-            throw new TembaException("Error reading response");
-        }
+        this.api = createRetrofit(host).create(TembaAPI.class);
     }
 
     /**
-     * Uploads a media file and returns the remove URL
-     * @param uri the local file to upload
-     * @return the relative path to media
+     * Utility to create a Authorization header value from a token
      */
-    public String uploadMedia(Uri uri, String extension) throws IOException {
-
-        Map<String, RequestBody> map = new HashMap<>();
-
-        InputStream stream = Surveyor.get().getContentResolver().openInputStream(uri);
-        byte[] bytes = IOUtils.toByteArray(stream);
-
-        RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), bytes);
-        map.put("media_file\"; filename=\"" + FilenameUtils.getBaseName(uri.toString()), fileBody);
-
-        RequestBody extBody = RequestBody.create(MediaType.parse("text/plain"), extension);
-        map.put("extension", extBody);
-
-        Response<JsonObject> result;
-        try {
-            result = m_api.uploadMedia(getToken(), map).execute();
-            checkResponse(result);
-        } catch (IOException e) {
-            throw new TembaException("Error uploading media", e);
-        }
-
-        return result.body().get("location").getAsString();
+    private static String asAuth(String token) {
+        return "Token " + token;
     }
 
-    public void addResults(final Submission submission) {
-        try {
-
-            boolean success = false;
-            for (JsonObject result : submission.getResultsJson()) {
-                Response response = m_api.addResults(getToken(), result).execute();
-                if (response.isSuccessful()) {
-                    success = response.isSuccessful();
-                }
-
-            }
-            if (success) {
-                submission.delete();
-            } else {
-                throw new TembaException("Error submitting results");
-            }
-        } catch (IOException e) {
-            throw new TembaException(e);
-        }
-    }
-
-    public void addCreatedFields(HashMap<String, Field> fields) {
-        for (Field field : fields.values()) {
-            m_api.addCreatedField(getToken(), field);
-        }
-    }
-
-    public List<DBLocation> getLocations() {
-
-        List<DBLocation> locations = new ArrayList<>();
-
-        try {
-            int pageNumber = 1;
-            // fetch our first page
-            LocationResultPage page = m_api.getLocationPage(getToken(), true, pageNumber).execute().body();
-            locations.addAll(page.results);
-
-            // fetch subsequent pages until we are done
-            while (page != null && page.next != null && page.next.trim().length() != 0) {
-                page = m_api.getLocationPage(getToken(), true, ++pageNumber).execute().body();
-                locations.addAll(page.results);
-            }
-
-            return locations;
-        } catch (IOException e) {
-            throw new TembaException(e);
-        }
-    }
-
-    public List<Field> getFields() {
-
-        try {
-            List<Field> fields = new ArrayList<>();
-            int pageNumber = 1;
-            FieldResultPage page = m_api.getFieldPage(getToken(), pageNumber).execute().body();
-            fields.addAll(page.getRunnerFields());
-
-            while (page != null && page.next != null && page.next.trim().length() != 0) {
-                page = m_api.getFieldPage(getToken(), ++pageNumber).execute().body();
-                fields.addAll(page.getRunnerFields());
-            }
-            return fields;
-        } catch (IOException e) {
-            throw new TembaException(e);
-        }
-    }
-
-    private TembaAPI getAPIAccessor(String host) {
-
-        Gson gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes f) {
-                return f.getDeclaringClass().equals(RealmObject.class);
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-        }).registerTypeAdapterFactory(new FlowListTypeAdapterFactory()).create();
-
+    private static Retrofit createRetrofit(String host) {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -330,70 +74,300 @@ public class TembaService {
         final OkHttpClient okHttpClient = builder.build();
 
         try {
-            m_retrofit = new Retrofit.Builder()
+            return new Retrofit.Builder()
                     .baseUrl(host)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .addConverterFactory(GsonConverterFactory.create(JsonUtils.getGson()))
                     .client(okHttpClient)
-
                     .build();
         } catch (IllegalArgumentException e) {
-            throw new TembaException(e);
+            throw new RuntimeException(e);
         }
-
-        return m_retrofit.create(TembaAPI.class);
     }
 
-    public APIError parseError(Response<?> response){
-        Converter<ResponseBody, APIError> converter =
-                m_retrofit.responseBodyConverter(APIError.class, new Annotation[0]);
+    /**
+     * Calls RapidPro's authenticate endpoint to give us the list of tokens and orgs we can access
+     *
+     * @param username the username
+     * @param password the password
+     */
+    public void authenticate(String username, String password, Callback<TokenResults> callback) {
+        api.authenticate(username, password, "S").enqueue(callback);
+    }
 
-        APIError error = new APIError(response.code(), null);
+    /**
+     * Gets all of the admin boundaries
+     *
+     * @param token the authentication token
+     */
+    public List<Boundary> getBoundaries(final String token) throws TembaException {
+        return fetchAllPages(new PageCaller<Boundary>() {
+            @Override
+            public Call<PaginatedResults<Boundary>> createCall(String cursor) {
+                return api.getBoundaries(asAuth(token), cursor);
+            }
+        });
+    }
+
+    /**
+     * Gets the org associated with the given token
+     *
+     * @param token the authentication token
+     */
+    public Org getOrg(String token) throws TembaException {
         try {
-            error = converter.convert(response.errorBody());
+            Response<Org> response = api.getOrg(asAuth(token)).execute();
+            checkResponse(response);
+
+            return response.body();
         } catch (IOException e) {
-            try {
-                error = new APIError(response.code(), response.errorBody().string());
-            } catch (IOException last) {}
+            throw new TembaException("Unable to fetch org", e);
         }
-
-        return error;
     }
 
-    public int getErrorMessage(Throwable t) {
-        if (t == null) {
-            return R.string.error_server_not_found;
-        }
-        return R.string.error_server_failure;
+    /**
+     * Gets all of the contact fields
+     *
+     * @param token the authentication token
+     */
+    public List<Field> getFields(final String token) throws TembaException {
+        return fetchAllPages(new PageCaller<Field>() {
+            @Override
+            public Call<PaginatedResults<Field>> createCall(String cursor) {
+                return api.getFields(asAuth(token), cursor);
+            }
+        });
     }
 
+    /**
+     * Gets all of the non-archived surveyor flows
+     *
+     * @param token the authentication token
+     */
+    public List<Flow> getFlows(final String token) throws TembaException {
+        return fetchAllPages(new PageCaller<Flow>() {
+            @Override
+            public Call<PaginatedResults<Flow>> createCall(String cursor) {
+                return api.getFlows(asAuth(token), "survey", false, cursor);
+            }
+        });
+    }
 
-    private class FlowListTypeAdapterFactory extends CustomizedTypeAdapterFactory<FlowList> {
-        private FlowListTypeAdapterFactory() {
-            super(FlowList.class);
+    /**
+     * Gets all of the contact groups
+     *
+     * @param token the authentication token
+     */
+    public List<Group> getGroups(final String token) throws TembaException {
+        return fetchAllPages(new PageCaller<Group>() {
+            @Override
+            public Call<PaginatedResults<Group>> createCall(String cursor) {
+                return api.getGroups(asAuth(token), cursor);
+            }
+        });
+    }
+
+    /**
+     * Gets full definitions for the given flows
+     *
+     * @param token the authentication token
+     * @param flows the list of flows
+     */
+    public List<RawJson> getDefinitions(final String token, final List<Flow> flows) throws TembaException {
+        // gather up flow UUIDs
+        final List<String> flowUUIDs = new ArrayList<>(flows.size());
+        for (Flow flow : flows) {
+            flowUUIDs.add(flow.getUuid());
         }
 
-        @Override protected void beforeWrite(FlowList flow, JsonElement json) {}
+        try {
+            Response<Definitions> response = api.getDefinitions(asAuth(token), flowUUIDs, "none").execute();
+            checkResponse(response);
 
-        @Override protected void afterRead(JsonElement deserialized) {
-            JsonObject custom = deserialized.getAsJsonObject();
-            JsonArray flows = custom.get("results").getAsJsonArray();
-            for (int i=0; i<flows.size(); i++) {
-                int questionCount = 0;
-                JsonObject flow = flows.get(i).getAsJsonObject();
-                JsonArray rulesets = flow.get("rulesets").getAsJsonArray();
-                for (int j=0; j<rulesets.size(); j++) {
-                    String rulesetType = rulesets.get(j).getAsJsonObject().get("ruleset_type").getAsString();
-                    if (rulesetType != null && rulesetType.startsWith("wait_")) {
-                        questionCount++;
-                    }
+            Definitions definitions = response.body();
+            String specVersion = definitions.getVersion();
+
+            if (specVersion.equals("11") || specVersion.startsWith("11.")) {
+                List<RawJson> migratedFlows = new ArrayList<>(definitions.getFlows().size());
+                for (RawJson legacyFlow : definitions.getFlows()) {
+                    String migrated = Engine.migrateLegacyDefinition(legacyFlow.toString());
+                    migratedFlows.add(new RawJson(migrated));
+                }
+                return migratedFlows;
+            }
+
+            return response.body().getFlows();
+
+        } catch (IOException e) {
+            throw new TembaException("Unable to fetch definitions", e);
+        }
+    }
+
+    /**
+     * Uploads a media file and returns the remove URL
+     *
+     * @param token the authentication token
+     * @param uri   the local file to upload
+     * @return the new media URL
+     */
+    public String uploadMedia(String token, Uri uri) throws TembaException {
+        String uriString = uri.toString();
+        String baseName = FilenameUtils.getBaseName(uriString);
+        String extension = FilenameUtils.getExtension(uriString);
+
+        // build multipart request
+        Map<String, RequestBody> map = new HashMap<>();
+        map.put("extension", RequestBody.create(MediaType.parse("text/plain"), extension));
+
+        try {
+            InputStream stream = SurveyorApplication.get().getContentResolver().openInputStream(uri);
+            byte[] bytes = IOUtils.toByteArray(stream);
+
+            RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), bytes);
+            map.put("media_file\"; filename=\"" + baseName, fileBody);
+
+            Response<JsonObject> result = api.uploadMedia(asAuth(token), map).execute();
+            checkResponse(result);
+
+            return result.body().get("location").getAsString();
+
+        } catch (IOException e) {
+            throw new TembaException("Error uploading media", e);
+        }
+    }
+
+    /**
+     * Submits a submission payload
+     *
+     * @param token      the authentication token
+     * @param submission the payload
+     */
+    public void submit(String token, SubmissionPayload submission) throws TembaException {
+        try {
+            Response<JsonObject> result = api.submit(asAuth(token), submission).execute();
+            checkResponse(result);
+
+        } catch (IOException e) {
+            throw new TembaException("Error submitting", e);
+        }
+    }
+
+    /**
+     * Utility for fetching all pages of a given type
+     */
+    private <T> List<T> fetchAllPages(PageCaller<T> caller) throws TembaException {
+        try {
+            List<T> all = new ArrayList<>();
+            PaginatedResults<T> page = null;
+
+            do {
+                String cursor = page != null ? page.getNextCursor() : null;
+                Call<PaginatedResults<T>> call = caller.createCall(cursor);
+                Response<PaginatedResults<T>> response = call.execute();
+
+                if (response.isSuccessful()) {
+                    page = response.body();
+                    all.addAll(page.getResults());
+                } else {
+                    throw new TembaException("Server returned non-200 response for " + call.request().url().toString());
                 }
 
-                flow.add("questionCount", new JsonPrimitive(questionCount));
-                if (questionCount == 0) {
-                    flows.remove(i);
-                    i--;
+            } while (page.hasNext());
+
+            return all;
+        } catch (IOException e) {
+            throw new TembaException("Unable to fetch page from API", e);
+        }
+    }
+
+    private void checkResponse(Response<?> response) throws TembaException {
+
+        if (!response.isSuccessful()) {
+
+            String errorBody;
+            try {
+                errorBody = response.errorBody().string();
+            } catch (Exception e) {
+                throw new TembaException("Unable to extract error body", e);
+            }
+
+            // make a note of the error in our log
+            Logger.w(errorBody);
+
+            // see if the server had anything interesting to say
+            Gson gson = new Gson();
+            JsonObject error = gson.fromJson(errorBody, JsonObject.class);
+            if (error != null) {
+                JsonElement detail = error.get("detail");
+                if (detail != null) {
+
+                    String message = detail.getAsString();
+                    if (message.equals("Invalid token")) {
+                        message = "Login failure, please logout and try again.";
+                    }
+                    throw new TembaException(message);
                 }
             }
+
+            throw new TembaException("Error reading response");
         }
+    }
+
+    @Deprecated
+    public void legacyAddCreatedFields(String token, HashMap<String, io.rapidpro.flows.runner.Field> fields) {
+        for (io.rapidpro.flows.runner.Field field : fields.values()) {
+            api.legacyAddCreatedField(asAuth(token), field);
+        }
+    }
+
+    /* Legacy endpoints to be removed */
+
+    @Deprecated
+    public io.rapidpro.flows.runner.Contact legacyAddContact(String token, io.rapidpro.flows.runner.Contact contact) throws TembaException {
+
+        if ("base".equals(contact.getLanguage())) {
+            contact.setLanguage(null);
+        }
+
+        try {
+            Response<JsonObject> result = api.legacyAddContact(asAuth(token), contact.toJson()).execute();
+
+            checkResponse(result);
+
+            String uuid = result.body().get("uuid").getAsString();
+            contact.setUuid(uuid);
+            return contact;
+
+        } catch (IOException e) {
+            throw new TembaException("Error submitting legacy contact", e);
+        }
+    }
+
+    @Deprecated
+    public void legacyAddResults(String token, io.rapidpro.surveyor.legacy.Submission submission) throws TembaException {
+        try {
+
+            boolean success = false;
+            for (JsonObject result : submission.getResultsJson()) {
+                Response response = api.legacyAddResults(asAuth(token), result).execute();
+                if (response.isSuccessful()) {
+                    success = response.isSuccessful();
+                }
+
+            }
+            if (success) {
+                submission.delete();
+            } else {
+                throw new TembaException("Error submitting results");
+            }
+        } catch (IOException e) {
+            throw new TembaException("Error submitting legacy results", e);
+        }
+    }
+
+    /**
+     * Utility for fetching all pages of a given type
+     */
+    private interface PageCaller<T> {
+        Call<PaginatedResults<T>> createCall(String cursor);
     }
 }

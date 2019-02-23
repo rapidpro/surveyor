@@ -1,6 +1,5 @@
 package io.rapidpro.surveyor.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,155 +7,78 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ShareCompat;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-
+import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.greysonparrelli.permiso.Permiso;
 import com.greysonparrelli.permiso.PermisoActivity;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 
 import io.rapidpro.surveyor.BuildConfig;
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
-import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.data.DBOrg;
-import io.rapidpro.surveyor.data.OrgDetails;
-import io.rapidpro.surveyor.data.Submission;
-import io.rapidpro.surveyor.net.TembaService;
+import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.ui.ViewCache;
-import io.realm.Realm;
 
 /**
- * All activities for the Surveyor app extend BaseActivity
- * which provides convenience methods for transferring state
- * between activities and the like.
+ * All activities for the SurveyorApplication app extend this base activity which provides convenience methods
+ * for things like authentication etc.
  */
-public class BaseActivity extends PermisoActivity {
+public abstract class BaseActivity extends PermisoActivity {
 
-    private DBOrg m_org;
-    private DBFlow m_flow;
     private ViewCache m_viewCache;
 
-    private Realm m_realm;
-
-    public Surveyor getSurveyor() {
-        return (Surveyor)getApplication();
-    }
-
-    public boolean validateLogin() {
-        return true;
-    }
-
     /**
-     * Logs in a user for the given orgs
+     * @see android.app.Activity#onCreate(Bundle)
      */
-    public void login(String email, List<DBOrg> orgs) {
-        Realm realm = getRealm();
-        realm.beginTransaction();
-        realm.where(DBOrg.class).findAll().clear();
-
-        // add our orgs, make sure we don't consider duplicates
-        HashSet<Integer> added = new HashSet<>();
-
-        HashSet<String> tokens = new HashSet<>();
-        for (DBOrg org : orgs) {
-            if (added.add(org.getId())) {
-                // don't add a token more than once
-                if (tokens.add(org.getToken())) {
-                    realm.copyToRealm(org);
-                }
-            }
-        }
-
-        realm.commitTransaction();
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(SurveyorIntent.PREF_USERNAME, email);
-        editor.apply();
-
-        startActivity(new Intent(this, OrgListActivity.class));
-        finish();
-    }
-
-    public void logout() {
-        logout(-1);
-    }
-
-
-    /**
-     * Logs the user out and returns them to the login page
-     */
-    public void logout(int error) {
-
-        Realm realm = getRealm();
-        realm.beginTransaction();
-        realm.clear(DBFlow.class);
-        realm.clear(DBOrg.class);
-        realm.commitTransaction();
-
-        Submission.clear();
-        OrgDetails.clear();
-
-        Intent intent = new Intent(this, LoginActivity.class);
-        if (error != -1) {
-            intent.putExtra(SurveyorIntent.EXTRA_ERROR, getString(error));
-        }
-        startActivity(intent);
-
-        finish();
-    }
-
-    public String getUsername() {
-        return PreferenceManager.getDefaultSharedPreferences(this).getString(SurveyorIntent.PREF_USERNAME, null);
-    }
-
-    public boolean isLoggedIn() {
-        return getUsername() != null;
-    }
-
+    @Override
     protected void onCreate(Bundle bundle) {
+        Logger.d("Creating " + getClass().getSimpleName());
+
+        // so that espresso tests always have an unlocked screen
+        if (BuildConfig.DEBUG) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+
         super.onCreate(bundle);
+
+        // make new activity come in from right
         overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
 
-        // check if they are properly logged in
-        if (validateLogin() && !isLoggedIn()) {
+        // if we're on an activity that requires a logged in user, and we aren't, redirect to login activity
+        if (requireLogin() && !isLoggedIn()) {
             logout();
         }
     }
 
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
-    }
-
-    @Override
-    public void setContentView(int layoutResID) {
-        super.setContentView(layoutResID);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-    }
-
+    /**
+     * @see android.app.Activity#onCreateOptionsMenu(Menu)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
 
-        // show the settings menu always in debug mode
+        // show the settings menu in debug mode
         if (BuildConfig.DEBUG) {
             MenuItem menuItem = menu.findItem(R.id.action_settings);
+            if (menuItem != null) {
+                menuItem.setVisible(true);
+            }
+        }
+
+        // show logout action if we're logged in
+        if (isLoggedIn()) {
+            MenuItem menuItem = menu.findItem(R.id.action_logout);
             if (menuItem != null) {
                 menuItem.setVisible(true);
             }
@@ -165,50 +87,103 @@ public class BaseActivity extends PermisoActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        } else if (id == R.id.action_logout) {
-            logout();
-            return true;
-        } else if (id == R.id.action_debug) {
-            sendBugReport();
-        }
-        return super.onOptionsItemSelected(item);
+    /**
+     * User clicked "Settings" menu option
+     *
+     * @param item the menu item
+     */
+    public void onActionSettings(MenuItem item) {
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
-    public void sendBugReport(){
+    /**
+     * User clicked "Logout" menu option
+     *
+     * @param item the menu item
+     */
+    public void onActionLogout(MenuItem item) {
+        logout();
+    }
 
-        // Log our build and device details
-        StringBuilder info = new StringBuilder();
-        info.append("Version: " + BuildConfig.VERSION_NAME + "; " + BuildConfig.VERSION_CODE);
-        info.append("\n  OS: " + System.getProperty("os.version") + " (API " + Build.VERSION.SDK_INT + ")");
-        info.append("\n  Model: " + android.os.Build.MODEL  + " (" + android.os.Build.DEVICE + ")");
-        Surveyor.LOG.d(info.toString());
+    /**
+     * User clicked "Bug Report" menu option
+     *
+     * @param item the menu item
+     */
+    public void onActionBugReport(MenuItem item) {
+        sendBugReport();
+    }
 
-        // Generate a logcat file
-        File outputFile = new File(Environment.getExternalStorageDirectory(), "surveyor-debug.txt");
+    /**
+     * Gets the instance of the application
+     *
+     * @return the application
+     */
+    public SurveyorApplication getSurveyor() {
+        return (SurveyorApplication) getApplication();
+    }
+
+    /**
+     * Whether this activity requires the user to be logged in
+     *
+     * @return true if activity requires login
+     */
+    public boolean requireLogin() {
+        return true;
+    }
+
+    /**
+     * Logs in a user for the given orgs
+     */
+    public void login(String email, Set<String> orgUUIDs) {
+        Logger.d("Logging in as " + email + " with access to orgs " + TextUtils.join(",", orgUUIDs));
+
+        // save email which we'll need for submissions later
+        getSurveyor().setPreference(SurveyorPreferences.AUTH_USERNAME, email);
+        getSurveyor().setPreference(SurveyorPreferences.PREV_USERNAME, email);
+        getSurveyor().setPreference(SurveyorPreferences.AUTH_ORGS, orgUUIDs);
+
+        // let the user pick an org...
+        startActivity(new Intent(this, OrgChooseActivity.class));
+
+        // we don't want to go back to the view that sent us here (i.e. login or create account)
+        finish();
+    }
+
+    /**
+     * Logs the user out and returns them to the login page
+     */
+    protected void logout() {
+        logout(-1);
+    }
+
+    /**
+     * Logs the user out and returns them to the login page showing the given error string
+     */
+    protected void logout(int errorResId) {
+        Logger.d("Logging out with error " + errorResId);
+
+        getSurveyor().clearPreference(SurveyorPreferences.AUTH_USERNAME);
+        getSurveyor().setPreference(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet());
 
         try {
-            Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath() + "  \"*:E Surveyor:*\" ");
-        } catch (Throwable t) {
-            Surveyor.LOG.e("Failed to generate report", t);
+            getSurveyor().clearSubmissions();
+        } catch (IOException e) {
+            Logger.e("Unable to clear submissions", e);
         }
 
-        ShareCompat.IntentBuilder.from(this)
-                .setType("message/rfc822")
-                .addEmailTo(getString(R.string.support_email))
-                .setSubject("Surveyor Bug Report")
-                .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
-                .setStream(getSurveyor().getUriForFile(outputFile))
-                .setChooserTitle("Send Email")
-                .startChooser();
+        Intent intent = new Intent(this, LoginActivity.class);
+
+        // clear the activity stack
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        if (errorResId != -1) {
+            intent.putExtra(SurveyorIntent.EXTRA_ERROR, getString(errorResId));
+        }
+        startActivity(intent);
     }
 
-    public void showSendBugReport() {
+    public void showBugReportDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirm_bug_report))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -226,19 +201,22 @@ public class BaseActivity extends PermisoActivity {
                 .show();
     }
 
-    protected void onResume() {
-        super.onResume();
-        Surveyor.LOG.d(getClass().getSimpleName() + ".onResume()");
+    private void sendBugReport() {
+        try {
+            Uri outputUri = getSurveyor().generateLogDump();
 
-    }
+            ShareCompat.IntentBuilder.from(this)
+                    .setType("message/rfc822")
+                    .addEmailTo(getString(R.string.support_email))
+                    .setSubject("Surveyor Bug Report")
+                    .setText("Please include what you were doing prior to sending this report and specific details on the error you encountered.")
+                    .setStream(outputUri)
+                    .setChooserTitle("Send Email")
+                    .startChooser();
 
-    protected void onPause() {
-        super.onPause();
-        if (m_realm != null) {
-            m_realm.close();
-            m_realm = null;
+        } catch (IOException e) {
+            Logger.e("Failed to generate bug report", e);
         }
-        Surveyor.LOG.d(getClass().getSimpleName() + ".onPause()");
     }
 
     public ViewCache getViewCache() {
@@ -248,76 +226,31 @@ public class BaseActivity extends PermisoActivity {
         return m_viewCache;
     }
 
-    public void refresh() {
-
+    /**
+     * Gets the currently authenticated username
+     *
+     * @return the username/email
+     */
+    protected String getUsername() {
+        return getPreferences().getString(SurveyorPreferences.AUTH_USERNAME, null);
     }
 
+    /**
+     * Checks whether we are currently authenticated
+     *
+     * @return truer if we are authenticated
+     */
+    protected boolean isLoggedIn() {
+        return !TextUtils.isEmpty(getUsername());
+    }
+
+    /**
+     * Gets the preferences for this application
+     *
+     * @return the preferences
+     */
     public SharedPreferences getPreferences() {
         return getSurveyor().getPreferences();
-    }
-
-    public void saveString(int key, String value) {
-        SharedPreferences.Editor editor = getPreferences().edit();
-        editor.putString(getString(key), value);
-        editor.apply();
-    }
-
-    public void saveInt(int key, int value) {
-        SharedPreferences.Editor editor = getPreferences().edit();
-        editor.putInt(getString(key), value);
-        editor.apply();
-    }
-
-    public String getPreferenceString(int key, String def) {
-        return getPreferences().getString(getString(key), def);
-    }
-
-    public int getPreferenceInt(int key, int def) {
-        return getPreferences().getInt(getString(key), def);
-    }
-
-    public Realm getRealm() {
-        if (m_realm == null) {
-            m_realm = Surveyor.get().getRealm();
-        }
-        return m_realm;
-    }
-
-    public TembaService getRapidProService() {
-        return getSurveyor().getRapidProService();
-    }
-
-    public DBFlow getDBFlow() {
-        if (m_flow == null) {
-            String flowId = getIntent().getStringExtra(SurveyorIntent.EXTRA_FLOW_ID);
-            if (flowId != null) {
-                m_flow = getRealm().where(DBFlow.class).equalTo("uuid", flowId).findFirst();
-            }
-        }
-        return m_flow;
-    }
-
-    public DBOrg getDBOrg() {
-        if (m_org == null) {
-            int orgId = getIntent().getIntExtra(SurveyorIntent.EXTRA_ORG_ID, 0);
-            m_org = getRealm().where(DBOrg.class).equalTo("id", orgId).findFirst();
-        }
-        return m_org;
-    }
-
-    public Intent getIntent(Activity from, Class to) {
-        Intent intent = new Intent(from, to);
-        DBOrg org = getDBOrg();
-        if (org !=null) {
-            intent.putExtra(SurveyorIntent.EXTRA_ORG_ID, org.getId());
-        }
-
-        DBFlow flow = getDBFlow();
-        if (flow != null) {
-            intent.putExtra(SurveyorIntent.EXTRA_FLOW_ID, flow.getUuid());
-        }
-
-        return intent;
     }
 
     public AlertDialog showAlert(int title, int body) {
@@ -328,6 +261,10 @@ public class BaseActivity extends PermisoActivity {
 
         dialog.show();
         return dialog;
+    }
+
+    protected void showToast(int resId) {
+        Toast.makeText(this, resId, Toast.LENGTH_SHORT).show();
     }
 
     public void showRationaleDialog(int body, Permiso.IOnRationaleProvided callback) {

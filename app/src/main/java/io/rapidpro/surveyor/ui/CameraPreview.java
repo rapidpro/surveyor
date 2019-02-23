@@ -1,7 +1,5 @@
 package io.rapidpro.surveyor.ui;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
@@ -14,8 +12,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.SurveyorIntent;
+import java.io.IOException;
+
+import io.rapidpro.surveyor.Logger;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder m_surfaceHolder;
@@ -51,7 +50,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     if ((rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) && rotation != m_lastRotation) {
                         try {
                             updateOrientation();
-                        } catch (Exception e) {}
+                        } catch (Exception e) {
+                        }
                         m_lastRotation = rotation;
                     }
                 }
@@ -119,7 +119,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             m_camera.setPreviewDisplay(m_surfaceHolder);
             m_camera.startPreview();
         } catch (Exception e) {
-            Surveyor.LOG.e("Error starting camera preview: " + e.getMessage(), e);
+            Logger.e("Error starting camera preview", e);
         }
     }
 

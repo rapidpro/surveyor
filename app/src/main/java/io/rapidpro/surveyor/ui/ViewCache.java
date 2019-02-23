@@ -30,7 +30,7 @@ public class ViewCache {
 
     private View getCachedView(int id) {
         View view = m_cache.get(id);
-        if (view == null){
+        if (view == null) {
             view = m_parent.findViewById(id);
             m_cache.put(id, view);
         }
@@ -47,7 +47,7 @@ public class ViewCache {
     }
 
     public Object getSelectedItem(int id) {
-        return ((Spinner)getCachedView(id)).getSelectedItem();
+        return ((Spinner) getCachedView(id)).getSelectedItem();
     }
 
     public String getText(int id) {
@@ -81,7 +81,7 @@ public class ViewCache {
         view.setVisibility(View.GONE);
 
         if (hideKeyboard) {
-            InputMethodManager imm = (InputMethodManager)m_context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) m_context.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
@@ -106,7 +106,7 @@ public class ViewCache {
     }
 
     public ListView getListView(int id) {
-        return (ListView)getCachedView(id);
+        return (ListView) getCachedView(id);
     }
 
     public ListAdapter getListViewAdapter(int list) {
@@ -118,7 +118,7 @@ public class ViewCache {
     }
 
     public Button getButton(int id) {
-        return (Button)getCachedView(id);
+        return (Button) getCachedView(id);
     }
 
     public void setButtonText(int id, String text) {

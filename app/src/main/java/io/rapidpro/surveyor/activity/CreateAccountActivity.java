@@ -3,23 +3,28 @@ package io.rapidpro.surveyor.activity;
 import android.app.Activity;
 import android.net.UrlQuerySanitizer;
 import android.os.Bundle;
-import android.view.Menu;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
+import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.data.DBOrg;
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.net.responses.Token;
+import io.rapidpro.surveyor.task.FetchOrgsTask;
 
+/**
+ * Activity for creating a new surveyor account
+ */
 public class CreateAccountActivity extends BaseActivity {
 
     public static final String CREATE_ACCOUNT_URL = "/org/surveyor/";
 
-    public boolean validateLogin() { return false; }
+    public boolean requireLogin() {
+        return false;
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -39,43 +44,45 @@ public class CreateAccountActivity extends BaseActivity {
             }
 
             public void onPageFinished(WebView view, String url) {
-
                 UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(url);
-                String user = sanitizer.getValue("user");
-                String token = sanitizer.getValue("token");
-                String name = sanitizer.getValue("org");
+                String email = sanitizer.getValue("user");
+                Token token = Token.fromUrl(url);
 
-                if (user != null && token != null && name != null) {
-                    DBOrg org = new DBOrg();
-                    org.setToken(token);
-                    org.setName(name);
-
-                    List<DBOrg> orgs = new ArrayList<>();
-                    orgs.add(org);
-                    login(user, orgs);
+                if (email != null && token.getToken() != null) {
+                    fetchOrgAndLogin(email, token);
                 }
 
-                if (url.endsWith(CREATE_ACCOUNT_URL))  {
+                if (url.endsWith(CREATE_ACCOUNT_URL)) {
                     getViewCache().hide(R.id.web_progress);
                 }
-
             }
 
-            public void onLoadResource (WebView view, String url) {
+            public void onLoadResource(WebView view, String url) {
                 if (url.endsWith(CREATE_ACCOUNT_URL)) {
                     getViewCache().show(R.id.web_progress);
                 }
             }
         });
 
-        web.loadUrl(Surveyor.BASE_URL + CREATE_ACCOUNT_URL);
+        String createAccountURL = SurveyorApplication.get().getTembaHost() + CREATE_ACCOUNT_URL;
+
+        Logger.d("Connecting to " + createAccountURL + "...");
+
+        web.loadUrl(createAccountURL);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_login, menu);
-        return true;
+    protected void fetchOrgAndLogin(final String email, final Token token) {
+
+        new FetchOrgsTask(new FetchOrgsTask.Listener() {
+            @Override
+            public void onComplete(Set<String> orgUUIDs) {
+                login(email, orgUUIDs);
+            }
+
+            @Override
+            public void onFailure() {
+                // TODO
+            }
+        }).execute(token);
     }
-    
 }

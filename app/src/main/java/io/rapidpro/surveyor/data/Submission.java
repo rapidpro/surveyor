@@ -1,570 +1,257 @@
 package io.rapidpro.surveyor.data;
 
 import android.net.Uri;
-import android.os.Environment;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.nyaruka.goflow.mobile.Event;
+import com.nyaruka.goflow.mobile.Modifier;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.threeten.bp.Instant;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import io.rapidpro.expressions.utils.ExpressionUtils;
-import io.rapidpro.flows.definition.Flow;
-import io.rapidpro.flows.definition.RuleSet;
-import io.rapidpro.flows.runner.Contact;
-import io.rapidpro.flows.runner.Field;
-import io.rapidpro.flows.runner.RunState;
-import io.rapidpro.flows.runner.Step;
-import io.rapidpro.flows.utils.JsonUtils;
-import io.rapidpro.flows.utils.Jsonizable;
-import io.rapidpro.surveyor.BuildConfig;
-import io.rapidpro.surveyor.Surveyor;
-import io.rapidpro.surveyor.activity.FlowRunActivity;
-import io.rapidpro.surveyor.net.TembaService;
+import io.rapidpro.surveyor.Logger;
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.engine.EngineException;
+import io.rapidpro.surveyor.engine.Session;
+import io.rapidpro.surveyor.net.TembaException;
+import io.rapidpro.surveyor.net.requests.SubmissionPayload;
+import io.rapidpro.surveyor.utils.RawJson;
+import io.rapidpro.surveyor.utils.SurveyUtils;
 
-/**
- * Represents a single flow run. Manages saving run progress and
- * submission to the server. Submissions are stored on the file
- * system to be tolerant of database changes in the future.
- */
-public class Submission implements Jsonizable {
+public class Submission {
 
-    private transient static final String SUBMISSIONS_DIR = "submissions";
-    private transient static final String FLOW_FILE = "flow.json";
-    private transient static final String MEDIA_DIR = "media";
-    private transient static final String CURRENT_FILE = "current.json";
+    private static final String SESSION_FILE = "session.json";
+    private static final String MODIFIERS_FILE = "modifiers.jsonl";
+    private static final String EVENTS_FILE = "events.jsonl";
+    private static final String COMPLETION_FILE = ".completed";
+    private static final String MEDIA_DIR = "media";
 
-    // the files we will be persisted in
-    private transient File m_currentFile;
-    private transient File m_completedFile;
-
-    // fields created during this submission
-    protected HashMap<String,Field> m_fields = new HashMap<>();
-
-    protected List<Step> m_steps;
-
-    // flow uuid
-    private String m_flow;
-
-    // our contact participating in the flow
-    private Contact m_contact;
-
-    // when the flow run started
-    private Instant m_started;
-
-    private int m_revision;
-
-    // if the flow was completed
-    private boolean m_completed;
-
-    // the username submitting this run
-    private String m_username;
-
-    // the app version when this submission started
-    private String m_appVersion;
-
-    private static FilenameFilter SUBMISSION_FILTER = new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String filename) {
-            return !filename.endsWith(FLOW_FILE)
-                    && !filename.equals(MEDIA_DIR)
-                    && !filename.endsWith(CURRENT_FILE);
-        }
-    };
-
-    public Submission() {}
+    private Org org;
+    private File directory;
 
     /**
-     * Clear out all submissions for all flows
+     * Creates a new submission for the given org in the given directory
+     *
+     * @param org       the org
+     * @param directory the directory
      */
-    public static void clear() {
-        FileUtils.deleteQuietly(getSubmissionsDir());
+    public Submission(Org org, File directory) {
+        this.org = org;
+        this.directory = directory;
     }
 
     /**
-     * The root submission directory
+     * Gets the UUID of this org (i.e. the name of its directory)
+     *
+     * @return the UUID
      */
-    private static File getSubmissionsDir() {
-        File runsDir = new File(Environment.getExternalStorageDirectory(), "Surveyor");
-        runsDir = new File(runsDir, SUBMISSIONS_DIR);
-        runsDir.mkdirs();
-        return runsDir;
+    public String getUuid() {
+        return directory.getName();
     }
 
     /**
-     * The submission directory for the given flow
+     * Gets the org this submission belongs to
+     *
+     * @return the org
      */
-    private static File getFlowDir(int orgId, String flowUuid) {
-        File flowDir = new File(getOrgDir(orgId), flowUuid);
-        flowDir.mkdirs();
-        return flowDir;
-    }
-
-    private static File getOrgDir(int orgId) {
-        File orgDir = new File(getSubmissionsDir(), orgId + "");
-        orgDir.mkdirs();
-        return orgDir;
+    public Org getOrg() {
+        return org;
     }
 
     /**
-     * Get the number of pending submissions for this flow
+     * Get's the directory this submission is stored in
+     *
+     * @return the directory
      */
-    public static int getPendingSubmissionCount(DBFlow flow) {
-        return Submission.getPendingSubmissions(flow).length;
+    public File getDirectory() {
+        return directory;
     }
 
     /**
-     * Get all the submission files for the given flow
+     * Get's the directory this submission's media is stored in
+     *
+     * @return the directory
      */
-    public static File[] getPendingSubmissions(DBFlow flow) {
-        return getFlowDir(flow.getOrg().getId(), flow.getUuid()).listFiles(SUBMISSION_FILTER);
+    public File getMediaDirectory() throws IOException {
+        return SurveyUtils.mkdir(directory, MEDIA_DIR);
     }
 
     /**
-     * Get all submission files across all flows
+     * Gets whether this submission is complete
+     *
+     * @return true if complete
      */
-    public static File[] getPendingSubmissions(int orgId) {
-
-        long start = System.currentTimeMillis();
-        List<File> files = new ArrayList<>();
-
-        for (File dir : getOrgDir(orgId).listFiles()) {
-            if (dir.isDirectory()) {
-                for (File submission : dir.listFiles(SUBMISSION_FILTER)) {
-                    files.add(submission);
-                }
-            }
-        }
-
-        File[] results = new File[files.size()];
-        results = files.toArray(results);
-        Surveyor.get().LOG.d("Fetched all submissions. Took: " + (System.currentTimeMillis() - start) + "ms");
-        return results;
-    }
-
-    private static JsonObject migrateFlowToVersion9(String flowUUID, JsonObject root) {
-
-        if (root.has("flows")) {
-            return root;
-        }
-
-        root.get("metadata").getAsJsonObject().addProperty("uuid", flowUUID);
-        JsonArray flowArray = new JsonArray();
-        flowArray.add(root);
-        JsonObject newRoot = new JsonObject();
-        newRoot.add("flows", flowArray);
-
-        return newRoot;
-    }
-
-    /**
-     * Read the flow definition from disk
-     */
-    private static Map<String,Flow> getFlows(File file) {
-        String revision = file.getName().split("_")[0];
-        File flowFile = new File(file.getParent(), revision + "_" + FLOW_FILE);
-        Surveyor.LOG.d("Reading flow: " + flowFile.getName());
-        String flowString = null;
-        try {
-            flowString = FileUtils.readFileToString(flowFile);
-        } catch (IOException e) {
-            Surveyor.LOG.e("Error loading flow", e);
-        }
-
-        String flowUUID = file.getParentFile().getName();
-        JsonParser parser = new JsonParser();
-
-        JsonObject root = parser.parse(flowString).getAsJsonObject();
-        root = migrateFlowToVersion9(flowUUID, root);
-
-        Map<String,Flow> flows = new HashMap<>();
-
-        for (JsonElement flowElement : root.get("flows").getAsJsonArray()) {
-            Flow flow = Flow.fromJson(flowElement.toString());
-            flows.put(flow.getUuid(), flow);
-        }
-
-        return flows;
-    }
-
-    /**
-     * Adds UUIDs where necessary to migrate a flow definition forward
-     */
-    private static JsonObject migrateToVersion9(JsonObject root) {
-        JsonArray steps = root.get("steps").getAsJsonArray();
-        String flowUUID = root.get("flow").getAsString();
-
-        for (JsonElement ele : steps) {
-            JsonObject step = ele.getAsJsonObject();
-            if (!step.has("flow_uuid")) {
-                step.addProperty("flow_uuid", flowUUID);
-            }
-
-            JsonElement stepEle = step.get("rule");
-            if (!stepEle.isJsonNull()) {
-                JsonObject rule = stepEle.getAsJsonObject();
-                if (!rule.has("flow_uuid")) {
-                    rule.addProperty("flow_uuid", flowUUID);
-                }
-            }
-        }
-        return root;
-    }
-
-    public static JsonObject migrateSubmission(JsonObject root) {
-        return migrateToVersion9(root);
-    }
-
-    /**
-     * Loads a submission from a file. Assumes the flow file is present in
-     * the parent directory.
-     */
-    public static Submission load(String username, File file) {
-        try {
-
-            String json = FileUtils.readFileToString(file);
-            JsonParser parser = new JsonParser();
-            JsonObject root = migrateSubmission(parser.parse(json).getAsJsonObject());
-            Flow.DeserializationContext context = new Flow.DeserializationContext(getFlows(file));
-
-            Surveyor.LOG.d(" << " + root.toString());
-            Submission submission = JsonUtils.fromJson(root, context, Submission.class);
-
-            if (submission.m_username == null) {
-                submission.m_username = username;
-            }
-
-            submission.m_currentFile = file;
-            submission.m_completedFile = file;
-            return submission;
-        } catch (IOException e) {
-            // we'll return null
-            Surveyor.LOG.e("Failure reading submission", e);
-        }
-        return null;
-    }
-
-    public static Submission fromJson(JsonElement ele, Flow.DeserializationContext context) {
-        JsonObject obj = (JsonObject) ele;
-        Submission submission = new Submission();
-        submission.m_steps = JsonUtils.fromJsonArray(obj.get("steps").getAsJsonArray(), context, Step.class);
-        submission.m_contact = JsonUtils.fromJson(obj.get("contact"), null, Contact.class);
-        submission.m_started = ExpressionUtils.parseJsonDate(obj.get("started").getAsString());
-
-        if (obj.has("submitted_by")) {
-            submission.m_username = obj.get("submitted_by").getAsString();
-        }
-
-        if (obj.has("revision")) {
-            submission.m_revision = obj.get("revision").getAsInt();
-        } else if (obj.has("version")) {
-            submission.m_revision = obj.get("version").getAsInt();
-        }
-
-        if (obj.has("app_version")) {
-            JsonElement version = obj.get("app_version");
-            if (!version.isJsonNull()) {
-                submission.m_appVersion = version.getAsString();
-            }
-        }
-
-        submission.m_completed = obj.get("completed").getAsBoolean();
-        submission.m_flow = obj.get("flow").getAsString();
-        return submission;
-    }
-
-    /**
-     * Serializes this run state to JSON
-     * @return the JSON
-     */
-    @Override
-    public JsonElement toJson() {
-        return JsonUtils.object(
-                "fields", JsonUtils.toJsonArray(m_fields.values()),
-                "steps", JsonUtils.toJsonArray(m_steps),
-                "flow", m_flow,
-                "contact", m_contact.toJson(),
-                "started", ExpressionUtils.formatJsonDate(m_started),
-                "revision", m_revision,
-                "completed", m_completed,
-                "app_version", m_appVersion,
-                "submitted_by", m_username
-        );
-    }
-
-    public List<JsonObject> getResultsJson() {
-        Map<Flow, List<Step>> resultsMap = getResultsMap();
-        List<JsonObject> resultsJson = new ArrayList<>();
-        for (Map.Entry entry : resultsMap.entrySet()) {
-
-            List<Step> steps = (List<Step>) entry.getValue();
-            Flow flow = (Flow) entry.getKey();
-            Instant started = steps.get(0).getArrivedOn();
-
-            if (steps.size() > 0) {
-                resultsJson.add(JsonUtils.object(
-                        "fields", JsonUtils.toJsonArray(m_fields.values()),
-                        "steps", JsonUtils.toJsonArray(steps),
-                        "flow", flow.getUuid(),
-                        "contact", m_contact.getUuid(),
-                        "started", ExpressionUtils.formatJsonDate(started),
-                        "revision", flow.getMetadata().get("revision").getAsInt(),
-                        "completed", m_completed,
-                        "app_version", m_appVersion,
-                        "submitted_by", m_username
-                ));
-            }
-        }
-
-        return resultsJson;
-    }
-
-
-    private Map<Flow,List<Step>> getResultsMap() {
-        // build up a map for each flow to it's steps
-        Map<Flow,List<Step>> resultMap = new HashMap<>();
-        for (Step step : m_steps) {
-            List<Step> steps = resultMap.get(step.getFlow());
-            if (steps == null) {
-                steps = new ArrayList<>();
-            }
-            steps.add(step);
-            resultMap.put(step.getFlow(), steps);
-        }
-
-        return resultMap;
-    }
-
-    private File getUniqueFile(File dir, String name, String ext) {
-        File file =  new File(dir, name + "." + ext);
-        int count = 2;
-        while (file.exists()) {
-            file =  new File(dir, name + "_" + count + "." + ext);
-            count++;
-        }
-        return file;
-    }
-
-    /**
-     * Create a new submission for a flow
-     */
-    public Submission(String username, DBFlow flow, String revision) {
-
-        m_username = username;
-        m_flow = flow.getUuid();
-        m_contact = new Contact();
-        m_revision = flow.getRevision();
-        m_appVersion = BuildConfig.VERSION_NAME;
-
-        // get a unique filename for our submission
-        File flowDir = getFlowDir(flow.getOrg().getId(), flow.getUuid());
-        m_completedFile = getUniqueFile(flowDir, revision + "_" + UUID.randomUUID().toString(), "json");
-
-        // start with an empty submission file
-        m_currentFile = new File(flowDir, CURRENT_FILE);
-        if (m_currentFile.exists()) {
-            m_currentFile.delete();
-        }
-
-        // write our flow definition if it isn't there yet
-        File flowFile = new File(flowDir, revision + "_" + FLOW_FILE);
-        if (!flowFile.exists()) {
-            try {
-                FileUtils.writeStringToFile(flowFile, flow.getDefinition());
-            } catch (Exception e) {
-                Surveyor.LOG.e("Failed to write flow to disk", e);
-                // TODO: this should probably fail hard
-            }
-        }
-    }
-
-    public File getCompletedFile() {
-        return m_completedFile;
-    }
-
-    public void addSteps(RunState runState) {
-
-        m_contact = runState.getContact();
-
-        if (m_steps == null) {
-            m_steps = new ArrayList<>();
-        }
-        m_steps.addAll(runState.getCompletedSteps());
-
-        // keep track of when we were started
-        m_started = runState.getStarted();
-
-        // mark us completed if necessary
-        m_completed = runState.getState() == RunState.State.COMPLETED;
-
-        // save off our current set of created fields
-        for (Field field : runState.getCreatedFields()) {
-            if (field.isNew()) {
-                m_fields.put(field.getKey(), field);
-            }
-        }
-    }
-
-    /**
-     * Get all the results which contain an pointer to a local file
-     */
-    private List<RuleSet.Result> getLocalFileResults() {
-        List<RuleSet.Result> localResults = new ArrayList<RuleSet.Result>();
-        // resolve the media for all of our steps
-        for (Step step : m_steps) {
-            RuleSet.Result result = step.getRuleResult();
-            if (result != null) {
-                String media = result.getMedia();
-                if (media != null) {
-                    int split = media.indexOf(":");
-                    String type = media.substring(0, split);
-                    String fileUrl = media.substring(split + 1, media.length());
-                    // don't attempt resolved types
-                    if (!FlowRunActivity.MSG_RESOLVED.contains(type) && fileUrl.startsWith("content:")) {
-                        localResults.add(result);
-                    }
-                }
-            }
-        }
-        return localResults;
-    }
-
-
-    /**
-     * Submits all local media and updates with remote urls
-     */
-    private void resolveMedia() throws IOException {
-
-        final TembaService rapid = Surveyor.get().getRapidProService();
-
-        List<RuleSet.Result> results = getLocalFileResults();
-
-        // if we have local files to upload, determine our flow run
-        if (results.size() > 0) {
-            for (RuleSet.Result result : results) {
-                String media = result.getMedia();
-                if (media != null) {
-                    Surveyor.LOG.d("Resolving media result: " + media);
-                    int split = media.indexOf(":");
-
-                    String type = media.substring(0, split);
-                    String fileUrl = media.substring(split + 1, media.length());
-                    String extension = FilenameUtils.getExtension(fileUrl);
-                    
-                    Uri mediaUri = Uri.parse(fileUrl);
-
-                    String newUrl = rapid.uploadMedia(mediaUri, extension);
-                    result.setMedia(type + ":" + newUrl);
-                }
-            }
-        }
-    }
-
-    public void save() {
-        save(m_currentFile);
-    }
-
-    protected void save(File file) {
-        try {
-            String output = toJson().toString();
-            Surveyor.LOG.d(" >> " + output);
-            FileUtils.write(file, output);
-        } catch (IOException e) {
-            Surveyor.LOG.e("Failure writing submission", e);
-        }
-    }
-
-    public void submit() throws IOException {
-        final TembaService rapid = Surveyor.get().getRapidProService();
-        final Submission submission = this;
-
-        // submit any created fields
-        rapid.addCreatedFields(m_fields);
-
-        // first we need to create our contact
-        Surveyor.LOG.d(m_contact.toJson().toString());
-        rapid.addContact(m_contact);
-
-        // then post the results
-        submission.resolveMedia();
-        rapid.addResults(submission);
-
-    }
-
-    public void delete() {
-        if (m_currentFile != null) {
-
-            // delete ourselves
-            FileUtils.deleteQuietly(m_currentFile);
-
-            // and our associated media files
-            deleteMediaFiles();
-        }
-    }
-
     public boolean isCompleted() {
-        return m_completed;
+        return new File(directory, COMPLETION_FILE).exists();
     }
 
-    public static void deleteFlowSubmissions(int orgId, String uuid) {
+    /**
+     * Saves the current session
+     *
+     * @param session the current session
+     */
+    public void saveSession(Session session) throws IOException, EngineException {
+        FileUtils.writeStringToFile(new File(directory, SESSION_FILE), session.toJSON());
+    }
+
+    /**
+     * Saves new modifiers to this submission
+     *
+     * @param modifiers the modifiers to save
+     */
+    public void saveNewModifiers(List<Modifier> modifiers) throws IOException {
+        File file = new File(directory, MODIFIERS_FILE);
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+
+        for (Modifier mod : modifiers) {
+            writer.write(mod.payload());
+            writer.newLine();
+        }
+
+        writer.close();
+    }
+
+    /**
+     * Saves new events to this submission
+     *
+     * @param events the events to save
+     */
+    public void saveNewEvents(List<Event> events) throws IOException {
+        File file = new File(directory, EVENTS_FILE);
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+
+        for (Event event : events) {
+            writer.write(event.payload());
+            writer.newLine();
+        }
+
+        writer.close();
+    }
+
+    /**
+     * Saves a new media file to this submission
+     *
+     * @param data      the media data
+     * @param extension the file extension
+     * @return the URI of the saved file
+     */
+    public Uri saveMedia(byte[] data, String extension) throws IOException {
+        File file = new File(getMediaDirectory(), UUID.randomUUID().toString() + "." + extension);
+        FileUtils.writeByteArrayToFile(file, data);
+        return SurveyorApplication.get().getUriForFile(file);
+    }
+
+    /**
+     * Saves a new media file to this submission
+     *
+     * @param src the file to copy
+     * @return the URI of the saved file
+     */
+    public Uri saveMedia(File src) throws IOException {
+        String extension = FilenameUtils.getExtension(src.getName());
+        File file = new File(getMediaDirectory(), UUID.randomUUID().toString() + "." + extension);
+        FileUtils.copyFile(src, file);
+        return SurveyorApplication.get().getUriForFile(file);
+    }
+
+    /**
+     * Marks this submission as completed
+     */
+    public void complete() throws IOException {
+        FileUtils.writeStringToFile(new File(directory, COMPLETION_FILE), "");
+    }
+
+    /**
+     * Deletes this submission from the file system
+     */
+    public void delete() {
         try {
-            FileUtils.deleteDirectory(getFlowDir(orgId, uuid));
-        } catch (IOException e) {}
-    }
-
-    public File getMediaDir() {
-        File submissionDir = m_currentFile.getParentFile();
-        File mediaDir = new File(submissionDir, "media");
-        mediaDir.mkdirs();
-        return mediaDir;
-
-    }
-
-    /**
-     * Get the prefix associated with this submission
-     * @return
-     */
-    public String getPrefix() {
-        // our prefix should be the filename up to the '.json' extension
-        String filename = m_completedFile.getName();
-        return filename.substring(0, filename.length() - 5);
-    }
-
-    /**
-     * Gets a unique file in the media directory keyed for this submission
-     */
-    public File createMediaFile(String extension) {
-        return getUniqueFile(getMediaDir(), getPrefix(), extension);
-    }
-
-    private void deleteMediaFiles() {
-        final String prefix = getPrefix();
-        File[] mediaFiles = getMediaDir().listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String filename) {
-                return filename.startsWith(prefix);
-            }
-        });
-
-        for (File mediaFile : mediaFiles) {
-            FileUtils.deleteQuietly(mediaFile);
+            FileUtils.deleteDirectory(directory);
+            directory = null;
+        } catch (IOException e) {
+            Logger.e("Unable to delete submission " + directory.getAbsolutePath(), e);
         }
     }
 
-    public void complete() {
-        save(m_completedFile);
+    public void submit() throws IOException, TembaException {
+        Logger.d("Submitting submission " + getUuid() + "...");
+
+        String session = FileUtils.readFileToString(new File(directory, SESSION_FILE));
+        List<String> modifiers = FileUtils.readLines(new File(directory, MODIFIERS_FILE));
+        List<String> events = FileUtils.readLines(new File(directory, EVENTS_FILE));
+
+        // upload all media and get a new remote URL for each item
+        Map<Uri, String> mediaUrls = uploadMedia();
+
+        // convert the map to parallel arrays of strings for replacement
+        String[] oldUris = new String[mediaUrls.size()];
+        String[] newUrls = new String[mediaUrls.size()];
+        int e = 0;
+        for (Map.Entry<Uri, String> entry : mediaUrls.entrySet()) {
+            oldUris[e] = entry.getKey().toString();
+            newUrls[e] = entry.getValue();
+            e++;
+        }
+
+        for (int i = 0; i < oldUris.length; i++) {
+            Logger.d(oldUris[i] + " --> " + newUrls[i]);
+        }
+
+        RawJson sessionJson = new RawJson(StringUtils.replaceEach(session, oldUris, newUrls));
+        List<RawJson> modifiersJson = new ArrayList<>(modifiers.size());
+        for (String modifier : modifiers) {
+            modifiersJson.add(new RawJson(modifier));
+        }
+        List<RawJson> eventsJson = new ArrayList<>(events.size());
+        for (String event : events) {
+            eventsJson.add(new RawJson(StringUtils.replaceEach(event, oldUris, newUrls)));
+        }
+
+        SubmissionPayload payload = new SubmissionPayload(sessionJson, modifiersJson, eventsJson);
+
+        SurveyorApplication.get().getTembaService().submit(org.getToken(), payload);
+
+        delete();
+    }
+
+    /**
+     * Upload all media files for this submission and return a map of their new URLs
+     *
+     * @return the map of local URIs to remote URLs
+     */
+    private Map<Uri, String> uploadMedia() throws IOException, TembaException {
+        if (!hasMedia()) {
+            return Collections.emptyMap();
+        }
+
+        SurveyorApplication app = SurveyorApplication.get();
+        Map<Uri, String> uploads = new HashMap<>();
+
+        for (File mediaFile : getMediaDirectory().listFiles()) {
+            Uri mediaUri = app.getUriForFile(mediaFile);
+            String newUrl = app.getTembaService().uploadMedia(org.getToken(), mediaUri);
+
+            uploads.put(mediaUri, newUrl);
+
+            Logger.d("Uploaded media " + mediaUri + " to " + newUrl);
+        }
+        return uploads;
+    }
+
+    private boolean hasMedia() {
+        return new File(directory, MEDIA_DIR).exists();
     }
 }

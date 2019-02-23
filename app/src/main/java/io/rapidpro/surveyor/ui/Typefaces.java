@@ -23,7 +23,7 @@ import android.graphics.Typeface;
 
 import java.util.Hashtable;
 
-import io.rapidpro.surveyor.Surveyor;
+import io.rapidpro.surveyor.Logger;
 
 public class Typefaces {
 
@@ -36,7 +36,7 @@ public class Typefaces {
                     Typeface t = Typeface.createFromAsset(c.getAssets(), assetPath);
                     s_fontCache.put(assetPath, t);
                 } catch (Exception e) {
-                    Surveyor.LOG.e("Could not get typeface '" + assetPath + "' because " + e.getMessage(), e);
+                    Logger.e("Could not get typeface '" + assetPath + "' because " + e.getMessage(), e);
                     return null;
                 }
             }

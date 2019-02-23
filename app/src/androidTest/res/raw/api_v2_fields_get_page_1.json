@@ -1,0 +1,16 @@
+{
+  "next": "https://app.rapidpro.io/api/v2/fields.json?cursor=123456789",
+  "previous": null,
+  "results": [
+    {
+      "key": "gender",
+      "label": "Gender",
+      "value_type": "text"
+    },
+    {
+      "key": "age",
+      "label": "Age",
+      "value_type": "numeric"
+    }
+  ]
+}

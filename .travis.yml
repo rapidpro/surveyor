@@ -1,0 +1,48 @@
+language: android
+
+jdk: oraclejdk8
+
+env:
+  global:
+    - ANDROID_TARGET=android-22
+    - ANDROID_ABI=armeabi-v7a
+    - ADB_INSTALL_TIMEOUT=5
+
+android:
+  licenses:
+    - android-sdk-license-.+
+    - '.+'
+  components:
+    - tools
+    - platform-tools
+    - tools
+    - build-tools-28.0.3
+    - android-27
+    - ${ANDROID_TARGET}
+    - extra
+    - extra-android-m2repository
+    - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
+
+before_install:
+  - echo yes | sdkmanager "tools"
+  - echo yes | sdkmanager "platforms;android-22"
+  - echo yes | sdkmanager "platforms;android-27"
+  - echo yes | sdkmanager "extras;android;m2repository"
+  - echo yes | sdkmanager "extras;google;m2repository"
+
+before_script:
+  - echo no | avdmanager create avd --force -c 1000M -n test -k "system-images;android-22;default;armeabi-v7a"
+  - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window -skin 768x1280 &
+  - android-wait-for-emulator
+  - adb shell setprop dalvik.vm.dexopt-flags v=n,o=v
+  - adb shell settings put global window_animation_scale 0 &
+  - adb shell settings put global transition_animation_scale 0 &
+  - adb shell settings put global animator_duration_scale 0 &
+  - adb logcat -v time > logcat.log &
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+after_failure:
+  - adb shell dumpsys package io.rapidpro.surveyor
+  - cat logcat.log

@@ -1,0 +1,20 @@
+{
+  "tokens": [
+    {
+      "token": "23453fwf33fw35g3222f67778",
+      "org": {
+        "uuid": "9f578940-215c-4e58-b399-e65d74041dc8",
+        "name": "UNICEF",
+        "id": 123
+      }
+    },
+    {
+      "token": "797d44ef78f7845de0f4dbb42d5174505563dd77",
+      "org": {
+        "uuid": "dc8123a1-168c-4962-ab9e-f784f3d804a2",
+        "name": "Nyaruka",
+        "id": 45
+      }
+    }
+  ]
+}

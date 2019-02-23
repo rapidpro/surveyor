@@ -1,53 +1,55 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context="io.rapidpro.surveyor.activity.OrgActivity">
-
-        <LinearLayout
-            android:id="@+id/container_pending"
-            android:gravity="center_horizontal"
-            android:visibility="visible"
-            android:background="@color/pending_background"
-            android:layout_width="match_parent"
-            android:padding="10dp"
-            android:layout_alignParentBottom="true"
-            android:layout_height="wrap_content" android:orientation="horizontal">
-
-            <Button style="?android:textAppearanceSmall"
-                android:minHeight="0dp"
-                android:minWidth="80dp"
-                android:id="@+id/button_pending"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/tertiary_button"
-                android:textColor="@color/pending_button_text"
-                android:onClick="onClickSubmit"
-                android:textSize="18dp"
-                android:text="3,122"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_marginTop="-10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/pending_text"
-                android:textSize="15sp"
-                android:paddingEnd="5dp"
-                android:paddingStart="5dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:text="@string/pending_summary"/>
-
-        </LinearLayout>
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="io.rapidpro.surveyor.activity.OrgActivity">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:name="io.rapidpro.surveyor.fragment.FlowListFragment"
+        android:id="@+id/container_pending"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/pending_background"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:visibility="visible">
+
+        <Button
+            android:id="@+id/button_pending"
+            style="?android:textAppearanceSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/tertiary_button"
+            android:minWidth="80dp"
+            android:minHeight="0dp"
+            android:onClick="onActionSubmit"
+            android:text="3,122"
+            android:textColor="@color/pending_button_text"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="-10dp"
+            android:layout_marginEnd="12dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:text="@string/pending_summary"
+            android:textColor="@color/pending_text"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/fragment_container"
+        android:name="io.rapidpro.surveyor.fragment.FlowListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/container_pending"
-        tools:layout="@layout/fragment_list"/>
+        android:orientation="vertical"
+        tools:layout="@layout/fragment_list" />
 
 </RelativeLayout>

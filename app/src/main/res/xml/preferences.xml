@@ -1,14 +1,13 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
-        android:title="@string/pref_header_general">
+    <PreferenceCategory android:title="@string/pref_header_general">
 
         <EditTextPreference
-            android:key="pref_key_host"
+            android:key="host"
             android:defaultValue="@string/pref_default_host"
-            android:title="@string/pref_title_rapidpro_host"
-            android:summary="@string/pref_summary_rapidpro_host"/>
+            android:title="@string/pref_title_host"
+            android:summary="@string/pref_summary_host"/>
 
     </PreferenceCategory>
 

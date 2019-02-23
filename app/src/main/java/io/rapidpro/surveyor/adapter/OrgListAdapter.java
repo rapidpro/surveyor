@@ -1,42 +1,40 @@
 package io.rapidpro.surveyor.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.List;
+
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.data.DBOrg;
-import io.realm.RealmBaseAdapter;
-import io.realm.RealmResults;
+import io.rapidpro.surveyor.data.Org;
 
-public class OrgListAdapter extends RealmBaseAdapter<DBOrg> implements ListAdapter {
+public class OrgListAdapter extends ArrayAdapter<Org> {
 
-    private int m_resourceId;
-
-    public OrgListAdapter(Context context, int resourceId,
-                     RealmResults<DBOrg> realmResults,
-                     boolean automaticUpdate) {
-        super(context, realmResults, automaticUpdate);
-        m_resourceId = resourceId;
+    public OrgListAdapter(Context context, int resourceId, List<Org> orgs) {
+        super(context, resourceId, orgs);
     }
-
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewCache cache = null;
+        ViewCache cache;
+        Org org = getItem(position);
+
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
-            convertView = inflater.inflate(m_resourceId, parent, false);
+            convertView = inflater.inflate(R.layout.item_org, parent, false);
             cache = new ViewCache();
-            cache.titleView = (TextView) convertView.findViewById(R.id.text_org);
+            cache.titleView = convertView.findViewById(R.id.text_org);
             convertView.setTag(cache);
         } else {
             cache = (ViewCache) convertView.getTag();
         }
 
-        DBOrg org = realmResults.get(position);
         cache.titleView.setText(org.getName());
         return convertView;
     }

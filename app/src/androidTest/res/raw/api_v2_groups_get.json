@@ -1,0 +1,21 @@
+{
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "uuid": "11f83067-7c40-49e8-8a35-a1a4e8dd3b69",
+      "name": "Testers",
+      "query": ""
+    },
+    {
+      "uuid": "372aba66-16e2-44ee-8486-fb5cedfe51d9",
+      "name": "Customers",
+      "query": ""
+    },
+    {
+      "uuid": "63867d07-c033-4ef1-957c-85fa9708c19c",
+      "name": "Youth",
+      "query": "age <= 18"
+    }
+  ]
+}

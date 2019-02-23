@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/content_view"
+    android:background="@color/primary_dark_material_light">
+
+    <io.rapidpro.surveyor.ui.IconTextView
+        android:id="@+id/button_capture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="140dp"
+        android:paddingBottom="50dp"
+        android:onClick="onActionCapture"
+        android:layout_centerInParent="true"
+        android:text="@string/icon_gps_off"/>
+
+    <TextView
+        android:id="@+id/text_instructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button_capture"
+        android:textSize="24sp"
+        android:layout_marginTop="-30dp"
+        android:text="@string/tap_to_capture"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/text_coordinates"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text_instructions"
+        android:textSize="18sp"
+        android:layout_marginTop="10dp"
+        android:text="@string/waiting_for_gps"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/text_accuracy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text_coordinates"
+        android:textSize="18sp"
+        android:layout_marginTop="10dp"
+        android:visibility="invisible"
+        android:text="@string/accuracy_meters"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>

@@ -5,68 +5,63 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.text.NumberFormat;
+import java.util.List;
 
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.data.DBFlow;
-import io.rapidpro.surveyor.data.Submission;
-import io.realm.RealmBaseAdapter;
-import io.realm.RealmResults;
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.data.Flow;
+import io.rapidpro.surveyor.data.Org;
+import io.rapidpro.surveyor.legacy.Legacy;
 
-public class FlowListAdapter extends RealmBaseAdapter<DBFlow> implements ListAdapter {
+public class FlowListAdapter extends ArrayAdapter<Flow> {
 
-    private int m_resourceId;
+    private Org org;
 
-    public FlowListAdapter(Context context, int resourceId,
-                          RealmResults<DBFlow> realmResults,
-                          boolean automaticUpdate) {
-        super(context, realmResults, automaticUpdate);
-        m_resourceId = resourceId;
+    public FlowListAdapter(Context context, int resourceId, Org org, List<Flow> flows) {
+        super(context, resourceId, flows);
+
+        this.org = org;
     }
-
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         ViewCache cache;
 
-        if(row == null) {
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            row = inflater.inflate(m_resourceId, parent, false);
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+
+        if (row == null) {
+            row = inflater.inflate(R.layout.item_flow, parent, false);
 
             cache = new ViewCache();
-            cache.titleView = (TextView)row.findViewById(R.id.text_flow_name);
-            cache.questionView = (TextView)row.findViewById(R.id.text_flow_questions);
-            cache.pendingSubmissions = (TextView)row.findViewById(R.id.text_pending_submissions);
+            cache.titleView = row.findViewById(R.id.text_flow_name);
+            cache.questionView = row.findViewById(R.id.text_flow_questions);
+            cache.pendingSubmissions = row.findViewById(R.id.text_pending_submissions);
 
             row.setTag(cache);
         } else {
-            cache = (ViewCache)row.getTag();
+            cache = (ViewCache) row.getTag();
         }
 
-        DBFlow flow = getItem(position);
+        Flow flow = getItem(position);
         cache.titleView.setText(flow.getName());
 
+        int pending = SurveyorApplication.get().getSubmissionService().getCompletedCount(org, flow);
+        pending += Legacy.getCompletedCount(org, flow);
+
         NumberFormat nf = NumberFormat.getInstance();
-        int submissions = Submission.getPendingSubmissionCount(flow);
-        cache.pendingSubmissions.setText(nf.format(submissions));
+        cache.pendingSubmissions.setText(nf.format(pending));
         cache.pendingSubmissions.setTag(flow);
+        cache.pendingSubmissions.setVisibility(pending > 0 ? View.VISIBLE : View.GONE);
 
-        if (submissions > 0) {
-            cache.pendingSubmissions.setVisibility(View.VISIBLE);
-        } else {
-            cache.pendingSubmissions.setVisibility(View.GONE);
-        }
+        int numQuestions = flow.getQuestionCount();
+        String questionsString = getContext().getResources().getQuantityString(R.plurals.questions, numQuestions, numQuestions);
 
-        String questionString = "Questions";
-        if (flow.getQuestionCount() == 1) {
-            questionString = "Question";
-        }
-
-        cache.questionView.setText(nf.format(flow.getQuestionCount()) + " " + questionString + " (v"+ nf.format(flow.getRevision()) + ")");
+        cache.questionView.setText(questionsString + " (v" + nf.format(flow.getRevision()) + ")");
         return row;
     }
 

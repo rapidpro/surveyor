@@ -1,23 +1,28 @@
 apply plugin: 'com.android.application'
+apply plugin: 'jacoco-android'
 
 android {
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
-    compileSdkVersion 24
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 27
+    buildToolsVersion '28.0.3'
+
     defaultConfig {
         applicationId "io.rapidpro.surveyor"
-        minSdkVersion 17
-        targetSdkVersion 26
-        versionCode 1153
-        versionName "11.5.3"
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 1204
+        versionName "12.0.4"
         multiDexEnabled = true
+
+        testInstrumentationRunner "io.rapidpro.surveyor.test.TestRunner"
+        testInstrumentationRunnerArgument 'notAnnotation', 'androidx.test.filters.FlakyTest'
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled true
         }
     }
     flavorDimensions 'version'
@@ -38,10 +43,10 @@ android {
         javaMaxHeapSize "4g"
     }
     lintOptions {
-        checkReleaseBuilds false
-        // Or, if you prefer, you can continue to check for errors in release builds,
-        // but continue the build even when errors are found:
         abortOnError false
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 
@@ -53,36 +58,53 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':goflow')
+
     // google services
-    implementation 'com.android.support:appcompat-v7:24.2.1'
-    implementation 'com.android.support:support-v4:24.2.1'
-    // database ORM
-    annotationProcessor 'io.realm:realm-android:0.82.1'
-    implementation 'io.realm:realm-android:0.82.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'androidx.exifinterface:exifinterface:1.0.0'
+
     // rest api
-    implementation 'com.squareup.retrofit2:retrofit:2.1.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.2.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.0.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.3.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+
     // for location services
-    implementation 'com.google.android.gms:play-services-gcm:9.6.1'
-    implementation 'com.google.android.gms:play-services-location:9.6.1'
+    implementation 'com.google.android.gms:play-services-gcm:16.0.0'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+
     // internationalization, language iso codes
     implementation 'com.neovisionaries:nv-i18n:1.11'
-    // our flow engine
+
+    // apache commons
+    implementation  'org.apache.commons:commons-lang3:3.8.1'
+    //noinspection GradleDependency newer versions use java.nio methods not supported on older Android versions
+    implementation 'commons-io:commons-io:2.4'
+
+    // Android M permissions
+    implementation 'com.greysonparrelli.permiso:permiso:0.3.0'
+
+    // legacy
+    annotationProcessor 'io.realm:realm-android:0.82.1'
+    implementation 'io.realm:realm-android:0.82.1'
     implementation('io.rapidpro:flows:11.5') {
-        // exclude threeten since it is inefficient in android land
         exclude group: 'org.threeten'
     }
-    // instead, add jakewharton's android friendly backport
     implementation 'com.jakewharton.threetenabp:threetenabp:1.0.2'
-    // apache commons io
-    // compile 'commons-io:commons-io:1.3.2'
-    implementation 'commons-io:commons-io:2.4'
-    // Android M permissions
-    implementation 'com.greysonparrelli.permiso:permiso:0.1.3'
+
+    // unit tests
+    testImplementation 'junit:junit:4.12'
+
+    // instrumented tests
+    androidTestImplementation 'androidx.test:core:1.1.0'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.1.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-web:3.1.1'
+    androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
+    androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.10.0'
 }
-
-

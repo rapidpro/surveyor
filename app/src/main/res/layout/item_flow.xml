@@ -1,48 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginEnd="16dp"
-    android:layout_marginStart="16dp"
-    android:gravity="center_vertical"
-    android:orientation="vertical"
-    android:paddingEnd="22dp"
-    android:paddingStart="22dp"
-    android:paddingTop="14dp"
-    android:paddingBottom="14dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="right"
+                android:paddingEnd="22dp"
+                android:paddingStart="22dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp">
 
     <TextView
         android:id="@+id/text_flow_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="18sp"
         android:layout_marginTop="2dp"
-        android:text="Customer Registration Flow"
-        android:textColor="@color/secondary_lightest"
-        android:textSize="18sp"/>
+        android:layout_marginLeft="12dp"
+        android:text="Customer Registration Flow"/>
 
     <TextView
         android:id="@+id/text_flow_questions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="12sp"
         android:layout_below="@id/text_flow_name"
-        android:text="7 Questions"
+        android:layout_alignLeft="@id/text_flow_name"
         android:textColor="@color/light_gray"
-        android:textSize="12sp"/>
+        android:text="7 Questions"/>
 
-    <io.rapidpro.surveyor.ui.IconTextView
+
+    <TextView
+        android:id="@+id/text_pending_submissions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/pending"
+        android:gravity="center_vertical|center_horizontal"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/text_flow_name"
-        android:layout_marginTop="-8dp"
-        android:gravity="center_vertical"
-        android:text="@string/icon_cloud_download"
-        android:textColor="@color/secondary_lightest"
-        android:textSize="24sp"
-        android:visibility="gone"/>
-
+        android:text="391"
+        android:visibility="visible"
+        />
 
 </RelativeLayout>
+
+
 

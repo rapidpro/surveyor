@@ -20,26 +20,22 @@ package io.rapidpro.surveyor;
 
 import android.util.Log;
 
+/**
+ * Convenience wrapper around the regular Android log to ensure that we always log with a tag value
+ */
 public class Logger {
 
-    public static final String TAG = "Surveyor";
+    private static final String TAG = "Surveyor";
 
-    public void d(String message) {
-        Log.d(TAG, message);
-    }
-
-    public void e(String message, Throwable t) {
+    public static void e(String message, Throwable t) {
         Log.e(TAG, message, t);
-        t.printStackTrace();
     }
 
-    public void v(String message) {
-        Log.v(TAG, message);
-    }
-
-
-    public void w(String message) {
+    public static void w(String message) {
         Log.w(TAG, message);
     }
 
+    public static void d(String message) {
+        Log.d(TAG, message);
+    }
 }

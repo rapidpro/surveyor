@@ -1,0 +1,54 @@
+{
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "uuid": "bdd61538-5f50-4836-a8fb-acaafd64ddb1",
+      "name": "Two Questions",
+      "type": "survey",
+      "archived": false,
+      "labels": [],
+      "expires": 10080,
+      "runs": {
+        "active": 0,
+        "completed": 0,
+        "interrupted": 0,
+        "expired": 0
+      },
+      "created_on": "2018-11-14T21:15:08.816870Z",
+      "modified_on": "2018-11-14T21:18:17.006546Z"
+    },
+    {
+      "uuid": "ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec",
+      "name": "Contact Details",
+      "type": "survey",
+      "archived": false,
+      "labels": [],
+      "expires": 10080,
+      "runs": {
+        "active": 0,
+        "completed": 3,
+        "interrupted": 0,
+        "expired": 0
+      },
+      "created_on": "2018-10-25T19:56:36.626539Z",
+      "modified_on": "2018-11-14T21:12:10.148865Z"
+    },
+    {
+      "uuid": "e54809ba-2f28-439b-b90b-c623eafa05ae",
+      "name": "Multimedia",
+      "type": "survey",
+      "archived": false,
+      "labels": [],
+      "expires": 10080,
+      "runs": {
+        "active": 1,
+        "completed": 2,
+        "interrupted": 0,
+        "expired": 0
+      },
+      "created_on": "2018-10-25T19:56:36.626539Z",
+      "modified_on": "2018-11-14T21:12:10.148865Z"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "uuid": "dc8123a1-168c-4962-ab9e-f784f3d804a2",
+  "name": "Nyaruka",
+  "country": "RW",
+  "languages": ["eng", "fra"],
+  "primary_language": "eng",
+  "timezone": "Africa/Kigali",
+  "date_style": "day_first",
+  "anon": false,
+  "token": "797d44ef78f7845de0f4dbb42d5174505563dd77"
+}
