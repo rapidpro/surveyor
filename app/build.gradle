@@ -9,8 +9,8 @@ android {
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 1204
-        versionName "12.0.4"
+        versionCode 1205
+        versionName "12.0.5"
         multiDexEnabled = true
 
         testInstrumentationRunner "io.rapidpro.surveyor.test.TestRunner"
@@ -63,6 +63,7 @@ dependencies {
     // google services
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.exifinterface:exifinterface:1.0.0'
 
     // rest api
@@ -72,7 +73,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
 
     // for location services
-    implementation 'com.google.android.gms:play-services-gcm:16.0.0'
+    implementation 'com.google.android.gms:play-services-gcm:16.1.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
 
     // internationalization, language iso codes
