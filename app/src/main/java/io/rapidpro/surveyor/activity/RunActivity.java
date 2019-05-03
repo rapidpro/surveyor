@@ -35,6 +35,8 @@ import com.nyaruka.goflow.mobile.Resume;
 import com.nyaruka.goflow.mobile.SessionAssets;
 import com.nyaruka.goflow.mobile.Trigger;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -100,11 +102,11 @@ public class RunActivity extends BaseActivity {
 
             Trigger trigger = Engine.createManualTrigger(environment, Contact.createEmpty(assets), flow.toReference());
 
-            session = Engine.getInstance().newSession(assets);
+            Pair<Session, Sprint> ss = Engine.getInstance().newSession(assets, trigger);
+            session = ss.getLeft();
             submission = getSurveyor().getSubmissionService().newSubmission(org, flow);
 
-            Sprint sprint = session.start(trigger);
-            handleEngineSprint(sprint);
+            handleEngineSprint(ss.getRight());
 
         } catch (EngineException | IOException e) {
             handleProblem("Unable to start flow", e);

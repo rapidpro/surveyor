@@ -219,13 +219,11 @@ public class EngineTest extends BaseApplicationTest {
 
         AssetsSource source = Engine.loadAssets(assetsJson);
         SessionAssets assets = Engine.createSessionAssets(source);
-        Session session = Engine.getInstance().newSession(assets);
 
         Environment env = Engine.createEnvironment(org);
         Contact contact = Contact.createEmpty(assets);
         Trigger trigger = Engine.createManualTrigger(env, contact, flow.toReference());
 
-        Sprint sprint = session.start(trigger);
-        return new ImmutablePair<>(session, sprint);
+        return Engine.getInstance().newSession(assets, trigger);
     }
 }
