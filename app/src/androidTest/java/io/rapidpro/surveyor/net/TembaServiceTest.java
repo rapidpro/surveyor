@@ -182,7 +182,7 @@ public class TembaServiceTest extends BaseApplicationTest {
     @Test
     public void getDefinitions_inLegacyFormat() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_flows_get, "application/json", 200);
-        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get_legacy, "application/json", 200);
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get_v11, "application/json", 200);
 
         List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
         List<RawJson> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);
@@ -198,7 +198,7 @@ public class TembaServiceTest extends BaseApplicationTest {
     @Test
     public void getDefinitions() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_flows_get, "application/json", 200);
-        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get, "application/json", 200);
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get_v13, "application/json", 200);
 
         List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
         List<RawJson> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);

@@ -1,38 +1,6 @@
 {
-  "fields": [
-    {
-      "key": "gender",
-      "name": "Gender",
-      "type": "text"
-    },
-    {
-      "key": "age",
-      "name": "Age",
-      "type": "number"
-    },
-    {
-      "key": "join_date",
-      "name": "Join Date",
-      "type": "datetime"
-    }
-  ],
-  "groups": [
-    {
-      "uuid": "6696cabf-eb5e-42bf-bcc6-f0c8be9b1316",
-      "name": "Testers",
-      "query": ""
-    },
-    {
-      "uuid": "372aba66-16e2-44ee-8486-fb5cedfe51d9",
-      "name": "Customers",
-      "query": ""
-    },
-    {
-      "uuid": "63867d07-c033-4ef1-957c-85fa9708c19c",
-      "name": "Youth",
-      "query": "age <= 18"
-    }
-  ],
+  "version": "13.0",
+  "site": "https://app.rapidpro.io",
   "flows": [
     {
       "uuid": "ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec",
@@ -282,7 +250,7 @@
     {
       "uuid": "bdd61538-5f50-4836-a8fb-acaafd64ddb1",
       "name": "Two Questions",
-      "spec_version": "13.0",
+      "spec_version": "13.0.0",
       "language": "base",
       "type": "messaging_offline",
       "revision": 24,
@@ -733,5 +701,7 @@
         }
       ]
     }
-  ]
+  ],
+  "campaigns": [],
+  "triggers": []
 }
