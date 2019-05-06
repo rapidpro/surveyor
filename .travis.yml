@@ -4,8 +4,8 @@ jdk: oraclejdk8
 
 env:
   global:
-    - ANDROID_TARGET=android-22
-    - ANDROID_ABI=armeabi-v7a
+    - API=22
+    - ABI=armeabi-v7a
     - ADB_INSTALL_TIMEOUT=5
 
 android:
@@ -13,26 +13,22 @@ android:
     - android-sdk-license-.+
     - '.+'
   components:
-    - tools
-    - platform-tools
-    - tools
-    - build-tools-28.0.3
-    - android-27
-    - ${ANDROID_TARGET}
-    - extra
-    - extra-android-m2repository
-    - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
+    - tools  # use sdkmanager below to get the rest
 
 before_install:
-  - echo yes | sdkmanager "tools"
-  - echo yes | sdkmanager "platforms;android-22"
-  - echo yes | sdkmanager "platforms;android-27"
-  - echo yes | sdkmanager "extras;android;m2repository"
-  - echo yes | sdkmanager "extras;google;m2repository"
+  - echo 'count=0' > /home/travis/.android/repositories.cfg  # avoid harmless sdkmanager warning
+  - echo y | sdkmanager "platform-tools" >/dev/null
+  - echo y | sdkmanager "build-tools;28.0.3" >/dev/null      # implicit gradle dependency
+  - echo y | sdkmanager "platforms;android-$API" >/dev/null  # API of the emulator we will run
+  - echo y | sdkmanager "platforms;android-27" >/dev/null    # API of the current compileSdkVersion
+  - echo y | sdkmanager --channel=4 "emulator"               # see https://github.com/ankidroid/Anki-Android/pull/5280
+  - echo y | sdkmanager "extras;android;m2repository" >/dev/null
+  - echo y | sdkmanager "extras;google;m2repository" >/dev/null
+  - echo y | sdkmanager "system-images;android-$API;default;$ABI" # install the emulator
 
 before_script:
-  - echo no | avdmanager create avd --force -c 1000M -n test -k "system-images;android-22;default;armeabi-v7a"
-  - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window -skin 768x1280 &
+  - echo no | avdmanager create avd --force -c 1000M -n test -k "system-images;android-$API;default;$ABI"
+  - $ANDROID_HOME/emulator/emulator -verbose -avd test -no-accel -no-snapshot -no-window -selinux permissive -qemu -m 2048 &
   - android-wait-for-emulator
   - adb shell setprop dalvik.vm.dexopt-flags v=n,o=v
   - adb shell settings put global window_animation_scale 0 &
