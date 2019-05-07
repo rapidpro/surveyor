@@ -45,13 +45,7 @@ public class LoginActivityTest extends BaseApplicationTest {
         mockServerResponse("", "text/html", 403);
 
         onView(withId(R.id.email)).perform(click(), typeText("bob@nyaruka.com"), closeSoftKeyboard());
-
-        sleep(2000);
-
         onView(withId(R.id.password)).perform(click(), typeText("Qwerty123"), closeSoftKeyboard());
-
-        sleep(2000);
-
         onView(withId(R.id.email_sign_in_button)).perform(click());
 
         sleep(2000);
