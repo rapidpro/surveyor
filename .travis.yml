@@ -4,10 +4,8 @@ jdk: oraclejdk8
 
 env:
   global:
-    - ABI=armeabi-v7a
     - ADB_INSTALL_TIMEOUT=5
   matrix:
-    - API=22
     - API=22 ABI=x86_64
     - API=23 ABI=x86_64
     - API=24 ABI=x86_64
