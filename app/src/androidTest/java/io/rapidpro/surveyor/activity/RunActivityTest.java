@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import androidx.test.espresso.intent.ActivityResultFunction;
+import androidx.test.espresso.intent.rule.IntentsTestRule;
+
 import org.apache.commons.io.FileUtils;
-import org.hamcrest.collection.IsArrayWithSize;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,16 +20,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 
-import androidx.test.espresso.intent.ActivityResultFunction;
-import androidx.test.espresso.intent.rule.IntentsTestRule;
-import androidx.test.filters.FlakyTest;
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.R;
-import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
-import io.rapidpro.surveyor.utils.ImageUtils;
 import io.rapidpro.surveyor.utils.SurveyUtils;
 import io.rapidpro.surveyor.widget.ChatBubbleView;
 
@@ -171,7 +168,6 @@ public class RunActivityTest extends BaseApplicationTest {
         onView(withText("Save")).check(matches(isDisplayed())).perform(click());
     }
 
-    @FlakyTest(detail = "failing on travis")
     @Test
     public void contactDetails() {
         launchForFlow("ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec");
