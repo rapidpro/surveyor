@@ -46,17 +46,12 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
         // this holds our flow list fragment which shows all available flows
         setContentView(R.layout.activity_org);
 
+        refresh();
+
         if (savedInstanceState == null) {
             Fragment fragment = new FlowListFragment();
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(R.id.fragment_container, fragment).commit();
-        }
-
-        refresh();
-
-        // if this org doesn't have downloaded assets, ask the user if we can download them now
-        if (!org.hasAssets()) {
-            confirmRefreshOrg(R.string.confirm_org_download);
         }
     }
 
@@ -99,14 +94,16 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
     }
 
     protected void refresh() {
-        String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
-        try {
-            org = getSurveyor().getOrgService().get(orgUUID);
-        } catch (Exception e) {
-            Logger.e("Unable to load org", e);
-            showBugReportDialog();
-            finish();
-            return;
+        if (org == null) {
+            String orgUUID = getIntent().getStringExtra(SurveyorIntent.EXTRA_ORG_UUID);
+            try {
+                org = getSurveyor().getOrgService().get(orgUUID);
+            } catch (Exception e) {
+                Logger.e("Unable to load org", e);
+                showBugReportDialog();
+                finish();
+                return;
+            }
         }
 
         setTitle(org.getName());
@@ -123,17 +120,26 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
         cache.setVisible(R.id.container_pending, pending > 0);
         cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
 
-        for (Flow flow : org.getFlows()) {
-            if (!Engine.isSpecVersionSupported(flow.getSpecVersion())) {
-                Semver flowVersion = new Semver(flow.getSpecVersion(), Semver.SemverType.LOOSE);
-                if (flowVersion.isGreaterThan(Engine.currentSpecVersion())){
-                    // if this flow is a major version ahead of us... user needs to upgrade the app
-                    promptToUpgrade();
-                    break;
-                } else {
-                    // if it is a major version behind, they should refresh the assets
-                    confirmRefreshOrg(R.string.confirm_org_refresh_old);
-                    break;
+        if (confirmRefreshDialog == null) {
+            if (!org.hasAssets()) {
+                // if this org doesn't have downloaded assets, ask the user if we can download them now
+                confirmRefreshOrg(R.string.confirm_org_download);
+            } else {
+                for (Flow flow : org.getFlows()) {
+                    if (!Engine.isSpecVersionSupported(flow.getSpecVersion())) {
+                        Logger.w("Found flow " + flow.getUuid() + " with unsupported version " + flow.getSpecVersion());
+
+                        Semver flowVersion = new Semver(flow.getSpecVersion(), Semver.SemverType.LOOSE);
+                        if (flowVersion.isGreaterThan(Engine.currentSpecVersion())) {
+                            // if this flow is a major version ahead of us... user needs to upgrade the app
+                            promptToUpgrade();
+                            break;
+                        } else {
+                            // if it is a major version behind, they should refresh the assets
+                            confirmRefreshOrg(R.string.confirm_org_refresh_old);
+                            break;
+                        }
+                    }
                 }
             }
         }
