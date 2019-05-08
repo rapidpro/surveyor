@@ -5,7 +5,7 @@ jdk: oraclejdk8
 env:
   global:
     - ADB_INSTALL_TIMEOUT=5
-    - INSTRUMENTED_TESTS_UI_DELAY=5000
+    - INSTRUMENTED_TESTS_PAUSE=5000
   matrix:
     - API=22 ABI=x86_64
     # - API=23 ABI=x86_64 # fails due to 'Native crash' in showFlowDetails
@@ -45,7 +45,7 @@ before_script:
 
 script:
   - ./gradlew build jacocoTestReport assembleAndroidTest
-  - ./gradlew connectedRapidproDebugAndroidTest
+  - ./gradlew -Pandroid.testInstrumentationRunnerArguments.pause=$INSTRUMENTED_TESTS_PAUSE connectedRapidproDebugAndroidTest
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

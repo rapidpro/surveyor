@@ -3,6 +3,8 @@ package io.rapidpro.surveyor.test;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -22,7 +24,6 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import androidx.test.platform.app.InstrumentationRegistry;
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorPreferences;
@@ -36,9 +37,6 @@ import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
  * Base for all the instrumented tests
  */
 public abstract class BaseApplicationTest {
-
-    private final String INSTRUMENTED_TESTS_UI_PAUSE_ENVVAR = "INSTRUMENTED_TESTS_UI_PAUSE";
-    private final int INSTRUMENTED_TESTS_UI_PAUSE_DEFAULT = 500;
 
     @Rule
     public TestRule logger = new TestWatcher() {
@@ -228,16 +226,10 @@ public abstract class BaseApplicationTest {
      * thread to complete.
      */
     protected void pause() {
-        int millis = INSTRUMENTED_TESTS_UI_PAUSE_DEFAULT;
-        String pauseMillis = System.getenv(INSTRUMENTED_TESTS_UI_PAUSE_ENVVAR);
-        if (pauseMillis != null) {
-            millis = Integer.parseInt(pauseMillis);
-        }
-
-        Logger.d("Pausing test for " + millis + " milliseconds...");
+        Logger.d("Pausing test for " + TestRunner.PAUSE_MILLIS + " milliseconds...");
 
         try {
-            Thread.sleep(millis);
+            Thread.sleep(TestRunner.PAUSE_MILLIS);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
