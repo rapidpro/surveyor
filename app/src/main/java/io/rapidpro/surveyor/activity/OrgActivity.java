@@ -5,10 +5,13 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.vdurmont.semver4j.Semver;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -21,6 +24,7 @@ import io.rapidpro.surveyor.adapter.FlowListAdapter;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.Submission;
+import io.rapidpro.surveyor.engine.Engine;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
 import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.task.RefreshOrgTask;
@@ -52,7 +56,7 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
 
         // if this org doesn't have downloaded assets, ask the user if we can download them now
         if (!org.hasAssets()) {
-            confirmRefreshOrg(true);
+            confirmRefreshOrg(R.string.confirm_org_download);
         }
     }
 
@@ -70,6 +74,28 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
         if (confirmRefreshDialog != null) {
             confirmRefreshDialog.dismiss();
         }
+    }
+
+    protected void promptToUpgrade() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.unsupported_version))
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        try {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=io.rapidpro.surveyor")));
+                        } catch (android.content.ActivityNotFoundException e) {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=io.rapidpro.surveyor")));
+                        }
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
     }
 
     protected void refresh() {
@@ -96,6 +122,21 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
         ViewCache cache = getViewCache();
         cache.setVisible(R.id.container_pending, pending > 0);
         cache.setButtonText(R.id.button_pending, NumberFormat.getInstance().format(pending));
+
+        for (Flow flow : org.getFlows()) {
+            if (!Engine.isSpecVersionSupported(flow.getSpecVersion())) {
+                Semver flowVersion = new Semver(flow.getSpecVersion(), Semver.SemverType.LOOSE);
+                if (flowVersion.isGreaterThan(Engine.currentSpecVersion())){
+                    // if this flow is a major version ahead of us... user needs to upgrade the app
+                    promptToUpgrade();
+                    break;
+                } else {
+                    // if it is a major version behind, they should refresh the assets
+                    confirmRefreshOrg(R.string.confirm_org_refresh_old);
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -111,12 +152,10 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
     }
 
     public void onActionRefresh(MenuItem item) {
-        confirmRefreshOrg(false);
+        confirmRefreshOrg(R.string.confirm_org_refresh);
     }
 
-    public void confirmRefreshOrg(boolean initial) {
-        int msgId = initial ? R.string.confirm_org_download : R.string.confirm_org_refresh;
-
+    public void confirmRefreshOrg(int msgId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         confirmRefreshDialog = builder.setMessage(getString(msgId))

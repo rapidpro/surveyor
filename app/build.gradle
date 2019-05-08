@@ -84,6 +84,8 @@ dependencies {
     //noinspection GradleDependency newer versions use java.nio methods not supported on older Android versions
     implementation 'commons-io:commons-io:2.4'
 
+    implementation 'com.vdurmont:semver4j:2.2.0'
+
     // Android M permissions
     implementation 'com.greysonparrelli.permiso:permiso:0.3.0'
 

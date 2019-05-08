@@ -1,12 +1,8 @@
 package io.rapidpro.surveyor.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-
-import androidx.appcompat.app.AlertDialog;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -18,7 +14,6 @@ import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.Submission;
-import io.rapidpro.surveyor.engine.Engine;
 import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.ui.ViewCache;
 
@@ -77,32 +72,10 @@ public class FlowActivity extends BaseSubmissionsActivity {
     }
 
     public void onActionStart(View view) {
-        if (!Engine.isSpecVersionSupported(flow.getSpecVersion())) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(getString(R.string.unsupported_version))
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            try {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=io.rapidpro.surveyor")));
-                            } catch (android.content.ActivityNotFoundException e) {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=io.rapidpro.surveyor")));
-                            }
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    })
-                    .show();
-        } else {
-            Intent intent = new Intent(this, RunActivity.class);
-            intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, org.getUuid());
-            intent.putExtra(SurveyorIntent.EXTRA_FLOW_UUID, flow.getUuid());
-            startActivity(intent);
-        }
+        Intent intent = new Intent(this, RunActivity.class);
+        intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, org.getUuid());
+        intent.putExtra(SurveyorIntent.EXTRA_FLOW_UUID, flow.getUuid());
+        startActivity(intent);
     }
 
     /**

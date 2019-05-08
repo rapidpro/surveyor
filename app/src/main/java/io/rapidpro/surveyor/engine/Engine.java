@@ -10,6 +10,7 @@ import com.nyaruka.goflow.mobile.SessionAndSprint;
 import com.nyaruka.goflow.mobile.SessionAssets;
 import com.nyaruka.goflow.mobile.StringSlice;
 import com.nyaruka.goflow.mobile.Trigger;
+import com.vdurmont.semver4j.Semver;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -58,13 +59,12 @@ public class Engine {
     }
 
     /**
-     * Determines whether the given flow definition is in legacy format
+     * Gets the current spec version
      *
-     * @param definition the definition
-     * @return true if definition is legacy format
+     * @return the spec version
      */
-    public static boolean isLegacyDefinition(String definition) {
-        return Mobile.isLegacyDefinition(definition);
+    public static Semver currentSpecVersion() {
+        return new Semver(Mobile.currentSpecVersion(), Semver.SemverType.LOOSE);
     }
 
     /**
