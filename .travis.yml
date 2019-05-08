@@ -5,6 +5,7 @@ jdk: oraclejdk8
 env:
   global:
     - ADB_INSTALL_TIMEOUT=5
+    - INSTRUMENTED_TESTS_UI_DELAY=5000
   matrix:
     - API=22 ABI=x86_64
     # - API=23 ABI=x86_64 # fails due to 'Native crash' in showFlowDetails

@@ -37,6 +37,9 @@ import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
  */
 public abstract class BaseApplicationTest {
 
+    private final String INSTRUMENTED_TESTS_UI_PAUSE_ENVVAR = "INSTRUMENTED_TESTS_UI_PAUSE";
+    private final int INSTRUMENTED_TESTS_UI_PAUSE_DEFAULT = 500;
+
     @Rule
     public TestRule logger = new TestWatcher() {
         protected void starting(Description description) {
@@ -130,8 +133,8 @@ public abstract class BaseApplicationTest {
         openContextualActionModeOverflowMenu();
         //openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
-        // especially on Travis, we need to give the emulator a git of time to actually open the menu
-        sleep(5000);
+        // especially on Travis, we need to give the emulator a bit of time to actually open the menu
+        pause();
     }
 
     /**
@@ -220,10 +223,22 @@ public abstract class BaseApplicationTest {
         }
     }
 
-    protected void sleep(long millis) {
+    /**
+     * Pauses the testing thread for a configurable amount of time to allow UI changes in a different
+     * thread to complete.
+     */
+    protected void pause() {
+        int millis = INSTRUMENTED_TESTS_UI_PAUSE_DEFAULT;
+        String pauseMillis = System.getenv(INSTRUMENTED_TESTS_UI_PAUSE_ENVVAR);
+        if (pauseMillis != null) {
+            millis = Integer.parseInt(pauseMillis);
+        }
+
+        Logger.d("Pausing test for " + millis + " milliseconds...");
+
         try {
             Thread.sleep(millis);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

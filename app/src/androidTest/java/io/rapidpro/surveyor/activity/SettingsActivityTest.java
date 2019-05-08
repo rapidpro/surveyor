@@ -43,7 +43,7 @@ public class SettingsActivityTest extends BaseApplicationTest {
                 .perform(closeSoftKeyboard());
         onView(withText("OK")).perform(click());
 
-        sleep(2000);
+        pause();
 
         // host should have been updated
         assertThat(getSurveyor().getTembaHost(), is("http://test.com"));
