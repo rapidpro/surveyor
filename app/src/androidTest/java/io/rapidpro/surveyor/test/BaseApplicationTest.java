@@ -3,6 +3,8 @@ package io.rapidpro.surveyor.test;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -22,7 +24,6 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import androidx.test.platform.app.InstrumentationRegistry;
 import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.SurveyorPreferences;
@@ -130,8 +131,8 @@ public abstract class BaseApplicationTest {
         openContextualActionModeOverflowMenu();
         //openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
-        // especially on Travis, we need to give the emulator a git of time to actually open the menu
-        sleep(5000);
+        // especially on Travis, we need to give the emulator a bit of time to actually open the menu
+        pause();
     }
 
     /**
@@ -220,10 +221,16 @@ public abstract class BaseApplicationTest {
         }
     }
 
-    protected void sleep(long millis) {
+    /**
+     * Pauses the testing thread for a configurable amount of time to allow UI changes in a different
+     * thread to complete.
+     */
+    protected void pause() {
+        Logger.d("Pausing test for " + TestRunner.PAUSE_MILLIS + " milliseconds...");
+
         try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
+            Thread.sleep(TestRunner.PAUSE_MILLIS);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

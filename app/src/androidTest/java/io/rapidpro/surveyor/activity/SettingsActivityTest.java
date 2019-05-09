@@ -1,9 +1,14 @@
 package io.rapidpro.surveyor.activity;
 
+import androidx.test.rule.ActivityTestRule;
+
 import org.junit.Rule;
 import org.junit.Test;
 
-import androidx.test.rule.ActivityTestRule;
+import java.util.Collections;
+
+import io.rapidpro.surveyor.SurveyorApplication;
+import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.test.BaseApplicationTest;
 
 import static androidx.test.espresso.Espresso.onData;
@@ -38,6 +43,13 @@ public class SettingsActivityTest extends BaseApplicationTest {
                 .perform(closeSoftKeyboard());
         onView(withText("OK")).perform(click());
 
+        pause();
+
+        // host should have been updated
         assertThat(getSurveyor().getTembaHost(), is("http://test.com"));
+
+        // and user logged out
+        assertThat(getSurveyor().getPreferences().getString(SurveyorPreferences.AUTH_USERNAME, ""), is(""));
+        assertThat(getSurveyor().getPreferences().getStringSet(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet()), is(Collections.<String>emptySet()));
     }
 }
