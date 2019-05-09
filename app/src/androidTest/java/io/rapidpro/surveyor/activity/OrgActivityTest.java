@@ -76,6 +76,18 @@ public class OrgActivityTest extends BaseApplicationTest {
     }
 
     @Test
+    public void showRefreshConfirmationIfAssetsOutOfDate() throws IOException {
+        installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows_v12, io.rapidpro.surveyor.test.R.raw.org1_assets);
+
+        Intent intent = new Intent();
+        intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, ORG_UUID);
+
+        rule.launchActivity(intent);
+
+        onView(withText(R.string.confirm_org_refresh_old)).check(matches(isDisplayed()));
+    }
+
+    @Test
     public void dontShowDownloadConfirmationIfAssetsDownloaded() throws IOException {
         installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows, io.rapidpro.surveyor.test.R.raw.org1_assets);
 

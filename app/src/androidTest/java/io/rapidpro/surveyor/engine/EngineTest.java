@@ -7,8 +7,8 @@ import com.nyaruka.goflow.mobile.Resume;
 import com.nyaruka.goflow.mobile.SessionAssets;
 import com.nyaruka.goflow.mobile.StringSlice;
 import com.nyaruka.goflow.mobile.Trigger;
+import com.vdurmont.semver4j.Semver;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
@@ -31,11 +31,16 @@ import static org.junit.Assert.assertThat;
 public class EngineTest extends BaseApplicationTest {
 
     @Test
+    public void currentSpecVersion() {
+        assertThat(Engine.currentSpecVersion(), is(new Semver("13.0.0")));
+    }
+
+    @Test
     public void isSpecVersionSupported() {
-        assertThat(Engine.isSpecVersionSupported("11.5"), is(true));
-        assertThat(Engine.isSpecVersionSupported("12.0"), is(true));
-        assertThat(Engine.isSpecVersionSupported("12.5"), is(true));
-        assertThat(Engine.isSpecVersionSupported("13.0"), is(false));
+        assertThat(Engine.isSpecVersionSupported("12.0"), is(false));
+        assertThat(Engine.isSpecVersionSupported("13.0"), is(true));
+        assertThat(Engine.isSpecVersionSupported("13.5"), is(true));
+        assertThat(Engine.isSpecVersionSupported("14.0"), is(false));
     }
 
     @Test
@@ -43,7 +48,7 @@ public class EngineTest extends BaseApplicationTest {
         String legacyFlow = "{\"action_sets\":[],\"rule_sets\":[],\"base_language\":\"eng\",\"metadata\":{\"uuid\":\"061be894-4507-470c-a20b-34273bf915be\",\"name\":\"Survey\"}}";
         String migrated = Engine.migrateLegacyDefinition(legacyFlow);
 
-        assertThat(migrated, is("{\"uuid\":\"061be894-4507-470c-a20b-34273bf915be\",\"name\":\"Survey\",\"spec_version\":\"12.0.0\",\"language\":\"eng\",\"type\":\"\",\"revision\":0,\"expire_after_minutes\":0,\"localization\":{},\"nodes\":[],\"_ui\":{\"nodes\":{},\"stickies\":{}}}"));
+        assertThat(migrated, is("{\"uuid\":\"061be894-4507-470c-a20b-34273bf915be\",\"name\":\"Survey\",\"spec_version\":\"13.0.0\",\"language\":\"eng\",\"type\":\"\",\"revision\":0,\"expire_after_minutes\":0,\"localization\":{},\"nodes\":[],\"_ui\":{\"nodes\":{},\"stickies\":{}}}"));
     }
 
     @Test(expected = EngineException.class)
@@ -178,7 +183,7 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(sprint.getModifiers().get(0).type(), is("urn"));
         assertThat(sprint.getModifiers().get(0).payload(), is("{\"type\":\"urn\",\"urn\":\"tel:+593979123456\",\"modification\":\"append\"}"));
         assertThat(sprint.getModifiers().get(1).type(), is("groups"));
-        assertThat(sprint.getModifiers().get(1).payload(), is("{\"type\":\"groups\",\"groups\":[{\"uuid\":\"11f83067-7c40-49e8-8a35-a1a4e8dd3b69\",\"name\":\"Testers\"}],\"modification\":\"add\"}"));
+        assertThat(sprint.getModifiers().get(1).payload(), is("{\"type\":\"groups\",\"groups\":[{\"uuid\":\"6696cabf-eb5e-42bf-bcc6-f0c8be9b1316\",\"name\":\"Testers\"}],\"modification\":\"add\"}"));
 
         MsgIn msg3 = Engine.createMsgIn("37");
         Resume resume3 = Engine.createMsgResume(null, null, msg3);
@@ -219,13 +224,11 @@ public class EngineTest extends BaseApplicationTest {
 
         AssetsSource source = Engine.loadAssets(assetsJson);
         SessionAssets assets = Engine.createSessionAssets(source);
-        Session session = Engine.getInstance().newSession(assets);
 
         Environment env = Engine.createEnvironment(org);
         Contact contact = Contact.createEmpty(assets);
         Trigger trigger = Engine.createManualTrigger(env, contact, flow.toReference());
 
-        Sprint sprint = session.start(trigger);
-        return new ImmutablePair<>(session, sprint);
+        return Engine.getInstance().newSession(assets, trigger);
     }
 }

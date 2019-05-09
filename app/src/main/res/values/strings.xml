@@ -26,6 +26,7 @@
     <!-- confirmation prompts -->
     <string name="confirm_org_download">Flows for this organization haven\'t been downloaded yet. Download all flows now?</string>
     <string name="confirm_org_refresh">Refresh all flows for this organization?</string>
+    <string name="confirm_org_refresh_old">This organization\'s flows are too old to work with this version of Surveyor. Refresh all flows for this organization?</string>
     <string name="confirm_bug_report">Oops, it looks like Surveyor is having difficulty. Would you like to send a bug report so we can look into it?</string>
     <string name="confirm_submission_discard">Are you sure you want to discard the data collected?</string>
     <string name="confirm_send_submissions">Are you sure you want to send submissions to the server?</string>
@@ -113,7 +114,7 @@
     <string name="pending_summary_flow">You have pending submissions for this flow to save on the server.</string>
     <string name="pending_summary">You have pending submissions to save on the server.</string>
     <string name="one_moment">One Moment</string>
-    <string name="unsupported_version">This flow needs a newer version of the Surveyor application. Would you like to download the latest version?</string>
+    <string name="unsupported_version">Your version of Surveyor is too old to run these flows. Would you like to download the latest version?</string>
     <string name="please_login_again">Please login to your account again.</string>
     <string name="transition_chat">transition_chat</string>
     <string name="intro_message">Intro message</string>

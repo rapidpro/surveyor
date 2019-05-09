@@ -16,20 +16,6 @@ public class Session {
     }
 
     /**
-     * Starts this session with a trigger
-     *
-     * @param trigger the trigger
-     * @return the events
-     */
-    public Sprint start(Trigger trigger) throws EngineException {
-        try {
-            return Sprint.fromNative(target.start(trigger));
-        } catch (Exception e) {
-            throw new EngineException(e);
-        }
-    }
-
-    /**
      * Resumes this session with a resume
      *
      * @param resume the resume

@@ -1,7 +1,7 @@
 {
   "uuid": "bdd61538-5f50-4836-a8fb-acaafd64ddb1",
   "name": "Two Questions",
-  "spec_version": "12.0",
+  "spec_version": "13.0.0",
   "language": "base",
   "type": "messaging_offline",
   "revision": 24,
@@ -89,13 +89,34 @@
     },
     {
       "uuid": "e1dbee2c-17df-471d-9768-eec94a3343c0",
-      "wait": {
-        "type": "msg"
-      },
       "router": {
         "type": "switch",
+        "wait": {
+          "type": "msg"
+        },
         "result_name": "Beer",
-        "default_exit_uuid": "c0d4fdd1-ec6c-4b6d-927d-c7f532989274",
+        "categories": [
+          {
+            "uuid": "9f484724-9adb-40da-9da3-d99973591e27",
+            "exit_uuid": "6c9c4dd8-ea82-44c7-9a17-54eec3667134",
+            "name": "Club"
+          },
+          {
+            "uuid": "7993051a-a2d9-4387-9cdb-bd0f48c288a3",
+            "exit_uuid": "b54f32a0-863a-4e71-82f7-4208e1453967",
+            "name": "Pilsner"
+          },
+          {
+            "uuid": "447b17a3-9f22-4267-b9bc-754036f842ce",
+            "exit_uuid": "a995efea-79d8-4fcd-a88f-2bada7a028d5",
+            "name": "Mutzig"
+          },
+          {
+            "uuid": "c0d4fdd1-ec6c-4b6d-927d-c7f532989274",
+            "exit_uuid": "354a2c60-a994-47cc-9117-50b131eff2e7",
+            "name": "Other"
+          }
+        ],
         "operand": "@input",
         "cases": [
           {
@@ -104,7 +125,7 @@
             "arguments": [
               "Club"
             ],
-            "exit_uuid": "9f484724-9adb-40da-9da3-d99973591e27"
+            "category_uuid": "9f484724-9adb-40da-9da3-d99973591e27"
           },
           {
             "uuid": "f740f2ee-56e2-4a2f-8cfb-73e20a4bb5f2",
@@ -112,7 +133,7 @@
             "arguments": [
               "Pilsner"
             ],
-            "exit_uuid": "7993051a-a2d9-4387-9cdb-bd0f48c288a3"
+            "category_uuid": "7993051a-a2d9-4387-9cdb-bd0f48c288a3"
           },
           {
             "uuid": "5d8b09f9-67ed-42c7-9e5e-2e4607ebd76f",
@@ -120,42 +141,60 @@
             "arguments": [
               "Mutzig"
             ],
-            "exit_uuid": "447b17a3-9f22-4267-b9bc-754036f842ce"
+            "category_uuid": "447b17a3-9f22-4267-b9bc-754036f842ce"
           }
-        ]
+        ],
+        "default_category_uuid": "c0d4fdd1-ec6c-4b6d-927d-c7f532989274"
       },
       "exits": [
         {
-          "uuid": "9f484724-9adb-40da-9da3-d99973591e27",
-          "destination_node_uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
-          "name": "Club"
+          "uuid": "6c9c4dd8-ea82-44c7-9a17-54eec3667134",
+          "destination_uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57"
         },
         {
-          "uuid": "7993051a-a2d9-4387-9cdb-bd0f48c288a3",
-          "destination_node_uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
-          "name": "Pilsner"
+          "uuid": "b54f32a0-863a-4e71-82f7-4208e1453967",
+          "destination_uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57"
         },
         {
-          "uuid": "447b17a3-9f22-4267-b9bc-754036f842ce",
-          "destination_node_uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57",
-          "name": "Mutzig"
+          "uuid": "a995efea-79d8-4fcd-a88f-2bada7a028d5",
+          "destination_uuid": "b12ed7f7-2d2c-4c59-8c2e-2cccee06ce57"
         },
         {
-          "uuid": "c0d4fdd1-ec6c-4b6d-927d-c7f532989274",
-          "destination_node_uuid": "6980dc8d-7787-4a83-a603-5b84fd8e87f9",
-          "name": "Other"
+          "uuid": "354a2c60-a994-47cc-9117-50b131eff2e7",
+          "destination_uuid": "6980dc8d-7787-4a83-a603-5b84fd8e87f9"
         }
       ]
     },
     {
       "uuid": "7854b048-038c-44fe-88c5-f62fd599b556",
-      "wait": {
-        "type": "msg"
-      },
       "router": {
         "type": "switch",
+        "wait": {
+          "type": "msg"
+        },
         "result_name": "Color",
-        "default_exit_uuid": "a45d84cc-725b-4626-98fd-54c64eff0e20",
+        "categories": [
+          {
+            "uuid": "46f73b0a-5845-4392-b5bf-f74c07bb1217",
+            "exit_uuid": "58999a5a-277e-4dd5-aa18-3069eecb1bd0",
+            "name": "Red"
+          },
+          {
+            "uuid": "26d3ec68-245c-49d9-b33f-35d590041827",
+            "exit_uuid": "f259e489-5295-41c6-8ee2-888d83c9495c",
+            "name": "Blue"
+          },
+          {
+            "uuid": "646d954d-9e6e-4e38-9a78-0df08b38b7ac",
+            "exit_uuid": "2867ccb6-97b3-484c-8af2-52bc62f79dc4",
+            "name": "Green"
+          },
+          {
+            "uuid": "a45d84cc-725b-4626-98fd-54c64eff0e20",
+            "exit_uuid": "9c43c990-4f92-43e7-a0f8-330b0ba30def",
+            "name": "Other"
+          }
+        ],
         "operand": "@input",
         "cases": [
           {
@@ -164,7 +203,7 @@
             "arguments": [
               "red"
             ],
-            "exit_uuid": "46f73b0a-5845-4392-b5bf-f74c07bb1217"
+            "category_uuid": "46f73b0a-5845-4392-b5bf-f74c07bb1217"
           },
           {
             "uuid": "15b1b6f1-2c4f-4e3f-aef0-79eb19c5a59f",
@@ -172,7 +211,7 @@
             "arguments": [
               "blue"
             ],
-            "exit_uuid": "26d3ec68-245c-49d9-b33f-35d590041827"
+            "category_uuid": "26d3ec68-245c-49d9-b33f-35d590041827"
           },
           {
             "uuid": "0802ebe3-6a39-413d-b3dd-1b6e232f3c24",
@@ -180,30 +219,27 @@
             "arguments": [
               "green"
             ],
-            "exit_uuid": "646d954d-9e6e-4e38-9a78-0df08b38b7ac"
+            "category_uuid": "646d954d-9e6e-4e38-9a78-0df08b38b7ac"
           }
-        ]
+        ],
+        "default_category_uuid": "a45d84cc-725b-4626-98fd-54c64eff0e20"
       },
       "exits": [
         {
-          "uuid": "46f73b0a-5845-4392-b5bf-f74c07bb1217",
-          "destination_node_uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
-          "name": "Red"
+          "uuid": "58999a5a-277e-4dd5-aa18-3069eecb1bd0",
+          "destination_uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a"
         },
         {
-          "uuid": "26d3ec68-245c-49d9-b33f-35d590041827",
-          "destination_node_uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
-          "name": "Blue"
+          "uuid": "f259e489-5295-41c6-8ee2-888d83c9495c",
+          "destination_uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a"
         },
         {
-          "uuid": "646d954d-9e6e-4e38-9a78-0df08b38b7ac",
-          "destination_node_uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a",
-          "name": "Green"
+          "uuid": "2867ccb6-97b3-484c-8af2-52bc62f79dc4",
+          "destination_uuid": "f4bb2acf-7ba0-448f-93ff-c4192b95169a"
         },
         {
-          "uuid": "a45d84cc-725b-4626-98fd-54c64eff0e20",
-          "destination_node_uuid": "504f5813-b500-431f-b7db-244606c9696b",
-          "name": "Other"
+          "uuid": "9c43c990-4f92-43e7-a0f8-330b0ba30def",
+          "destination_uuid": "504f5813-b500-431f-b7db-244606c9696b"
         }
       ]
     }

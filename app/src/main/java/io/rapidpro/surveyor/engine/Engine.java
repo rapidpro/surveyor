@@ -6,9 +6,14 @@ import com.nyaruka.goflow.mobile.FlowReference;
 import com.nyaruka.goflow.mobile.Mobile;
 import com.nyaruka.goflow.mobile.MsgIn;
 import com.nyaruka.goflow.mobile.Resume;
+import com.nyaruka.goflow.mobile.SessionAndSprint;
 import com.nyaruka.goflow.mobile.SessionAssets;
 import com.nyaruka.goflow.mobile.StringSlice;
 import com.nyaruka.goflow.mobile.Trigger;
+import com.vdurmont.semver4j.Semver;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,13 +59,12 @@ public class Engine {
     }
 
     /**
-     * Determines whether the given flow definition is in legacy format
+     * Gets the current spec version
      *
-     * @param definition the definition
-     * @return true if definition is legacy format
+     * @return the spec version
      */
-    public static boolean isLegacyDefinition(String definition) {
-        return Mobile.isLegacyDefinition(definition);
+    public static Semver currentSpecVersion() {
+        return new Semver(Mobile.currentSpecVersion(), Semver.SemverType.LOOSE);
     }
 
     /**
@@ -172,12 +176,20 @@ public class Engine {
     }
 
     /**
-     * Creates a new session
+     * Creates and starts a new session
      *
      * @param assets the session assets
      */
-    public Session newSession(SessionAssets assets) {
-        return new Session(this.target.newSession(assets));
+    public Pair<Session, Sprint> newSession(SessionAssets assets, Trigger trigger) throws EngineException {
+        try {
+            SessionAndSprint ss = this.target.newSession(assets, trigger);
+            return new ImmutablePair<>(
+                    new Session(ss.session()),
+                    Sprint.fromNative(ss.sprint())
+            );
+        } catch (Exception e) {
+            throw new EngineException(e);
+        }
     }
 
     /**

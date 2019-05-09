@@ -165,7 +165,7 @@ public class TembaServiceTest extends BaseApplicationTest {
 
         List<Group> groups = getSurveyor().getTembaService().getGroups("abc123");
         assertThat(groups, hasSize(3));
-        assertThat(groups.get(0).getUuid(), is("11f83067-7c40-49e8-8a35-a1a4e8dd3b69"));
+        assertThat(groups.get(0).getUuid(), is("6696cabf-eb5e-42bf-bcc6-f0c8be9b1316"));
         assertThat(groups.get(0).getName(), is("Testers"));
         assertThat(groups.get(0).getQuery(), is(""));
         assertThat(groups.get(1).getUuid(), is("372aba66-16e2-44ee-8486-fb5cedfe51d9"));
@@ -182,7 +182,7 @@ public class TembaServiceTest extends BaseApplicationTest {
     @Test
     public void getDefinitions_inLegacyFormat() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_flows_get, "application/json", 200);
-        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get_legacy, "application/json", 200);
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get_v11, "application/json", 200);
 
         List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
         List<RawJson> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);
@@ -198,7 +198,7 @@ public class TembaServiceTest extends BaseApplicationTest {
     @Test
     public void getDefinitions() throws Exception {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_flows_get, "application/json", 200);
-        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get, "application/json", 200);
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.api_v2_definitions_get_v13, "application/json", 200);
 
         List<Flow> flows = getSurveyor().getTembaService().getFlows("abc123");
         List<RawJson> definitions = getSurveyor().getTembaService().getDefinitions("abc123", flows);

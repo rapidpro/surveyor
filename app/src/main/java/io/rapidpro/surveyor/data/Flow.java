@@ -59,9 +59,14 @@ public class Flow {
         JsonArray nodes = definition.get("nodes").getAsJsonArray();
         for (JsonElement elem : nodes) {
             JsonObject node = elem.getAsJsonObject();
-            if (node.get("wait") != null) {
-                questionCount++;
+            JsonElement routerElem = node.get("router");
+            if (routerElem != null) {
+                JsonObject router = routerElem.getAsJsonObject();
+                if (router.get("wait") != null) {
+                    questionCount++;
+                }
             }
+
         }
 
         return new Flow(uuid, name, specVersion, revision, questionCount);
