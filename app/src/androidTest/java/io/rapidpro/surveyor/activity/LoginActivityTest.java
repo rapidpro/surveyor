@@ -48,7 +48,7 @@ public class LoginActivityTest extends BaseApplicationTest {
         onView(withId(R.id.password)).perform(click(), typeText("Qwerty123"), closeSoftKeyboard());
         onView(withId(R.id.email_sign_in_button)).perform(click());
 
-        sleep(2000);
+        pause();
 
         onView(withId(R.id.text_error_message))
                 .check(matches(isDisplayed()))

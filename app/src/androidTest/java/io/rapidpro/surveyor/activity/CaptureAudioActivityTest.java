@@ -41,7 +41,7 @@ public class CaptureAudioActivityTest extends BaseApplicationTest {
                 .check(matches(isDisplayed()))
                 .perform(click());
 
-        sleep(2000);
+        pause();
 
         // stop recording
         onView(withId(R.id.button_capture)).perform(click());
