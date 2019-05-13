@@ -6,8 +6,11 @@ is available.
 
 RapidPro Surveyor is open source (BSD). Copyright 2019, UNICEF.
 
-<img src="https://raw.githubusercontent.com/rapidpro/surveyor/master/screens/org.png" width="150">
-<img src="https://raw.githubusercontent.com/rapidpro/surveyor/master/screens/flow.png" width="150">
-<img src="https://raw.githubusercontent.com/rapidpro/surveyor/master/screens/run.png" width="150">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rapidpro/surveyor/master/screens/login.png" width="150">
+  <img src="https://raw.githubusercontent.com/rapidpro/surveyor/master/screens/org.png" width="150">
+  <img src="https://raw.githubusercontent.com/rapidpro/surveyor/master/screens/flow.png" width="150">
+  <img src="https://raw.githubusercontent.com/rapidpro/surveyor/master/screens/run.png" width="150">
+</p>
 
 
