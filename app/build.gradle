@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'jacoco-android'
 
+// load our keystore configuration
+def keystore = new Properties()
+keystore.load(new FileInputStream(rootProject.file("keystore.properties")))
+
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
@@ -16,10 +20,19 @@ android {
         testInstrumentationRunner "io.rapidpro.surveyor.test.TestRunner"
         testInstrumentationRunnerArgument 'notAnnotation', 'androidx.test.filters.FlakyTest'
     }
+    signingConfigs {
+        release {
+            storeFile file(keystore['storeFile'])
+            storePassword keystore['storePassword']
+            keyAlias keystore['keyAlias']
+            keyPassword keystore['keyPassword']
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
         debug {
             testCoverageEnabled true
