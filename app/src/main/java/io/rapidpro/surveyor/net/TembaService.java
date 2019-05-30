@@ -184,18 +184,19 @@ public class TembaService {
             checkResponse(response);
 
             Definitions definitions = response.body();
-            String specVersion = definitions.getVersion();
+            List<RawJson> flowDefs = new ArrayList<>(definitions.getFlows().size());
 
-            if (specVersion.equals("11") || specVersion.startsWith("11.")) {
-                List<RawJson> migratedFlows = new ArrayList<>(definitions.getFlows().size());
-                for (RawJson legacyFlow : definitions.getFlows()) {
-                    String migrated = Engine.migrateLegacyDefinition(legacyFlow.toString());
-                    migratedFlows.add(new RawJson(migrated));
+            for (RawJson rawFlow : definitions.getFlows()) {
+                if (Engine.isLegacyDefinition(rawFlow.toString())) {
+                    String migrated = Engine.migrateLegacyDefinition(rawFlow.toString());
+                    flowDefs.add(new RawJson(migrated));
+                } else {
+                    flowDefs.add(rawFlow);
                 }
-                return migratedFlows;
             }
 
-            return response.body().getFlows();
+            return flowDefs;
+
 
         } catch (IOException e) {
             throw new TembaException("Unable to fetch definitions", e);
