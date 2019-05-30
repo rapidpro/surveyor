@@ -48,7 +48,7 @@ public class EngineTest extends BaseApplicationTest {
         String legacyFlow = "{\"action_sets\":[],\"rule_sets\":[],\"base_language\":\"eng\",\"metadata\":{\"uuid\":\"061be894-4507-470c-a20b-34273bf915be\",\"name\":\"Survey\"}}";
         String migrated = Engine.migrateLegacyDefinition(legacyFlow);
 
-        assertThat(migrated, is("{\"uuid\":\"061be894-4507-470c-a20b-34273bf915be\",\"name\":\"Survey\",\"spec_version\":\"13.0.0\",\"language\":\"eng\",\"type\":\"\",\"revision\":0,\"expire_after_minutes\":0,\"localization\":{},\"nodes\":[],\"_ui\":{\"nodes\":{},\"stickies\":{}}}"));
+        assertThat(migrated, is("{\"uuid\":\"061be894-4507-470c-a20b-34273bf915be\",\"name\":\"Survey\",\"spec_version\":\"13.0.0\",\"language\":\"eng\",\"type\":\"messaging\",\"revision\":0,\"expire_after_minutes\":0,\"localization\":{},\"nodes\":[],\"_ui\":{\"nodes\":{},\"stickies\":{}}}"));
     }
 
     @Test(expected = EngineException.class)

@@ -45,6 +45,16 @@ public class Engine {
     }
 
     /**
+     * Returns whether the given definition is in legacy format
+     *
+     * @param definition the legacy definition
+     * @return true if definition is legacy
+     */
+    public static boolean isLegacyDefinition(String definition) {
+        return Mobile.isLegacyDefinition(definition);
+    }
+
+    /**
      * Migrates a legacy flow definition to the new engine format
      *
      * @param definition the legacy definition
