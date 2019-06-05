@@ -30,6 +30,7 @@ import io.rapidpro.surveyor.SurveyorPreferences;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
+import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.Espresso.openContextualActionModeOverflowMenu;
 import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
 
@@ -128,8 +129,10 @@ public abstract class BaseApplicationTest {
     }
 
     protected void openOptionsMenu() {
-        openContextualActionModeOverflowMenu();
-        //openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        //openContextualActionModeOverflowMenu();
+
+        Context context = InstrumentationRegistry.getInstrumentation().getContext();
+        openActionBarOverflowOrOptionsMenu(context);
 
         // especially on Travis, we need to give the emulator a bit of time to actually open the menu
         pause();
