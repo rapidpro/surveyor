@@ -23,10 +23,10 @@ android:
 install:
   - echo 'count=0' > /home/travis/.android/repositories.cfg  # avoid harmless sdkmanager warning
   - echo y | sdkmanager "platform-tools" >/dev/null
-  - echo y | sdkmanager "build-tools;28.0.3" >/dev/null      # implicit gradle dependency
+  - echo y | sdkmanager "build-tools;29.0.0" >/dev/null      # implicit gradle dependency
   - echo y | sdkmanager "platforms;android-$API" >/dev/null  # API of the emulator we will run
-  - echo y | sdkmanager "platforms;android-28" >/dev/null    # API of the current compileSdkVersion
-  - echo y | sdkmanager --channel=4 "emulator"               # see https://github.com/ankidroid/Anki-Android/pull/5280
+  - echo y | sdkmanager "platforms;android-29" >/dev/null    # API of the current compileSdkVersion
+  - echo y | sdkmanager "emulator"
   - echo y | sdkmanager "extras;android;m2repository" >/dev/null
   - echo y | sdkmanager "extras;google;m2repository" >/dev/null
   - echo y | sdkmanager "system-images;android-$API;default;$ABI" # install the emulator
