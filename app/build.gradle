@@ -102,14 +102,6 @@ dependencies {
     // Android M permissions
     implementation 'com.greysonparrelli.permiso:permiso:0.3.0'
 
-    // legacy
-    annotationProcessor 'io.realm:realm-android:0.82.1'
-    implementation 'io.realm:realm-android:0.82.1'
-    implementation('io.rapidpro:flows:11.5') {
-        exclude group: 'org.threeten'
-    }
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.0.2'
-
     // unit tests
     testImplementation 'junit:junit:4.12'
 

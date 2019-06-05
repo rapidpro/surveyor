@@ -2,7 +2,6 @@ package io.rapidpro.surveyor.task;
 
 import android.os.AsyncTask;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,7 +9,6 @@ import io.rapidpro.surveyor.Logger;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.OrgService;
-import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.net.responses.Token;
 
 /**
@@ -44,15 +42,6 @@ public class FetchOrgsTask extends AsyncTask<Token, Void, Set<String>> {
                 Logger.e("Unable to fetch org", e);
                 this.failed = true;
                 break;
-            }
-        }
-
-        // finally clean up any legacy orgs leftover from an older installation
-        if (Legacy.isCleanupNeeded()) {
-            try {
-                Legacy.cleanupOrgs(orgs);
-            } catch (IOException e) {
-                Logger.e("Unable to cleanup legacy orgs", e);
             }
         }
 

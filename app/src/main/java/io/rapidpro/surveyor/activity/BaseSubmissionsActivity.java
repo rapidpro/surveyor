@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.view.View;
 import android.widget.Toast;
 
-import java.io.File;
 import java.util.List;
 
 import io.rapidpro.surveyor.R;
@@ -78,15 +77,10 @@ public abstract class BaseSubmissionsActivity extends BaseActivity {
             }
         });
 
-        task.setUsername(getUsername());
-        task.setLegacyToken(getOrg().getToken());
-        task.includeLegacySubmissions(getLegacySubmissions());
         task.execute(asArray);
     }
 
     protected abstract List<Submission> getPendingSubmissions();
-
-    protected abstract List<File> getLegacySubmissions();
 
     protected abstract Org getOrg();
 

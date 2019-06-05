@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import java.io.File;
 import java.text.NumberFormat;
 import java.util.List;
 
@@ -14,7 +13,6 @@ import io.rapidpro.surveyor.SurveyorIntent;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.Submission;
-import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.ui.ViewCache;
 
 /**
@@ -65,7 +63,6 @@ public class FlowActivity extends BaseSubmissionsActivity {
         cache.setText(R.id.text_flow_revision, "(v" + nf.format(flow.getRevision()) + ")");
 
         int pending = getSurveyor().getSubmissionService().getCompletedCount(org, flow);
-        pending += Legacy.getCompletedCount(org, flow);
 
         cache.setVisible(R.id.container_pending, pending > 0);
         cache.setButtonText(R.id.button_pending, nf.format(pending));
@@ -84,11 +81,6 @@ public class FlowActivity extends BaseSubmissionsActivity {
     @Override
     protected List<Submission> getPendingSubmissions() {
         return getSurveyor().getSubmissionService().getCompleted(org, flow);
-    }
-
-    @Override
-    protected List<File> getLegacySubmissions() {
-        return Legacy.getCompleted(org, flow);
     }
 
     @Override
