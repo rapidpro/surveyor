@@ -1,5 +1,5 @@
 language: android
-
+dist: trusty
 jdk: oraclejdk8
 
 env:
@@ -44,7 +44,9 @@ before_script:
   - adb logcat -v time > logcat.log &
 
 script:
-  - ./gradlew build jacocoTestReport assembleAndroidTest
+  - ./gradlew buildRapidproDebug
+  - ./gradlew jacocoTestReport
+  - ./gradlew assembleAndroidTest
   - ./gradlew -Pandroid.testInstrumentationRunnerArguments.pause=$INSTRUMENTED_TESTS_PAUSE connectedRapidproDebugAndroidTest
 
 after_success:
