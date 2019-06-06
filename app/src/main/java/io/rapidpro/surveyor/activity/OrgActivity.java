@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.vdurmont.semver4j.Semver;
 
-import java.io.File;
 import java.text.NumberFormat;
 import java.util.List;
 
@@ -26,7 +25,6 @@ import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.Submission;
 import io.rapidpro.surveyor.engine.Engine;
 import io.rapidpro.surveyor.fragment.FlowListFragment;
-import io.rapidpro.surveyor.legacy.Legacy;
 import io.rapidpro.surveyor.task.RefreshOrgTask;
 import io.rapidpro.surveyor.ui.BlockingProgress;
 import io.rapidpro.surveyor.ui.ViewCache;
@@ -114,7 +112,6 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
         }
 
         int pending = getSurveyor().getSubmissionService().getCompletedCount(getOrg());
-        pending += Legacy.getCompletedCount(getOrg());
 
         ViewCache cache = getViewCache();
         cache.setVisible(R.id.container_pending, pending > 0);
@@ -213,11 +210,6 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
     @Override
     protected List<Submission> getPendingSubmissions() {
         return getSurveyor().getSubmissionService().getCompleted(getOrg());
-    }
-
-    @Override
-    protected List<File> getLegacySubmissions() {
-        return Legacy.getCompleted(getOrg());
     }
 
     @Override

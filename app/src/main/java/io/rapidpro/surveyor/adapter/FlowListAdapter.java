@@ -15,7 +15,6 @@ import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorApplication;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
-import io.rapidpro.surveyor.legacy.Legacy;
 
 public class FlowListAdapter extends ArrayAdapter<Flow> {
 
@@ -51,7 +50,6 @@ public class FlowListAdapter extends ArrayAdapter<Flow> {
         cache.titleView.setText(flow.getName());
 
         int pending = SurveyorApplication.get().getSubmissionService().getCompletedCount(org, flow);
-        pending += Legacy.getCompletedCount(org, flow);
 
         NumberFormat nf = NumberFormat.getInstance();
         cache.pendingSubmissions.setText(nf.format(pending));

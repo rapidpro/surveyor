@@ -313,58 +313,6 @@ public class TembaService {
         }
     }
 
-    @Deprecated
-    public void legacyAddCreatedFields(String token, HashMap<String, io.rapidpro.flows.runner.Field> fields) {
-        for (io.rapidpro.flows.runner.Field field : fields.values()) {
-            api.legacyAddCreatedField(asAuth(token), field);
-        }
-    }
-
-    /* Legacy endpoints to be removed */
-
-    @Deprecated
-    public io.rapidpro.flows.runner.Contact legacyAddContact(String token, io.rapidpro.flows.runner.Contact contact) throws TembaException {
-
-        if ("base".equals(contact.getLanguage())) {
-            contact.setLanguage(null);
-        }
-
-        try {
-            Response<JsonObject> result = api.legacyAddContact(asAuth(token), contact.toJson()).execute();
-
-            checkResponse(result);
-
-            String uuid = result.body().get("uuid").getAsString();
-            contact.setUuid(uuid);
-            return contact;
-
-        } catch (IOException e) {
-            throw new TembaException("Error submitting legacy contact", e);
-        }
-    }
-
-    @Deprecated
-    public void legacyAddResults(String token, io.rapidpro.surveyor.legacy.Submission submission) throws TembaException {
-        try {
-
-            boolean success = false;
-            for (JsonObject result : submission.getResultsJson()) {
-                Response response = api.legacyAddResults(asAuth(token), result).execute();
-                if (response.isSuccessful()) {
-                    success = response.isSuccessful();
-                }
-
-            }
-            if (success) {
-                submission.delete();
-            } else {
-                throw new TembaException("Error submitting results");
-            }
-        } catch (IOException e) {
-            throw new TembaException("Error submitting legacy results", e);
-        }
-    }
-
     /**
      * Utility for fetching all pages of a given type
      */
