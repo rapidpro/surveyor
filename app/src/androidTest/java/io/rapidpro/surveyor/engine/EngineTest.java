@@ -97,7 +97,7 @@ public class EngineTest extends BaseApplicationTest {
 
         // try to marshal to JSON
         String marshaled = session.toJSON();
-        assertThat(marshaled.substring(0, 50), is("{\"type\":\"messaging_offline\",\"environment\":{\"date_f"));
+        assertThat(marshaled.substring(0, 9), is("{\"uuid\":\""));
 
         // and unmarshal back
         Session session2 = Engine.getInstance().readSession(session.getAssets(), marshaled);

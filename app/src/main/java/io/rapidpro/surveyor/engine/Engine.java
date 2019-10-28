@@ -41,7 +41,7 @@ public class Engine {
      * Creates a new engine
      */
     private Engine() {
-        this.target = new com.nyaruka.goflow.mobile.Engine(null);
+        this.target = new com.nyaruka.goflow.mobile.Engine();
     }
 
     /**
