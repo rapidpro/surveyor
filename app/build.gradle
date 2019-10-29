@@ -74,7 +74,8 @@ dependencies {
     implementation project(':goflow')
 
     // google services
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    //noinspection issues with 1.1.1 https://issuetracker.google.com/issues/141132133
+    implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.exifinterface:exifinterface:1.0.0'
