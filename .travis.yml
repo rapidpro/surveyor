@@ -44,10 +44,7 @@ before_script:
   - adb logcat -v time > logcat.log &
 
 script:
-  - ./gradlew buildRapidproDebug
-  - ./gradlew jacocoTestReport
-  - ./gradlew assembleAndroidTest
-  - ./gradlew -Pandroid.testInstrumentationRunnerArguments.pause=$INSTRUMENTED_TESTS_PAUSE connectedRapidproDebugAndroidTest
+  - ./gradlew -Pandroid.testInstrumentationRunnerArguments.pause=$INSTRUMENTED_TESTS_PAUSE connectedRapidproDebugAndroidTest jacocoMergedReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
