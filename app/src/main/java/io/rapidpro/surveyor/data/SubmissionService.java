@@ -1,6 +1,7 @@
 package io.rapidpro.surveyor.data;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -18,6 +19,8 @@ import io.rapidpro.surveyor.utils.SurveyUtils;
 public class SubmissionService {
 
     private File rootDir;
+
+    private static FileFilter DIR_FILTER = DirectoryFileFilter.INSTANCE;
 
     /**
      * Creates a new submission service
@@ -78,16 +81,23 @@ public class SubmissionService {
         File orgDir = new File(rootDir, org.getUuid());
         File flowDir = new File(orgDir, flow.getUuid());
         if (flowDir.exists()) {
-            for (File file : flowDir.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File f) {
-                    return f.isDirectory();
-                }
-            })) {
+            for (File file : flowDir.listFiles(DIR_FILTER)) {
                 all.add(new Submission(org, file));
             }
         }
         return all;
+    }
+
+    public boolean hasSubmissions() {
+        for (File orgDir : rootDir.listFiles(DIR_FILTER)) {
+            for (File flowDir : orgDir.listFiles(DIR_FILTER)) {
+                File[] subDirs = flowDir.listFiles(DIR_FILTER);
+                if (subDirs != null && subDirs.length > 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -126,5 +136,13 @@ public class SubmissionService {
      */
     public int getCompletedCount(Org org, Flow flow) {
         return getCompleted(org, flow).size();
+    }
+
+    /**
+     * Clear all submissions
+     */
+    public void clearAll() throws IOException {
+        FileUtils.deleteDirectory(rootDir);
+        rootDir.mkdir();
     }
 }

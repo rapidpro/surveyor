@@ -30,6 +30,7 @@
     <string name="confirm_bug_report">Oops, it looks like Surveyor is having difficulty. Would you like to send a bug report so we can look into it?</string>
     <string name="confirm_submission_discard">Are you sure you want to discard the data collected?</string>
     <string name="confirm_send_submissions">Are you sure you want to send submissions to the server?</string>
+    <string name="confirm_logout_with_submissions">You have unsubmitted submissions which will be lost if you logout. Are you sure?</string>
 
     <!-- error messages -->
     <string name="error_server_not_found">Server is unavailable. Please check your settings or try again later.</string>

@@ -70,25 +70,16 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
     }
 
     protected void promptToUpgrade() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.unsupported_version))
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        try {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=io.rapidpro.surveyor")));
-                        } catch (android.content.ActivityNotFoundException e) {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=io.rapidpro.surveyor")));
-                        }
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
-                .show();
+        showConfirmDialog(R.string.unsupported_version, new ConfirmationListener() {
+            @Override
+            public void onConfirm() {
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=io.rapidpro.surveyor")));
+                } catch (android.content.ActivityNotFoundException e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=io.rapidpro.surveyor")));
+                }
+            }
+        });
     }
 
     protected void refresh() {
@@ -159,23 +150,12 @@ public class OrgActivity extends BaseSubmissionsActivity implements FlowListFrag
     }
 
     public void confirmRefreshOrg(int msgId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        confirmRefreshDialog = builder.setMessage(getString(msgId))
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        doRefresh();
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                }).create();
-
-        confirmRefreshDialog.show();
+        confirmRefreshDialog = showConfirmDialog(msgId, new ConfirmationListener() {
+            @Override
+            public void onConfirm() {
+                doRefresh();
+            }
+        });
     }
 
     private void doRefresh() {

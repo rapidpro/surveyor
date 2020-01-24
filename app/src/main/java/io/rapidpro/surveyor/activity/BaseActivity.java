@@ -101,7 +101,16 @@ public abstract class BaseActivity extends PermisoActivity {
      * @param item the menu item
      */
     public void onActionLogout(MenuItem item) {
-        logout();
+        if (getSurveyor().getSubmissionService().hasSubmissions()) {
+            showConfirmDialog(R.string.confirm_logout_with_submissions, new ConfirmationListener() {
+                @Override
+                public void onConfirm() {
+                    logout();
+                }
+            });
+        } else {
+            logout();
+        }
     }
 
     /**
@@ -166,7 +175,7 @@ public abstract class BaseActivity extends PermisoActivity {
         getSurveyor().setPreference(SurveyorPreferences.AUTH_ORGS, Collections.<String>emptySet());
 
         try {
-            getSurveyor().clearSubmissions();
+            getSurveyor().getSubmissionService().clearAll();
         } catch (IOException e) {
             Logger.e("Unable to clear submissions", e);
         }
@@ -183,21 +192,12 @@ public abstract class BaseActivity extends PermisoActivity {
     }
 
     public void showBugReportDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.confirm_bug_report))
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        sendBugReport();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
-                .show();
+        showConfirmDialog(R.string.confirm_bug_report, new ConfirmationListener() {
+            @Override
+            public void onConfirm() {
+                sendBugReport();
+            }
+        });
     }
 
     private void sendBugReport() {
@@ -252,18 +252,29 @@ public abstract class BaseActivity extends PermisoActivity {
         return getSurveyor().getPreferences();
     }
 
-    public AlertDialog showAlert(int title, int body) {
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(body)
-                .setIcon(android.R.drawable.ic_dialog_alert).create();
-
-        dialog.show();
-        return dialog;
-    }
-
     protected void showToast(int resId) {
         Toast.makeText(this, resId, Toast.LENGTH_SHORT).show();
+    }
+
+    protected interface ConfirmationListener {
+        void onConfirm();
+    }
+
+    protected AlertDialog showConfirmDialog(int msgResId, final ConfirmationListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        return builder.setMessage(msgResId)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog1, int id) {
+                        listener.onConfirm();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog1, int id) {
+                        dialog1.cancel();
+                    }
+                }).show();
     }
 
     public void showRationaleDialog(int body, Permiso.IOnRationaleProvided callback) {

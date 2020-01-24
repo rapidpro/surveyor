@@ -1,6 +1,5 @@
 package io.rapidpro.surveyor.data;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -65,10 +64,15 @@ public class SubmissionServiceTest extends BaseApplicationTest {
         assertThat(svc.getCompletedCount(org, flow1), is(2));
         assertThat(svc.getCompletedCount(org, flow2), is(1));
         assertThat(svc.getCompletedCount(org, flow3), is(0));
+        assertThat(svc.hasSubmissions(), is(true));
 
         List<Submission> pending = svc.getCompleted(org);
         assertThat(pending, is(hasSize(3)));
 
         assertThat(pending.get(0).getDirectory(), is(sub1Dir));
+
+        svc.clearAll();
+
+        assertThat(svc.hasSubmissions(), is(false));
     }
 }

@@ -12,6 +12,7 @@ import java.util.Collections;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import io.rapidpro.surveyor.R;
 import io.rapidpro.surveyor.SurveyorIntent;
+import io.rapidpro.surveyor.SurveyorPreferences;
 import io.rapidpro.surveyor.data.Flow;
 import io.rapidpro.surveyor.data.Org;
 import io.rapidpro.surveyor.data.Submission;
@@ -25,11 +26,13 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.is;
 
 public class OrgActivityTest extends BaseApplicationTest {
 
@@ -139,5 +142,43 @@ public class OrgActivityTest extends BaseApplicationTest {
 
         onView(withId(R.id.container_pending)).check(matches(isDisplayed()));
         onView(withId(R.id.button_pending)).check(matches(withText("2")));
+    }
+
+    @Test
+    public void showLogoutConfirmationIfHasSubmissions() throws IOException {
+        installOrg(ORG_UUID, io.rapidpro.surveyor.test.R.raw.org1_details, io.rapidpro.surveyor.test.R.raw.org1_flows, io.rapidpro.surveyor.test.R.raw.org1_assets);
+
+        Org org = getSurveyor().getOrgService().get(ORG_UUID);
+        Flow flow1 = org.getFlow("bdd61538-5f50-4836-a8fb-acaafd64ddb1");
+
+        SubmissionService svc = getSurveyor().getSubmissionService();
+        Submission sub1 = svc.newSubmission(org, flow1);
+        sub1.complete();
+        Submission sub2 = svc.newSubmission(org, flow1);
+        sub2.complete();
+        svc.newSubmission(org, flow1);
+
+        Intent intent = new Intent();
+        intent.putExtra(SurveyorIntent.EXTRA_ORG_UUID, ORG_UUID);
+
+        rule.launchActivity(intent);
+
+        openOptionsMenu();
+
+        onView(withText("Logout")).perform(click());
+        onView(withText("No")).perform(click());
+
+        // check that we're still logged in
+        assertThat(getSurveyor().getPreferences().getString(SurveyorPreferences.AUTH_USERNAME, ""), is("bob@nyaruka.com"));
+
+        // clear all submissions
+        svc.clearAll();
+
+        openOptionsMenu();
+
+        onView(withText("Logout")).perform(click());
+
+        // check that we're logged out
+        assertThat(getSurveyor().getPreferences().getString(SurveyorPreferences.AUTH_USERNAME, ""), is(""));
     }
 }
