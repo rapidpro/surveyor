@@ -148,7 +148,7 @@ public class SurveyorApplication extends Application {
         clearPreference(SurveyorPreferences.AUTH_USERNAME);
         clearPreference(SurveyorPreferences.AUTH_ORGS);
         try {
-            clearSubmissions();
+            getSubmissionService().clearAll();
         } catch (IOException e) {
             Logger.e("Unable to clear submissions", e);
         }
@@ -208,13 +208,6 @@ public class SurveyorApplication extends Application {
      */
     protected File getSubmissionsDirectory() throws IOException {
         return SurveyUtils.mkdir(getUserDirectory(), "submissions");
-    }
-
-    /**
-     * Clears the submissions storage directory
-     */
-    public void clearSubmissions() throws IOException {
-        FileUtils.deleteDirectory(getSubmissionsDirectory());
     }
 
     /**

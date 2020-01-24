@@ -594,22 +594,13 @@ public class RunActivity extends BaseActivity {
     }
 
     private void confirmDiscardRun() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.confirm_submission_discard))
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        submission.delete();
-                        finish();
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
-                .show();
+        showConfirmDialog(R.string.confirm_submission_discard, new ConfirmationListener() {
+            @Override
+            public void onConfirm() {
+                submission.delete();
+                finish();
+            }
+        });
     }
 
     public void onClickMedia(View view) {
