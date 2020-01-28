@@ -189,7 +189,7 @@ public class TembaServiceTest extends BaseApplicationTest {
 
         // check flow definitions have been migrated
         assertThat(definitions, hasSize(3));
-        assertThat(definitions.get(0).toString(), startsWith("{\"uuid\":\"ed8cf8d4-a42c-4ce1-a7e3-44a2918e3cec\",\"name\":\"Contact Details\""));
+        assertThat(definitions.get(0).toString(), startsWith("{\"entry\":\"036901e0-abb8-4979-92cb-f0d43aeb5b68\""));
     }
 
     /**
