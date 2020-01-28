@@ -45,30 +45,6 @@ public class Engine {
     }
 
     /**
-     * Returns whether the given definition is in legacy format
-     *
-     * @param definition the legacy definition
-     * @return true if definition is legacy
-     */
-    public static boolean isLegacyDefinition(String definition) {
-        return Mobile.isLegacyDefinition(definition);
-    }
-
-    /**
-     * Migrates a legacy flow definition to the new engine format
-     *
-     * @param definition the legacy definition
-     * @return the new definition
-     */
-    public static String migrateLegacyDefinition(String definition) {
-        try {
-            return Mobile.migrateLegacyDefinition(definition);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * Gets the current spec version
      *
      * @return the spec version
@@ -84,7 +60,12 @@ public class Engine {
      * @return true if supported
      */
     public static boolean isSpecVersionSupported(String ver) {
-        return Mobile.isSpecVersionSupported(ver);
+        // for a while Surveyor was creating v12 flows which don't exist anywhere else
+        if (ver.startsWith("12.")) {
+            return false;
+        }
+
+        return Mobile.isVersionSupported(ver);
     }
 
     /**
