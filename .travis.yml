@@ -24,6 +24,7 @@ install:
   - echo 'count=0' > /home/travis/.android/repositories.cfg  # avoid harmless sdkmanager warning
   - echo y | sdkmanager "platform-tools" >/dev/null
   - echo y | sdkmanager "build-tools;29.0.2" >/dev/null      # implicit gradle dependency
+  - echo y | sdkmanager "cmdline-tools;latest"
   - echo y | sdkmanager "platforms;android-$API" >/dev/null  # API of the emulator we will run
   - echo y | sdkmanager "platforms;android-29" >/dev/null    # API of the current compileSdkVersion
   - echo y | sdkmanager "emulator"
@@ -32,8 +33,8 @@ install:
   - echo y | sdkmanager "system-images;android-$API;default;$ABI" # install the emulator
 
 before_script:
-  - avdmanager list device
-  - echo no | avdmanager create avd --force --name test --sdcard 100M --package "system-images;android-$API;default;$ABI" --device "Nexus 5X"
+  - $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list device
+  - echo no | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force --name test --sdcard 100M --package "system-images;android-$API;default;$ABI" --device "Nexus 5X"
   - $ANDROID_HOME/emulator/emulator -version
   - $ANDROID_HOME/emulator/emulator -verbose -avd test -no-accel -no-snapshot -no-window -selinux permissive -qemu -m 2048 &
   - android-wait-for-emulator
