@@ -46,27 +46,46 @@ public class Flow {
      * @return the flow summary
      */
     public static Flow extract(RawJson flow) {
-
-        // TODO use streaming for performance https://developer.android.com/reference/android/util/JsonReader
         JsonObject definition = JsonUtils.unmarshal(flow.toString(), JsonObject.class);
 
-        String uuid = definition.get("uuid").getAsString();
-        String name = definition.get("name").getAsString();
-        String specVersion = definition.get("spec_version").getAsString();
-        int revision = definition.get("revision").getAsInt();
-        int questionCount = 0;
+        // flow is in 13+ format
+        if (definition.get("uuid") != null) {
+            String uuid = definition.get("uuid").getAsString();
+            String name = definition.get("name").getAsString();
+            String specVersion = definition.get("spec_version").getAsString();
+            int revision = definition.get("revision").getAsInt();
+            int questionCount = 0;
 
-        JsonArray nodes = definition.get("nodes").getAsJsonArray();
-        for (JsonElement elem : nodes) {
-            JsonObject node = elem.getAsJsonObject();
-            JsonElement routerElem = node.get("router");
-            if (routerElem != null) {
-                JsonObject router = routerElem.getAsJsonObject();
-                if (router.get("wait") != null) {
-                    questionCount++;
+            JsonArray nodes = definition.get("nodes").getAsJsonArray();
+            for (JsonElement elem : nodes) {
+                JsonObject node = elem.getAsJsonObject();
+                JsonElement routerElem = node.get("router");
+                if (routerElem != null) {
+                    JsonObject router = routerElem.getAsJsonObject();
+                    if (router.get("wait") != null) {
+                        questionCount++;
+                    }
                 }
             }
 
+            return new Flow(uuid, name, specVersion, revision, questionCount);
+        }
+
+        // flow is in 11.x format
+        JsonObject metadata = definition.get("metadata").getAsJsonObject();
+        String uuid = metadata.get("uuid").getAsString();
+        String name = metadata.get("name").getAsString();
+        String specVersion = definition.get("version").getAsString();
+        int revision = metadata.get("revision").getAsInt();
+        int questionCount = 0;
+
+        JsonArray ruleSets = definition.get("rule_sets").getAsJsonArray();
+        for (JsonElement elem : ruleSets) {
+            JsonObject ruleSet = elem.getAsJsonObject();
+            String rulesetType = ruleSet.get("ruleset_type").getAsString();
+            if (rulesetType.startsWith("wait_")) {
+                questionCount++;
+            }
         }
 
         return new Flow(uuid, name, specVersion, revision, questionCount);
