@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'jacoco-android'
+apply plugin: 'com.hiya.jacoco-android'
 
 // load our keystore configuration
 def keystore = new Properties()
@@ -78,7 +78,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.exifinterface:exifinterface:1.1.0'
+    implementation 'androidx.exifinterface:exifinterface:1.2.0'
 
     // rest api
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
@@ -129,10 +129,10 @@ task jacocoMergedReport(type: JacocoReport, dependsOn: ['testRapidproDebugUnitTe
     def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: fileFilter)
     def mainSrc = "${project.projectDir}/src/main/java"
 
-    sourceDirectories = files([mainSrc])
-    classDirectories = files([debugTree])
-    executionData = fileTree(dir: "$buildDir", includes: [
+    getSourceDirectories().setFrom(files([mainSrc]))
+    getClassDirectories().setFrom(files([debugTree]))
+    getExecutionData().setFrom(fileTree(dir: "$buildDir", includes: [
             "jacoco/testRapidproDebugUnitTest.exec",
             "outputs/code_coverage/rapidproDebugAndroidTest/connected/*coverage.ec"
-    ])
+    ]))
 }
