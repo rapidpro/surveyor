@@ -173,8 +173,8 @@ public class EngineTest extends BaseApplicationTest {
         assertThat(sprint.getEvents().get(5).type(), is("msg_wait"));
 
         assertThat(sprint.getModifiers(), hasSize(2));
-        assertThat(sprint.getModifiers().get(0).type(), is("urn"));
-        assertThat(sprint.getModifiers().get(0).payload(), is("{\"type\":\"urn\",\"urn\":\"tel:+593979123456\",\"modification\":\"append\"}"));
+        assertThat(sprint.getModifiers().get(0).type(), is("urns"));
+        assertThat(sprint.getModifiers().get(0).payload(), is("{\"type\":\"urns\",\"urns\":[\"tel:+593979123456\"],\"modification\":\"append\"}"));
         assertThat(sprint.getModifiers().get(1).type(), is("groups"));
         assertThat(sprint.getModifiers().get(1).payload(), is("{\"type\":\"groups\",\"groups\":[{\"uuid\":\"6696cabf-eb5e-42bf-bcc6-f0c8be9b1316\",\"name\":\"Testers\"}],\"modification\":\"add\"}"));
 
@@ -192,7 +192,7 @@ public class EngineTest extends BaseApplicationTest {
 
         assertThat(sprint.getModifiers(), hasSize(1));
         assertThat(sprint.getModifiers().get(0).type(), is("field"));
-        assertThat(sprint.getModifiers().get(0).payload(), is("{\"type\":\"field\",\"field\":{\"key\":\"age\",\"name\":\"Age\"},\"value\":{\"text\":\"37\",\"number\":37}}"));
+        assertThat(sprint.getModifiers().get(0).payload(), is("{\"type\":\"field\",\"field\":{\"key\":\"age\",\"name\":\"Age\"},\"value\":\"37\"}"));
     }
 
     @Test
@@ -215,10 +215,10 @@ public class EngineTest extends BaseApplicationTest {
 
         String assetsJson = readResourceAsString(R.raw.org1_assets);
 
-        AssetsSource source = Engine.loadAssets(assetsJson);
-        SessionAssets assets = Engine.createSessionAssets(source);
-
         Environment env = Engine.createEnvironment(org);
+        AssetsSource source = Engine.loadAssets(assetsJson);
+        SessionAssets assets = Engine.createSessionAssets(env, source);
+
         Contact contact = Contact.createEmpty(assets);
         Trigger trigger = Engine.createManualTrigger(env, contact, flow.toReference());
 

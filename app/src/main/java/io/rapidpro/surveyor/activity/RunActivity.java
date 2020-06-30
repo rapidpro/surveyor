@@ -95,8 +95,8 @@ public class RunActivity extends BaseActivity {
 
         try {
             Org org = getSurveyor().getOrgService().get(orgUUID);
-            SessionAssets assets = Engine.createSessionAssets(Engine.loadAssets(org.getAssets()));
             Environment environment = Engine.createEnvironment(org);
+            SessionAssets assets = Engine.createSessionAssets(environment, Engine.loadAssets(org.getAssets()));
 
             Flow flow = org.getFlow(flowUUID);
             setTitle(flow.getName());
