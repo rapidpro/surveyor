@@ -102,9 +102,9 @@ public class Engine {
      * @param source the source
      * @return the session assets
      */
-    public static SessionAssets createSessionAssets(AssetsSource source) throws EngineException {
+    public static SessionAssets createSessionAssets(Environment env, AssetsSource source) throws EngineException {
         try {
-            return new SessionAssets(source);
+            return new SessionAssets(env, source);
         } catch (Exception e) {
             throw new EngineException(e);
         }
