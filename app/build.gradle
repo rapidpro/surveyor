@@ -74,11 +74,10 @@ dependencies {
     implementation project(':goflow')
 
     // google services
-    //noinspection GradleDependency issues with 1.1.1 https://issuetracker.google.com/issues/141132133
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.exifinterface:exifinterface:1.2.0'
+    implementation 'androidx.exifinterface:exifinterface:1.3.1'
 
     // rest api
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
@@ -88,7 +87,7 @@ dependencies {
 
     // for location services
     implementation 'com.google.android.gms:play-services-gcm:17.0.0'
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.1.0'
 
     // internationalization, language iso codes
     implementation 'com.neovisionaries:nv-i18n:1.11'
@@ -107,13 +106,13 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     // instrumented tests
-    androidTestImplementation 'androidx.test:core:1.2.0'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test:rules:1.2.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-web:3.2.0'
+    androidTestImplementation 'androidx.test:core:1.3.0'
+    androidTestImplementation 'androidx.test:runner:1.3.0'
+    androidTestImplementation 'androidx.test:rules:1.3.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-web:3.3.0'
     androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
     androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.10.0'
 }
