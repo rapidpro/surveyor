@@ -1,4 +1,7 @@
-# RapidPro Surveyor [![Build Status](https://travis-ci.org/rapidpro/surveyor.svg?branch=master)](https://travis-ci.org/rapidpro/surveyor) [![codecov](https://codecov.io/gh/rapidpro/surveyor/branch/master/graph/badge.svg)](https://codecov.io/gh/rapidpro/surveyor)
+# RapidPro Surveyor 
+
+[![Build Status](https://travis-ci.org/rapidpro/surveyor.svg?branch=main)](https://travis-ci.org/rapidpro/surveyor) 
+[![codecov](https://codecov.io/gh/rapidpro/surveyor/branch/main/graph/badge.svg)](https://codecov.io/gh/rapidpro/surveyor)
 
 Surveyor is an offline client for [RapidPro](https://github.com/rapidpro/rapidpro). It allows flows
 to be run offline, i.e. without internet access, and the results to be uploaded later when internet
