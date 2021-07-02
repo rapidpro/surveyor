@@ -38,7 +38,6 @@ public class OrgServiceTest extends BaseApplicationTest {
         assertThat(org.getName(), is("Nyaruka"));
         assertThat(org.getCountry(), is("RW"));
         assertThat(org.getLanguages(), is(arrayContaining("eng", "fra")));
-        assertThat(org.getPrimaryLanguage(), is("eng"));
         assertThat(org.getTimezone(), is("Africa/Kigali"));
         assertThat(org.getDateStyle(), is("day_first"));
         assertThat(org.isAnon(), is(false));

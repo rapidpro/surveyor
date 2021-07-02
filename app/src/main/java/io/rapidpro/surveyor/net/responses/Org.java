@@ -37,10 +37,6 @@ public class Org {
         return languages;
     }
 
-    public String getPrimaryLanguage() {
-        return primaryLanguage;
-    }
-
     public String getTimezone() {
         return timezone;
     }

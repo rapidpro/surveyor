@@ -100,7 +100,6 @@ public class TembaServiceTest extends BaseApplicationTest {
         Org org = getSurveyor().getTembaService().getOrg("abc123");
         assertThat(org.getUuid(), is("dc8123a1-168c-4962-ab9e-f784f3d804a2"));
         assertThat(org.getName(), is("Nyaruka"));
-        assertThat(org.getPrimaryLanguage(), is("eng"));
         assertThat(org.getLanguages(), arrayContaining("eng", "fra"));
         assertThat(org.getTimezone(), is("Africa/Kigali"));
         assertThat(org.getDateStyle(), is("day_first"));
