@@ -79,7 +79,7 @@ public class Engine {
         String timeformat = "tt:mm";
         StringSlice languages = listToSlice(Arrays.asList(org.getLanguages()));
         String redactionPolicy = org.isAnon() ? "urns" : "none";
-        return new Environment(dateFormat, timeformat, org.getTimezone(), org.getPrimaryLanguage(), languages, org.getCountry(), redactionPolicy);
+        return new Environment(dateFormat, timeformat, org.getTimezone(), languages, org.getCountry(), redactionPolicy);
     }
 
     /**

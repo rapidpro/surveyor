@@ -153,10 +153,6 @@ public class Org {
         return country;
     }
 
-    public String getPrimaryLanguage() {
-        return primaryLanguage;
-    }
-
     public String[] getLanguages() {
         return languages;
     }
@@ -231,7 +227,6 @@ public class Org {
         io.rapidpro.surveyor.net.responses.Org apiOrg = svc.getOrg(this.token);
 
         this.name = apiOrg.getName();
-        this.primaryLanguage = apiOrg.getPrimaryLanguage();
         this.languages = apiOrg.getLanguages();
         this.timezone = apiOrg.getTimezone();
         this.country = apiOrg.getCountry();
