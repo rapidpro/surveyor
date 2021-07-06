@@ -38,3 +38,9 @@ jobs:
           emulator-options: -no-accel -no-snapshot -no-window -noaudio -selinux permissive
           disable-animations: true
           script: ./gradlew -Pandroid.testInstrumentationRunnerArguments.pause=5000 connectedRapidproDebugAndroidTest jacocoMergedReport
+
+      - name: Upload coverage
+        if: success()
+        uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: true
