@@ -1,0 +1,40 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    name: Test
+    env:
+      jdk_version: '1.8'
+      api_level: 22
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ env.jdk_version }}
+
+      - name: Build the app
+        run: ./gradlew assembleDebug
+
+      - name: Upload apk
+        uses: actions/upload-artifact@v2
+        with:
+          name: debug apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Run unit tests
+        run: ./gradlew test --stacktrace
+
+      - name: Run instrumented tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.api_level }}
+          arch: x86_64
+          profile: Nexus 5X
+          sdcard-path-or-size: 100M
+          emulator-options: -no-accel -no-snapshot -no-window -noaudio -selinux permissive
+          disable-animations: true
+          script: ./gradlew -Pandroid.testInstrumentationRunnerArguments.pause=5000 connectedRapidproDebugAndroidTest jacocoMergedReport
