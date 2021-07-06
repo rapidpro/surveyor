@@ -1,6 +1,6 @@
-# RapidPro Surveyor 
+# RapidPro Surveyor
 
-[![Build Status](https://travis-ci.org/rapidpro/surveyor.svg?branch=main)](https://travis-ci.org/rapidpro/surveyor) 
+[![Build Status](https://github.com/rapidpro/surveyor/workflows/CI/badge.svg)](https://github.com/rapidpro/surveyor/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/rapidpro/surveyor/branch/main/graph/badge.svg)](https://codecov.io/gh/rapidpro/surveyor)
 
 Surveyor is an offline client for [RapidPro](https://github.com/rapidpro/rapidpro). It allows flows
