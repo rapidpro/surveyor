@@ -5,7 +5,7 @@ jobs:
     name: Test
     env:
       jdk_version: '1.8'
-      api_level: 22
+      api_level: 21
     runs-on: macos-latest
     steps:
       - name: Checkout code
