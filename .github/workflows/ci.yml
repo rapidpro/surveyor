@@ -4,7 +4,7 @@ jobs:
   test:
     name: Test
     env:
-      jdk_version: '1.8'
+      jdk_version: '1.11'
       api_level: 21
     runs-on: macos-latest
     steps:
