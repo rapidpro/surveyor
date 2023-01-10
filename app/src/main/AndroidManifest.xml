@@ -30,11 +30,11 @@
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateVisible"></activity>
+            android:windowSoftInputMode="adjustResize|stateVisible" />
         <activity
             android:name=".activity.SettingsActivity"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
         <activity
             android:name=".activity.OrgChooseActivity"
             android:screenOrientation="portrait"
@@ -48,30 +48,30 @@
         <activity
             android:name=".activity.OrgActivity"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_org"></activity>
+            android:label="@string/title_activity_org" />
         <activity
             android:name=".activity.FlowActivity"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_flow"></activity>
+            android:label="@string/title_activity_flow" />
         <activity
             android:name=".activity.RunActivity"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_run"></activity>
+            android:label="@string/title_activity_run" />
         <activity
             android:name=".activity.CaptureAudioActivity"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_audio"></activity>
+            android:label="@string/title_activity_audio" />
         <activity
             android:name=".activity.CaptureVideoActivity"
             android:theme="@style/RapidTheme.FullScreen"
-            android:label="@string/title_activity_video"></activity>
+            android:label="@string/title_activity_video" />
         <activity
             android:name=".activity.CaptureLocationActivity"
             android:theme="@style/RapidTheme.FullScreen"
-            android:label="@string/title_activity_location"></activity>
+            android:label="@string/title_activity_location" />
         <activity
             android:name=".activity.CreateAccountActivity"
-            android:label="@string/title_activity_create_account"></activity>
+            android:label="@string/title_activity_create_account" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
