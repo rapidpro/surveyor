@@ -7,9 +7,9 @@ keystore.load(new FileInputStream(rootProject.file("keystore.properties")))
 
 android {
     compileSdkVersion 30
-    buildToolsVersion '30.0.2'
 
     defaultConfig {
+        testInstrumentationRunnerArguments notAnnotation: 'androidx.test.filters.FlakyTest'
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 21
         targetSdkVersion 30
@@ -18,7 +18,6 @@ android {
         multiDexEnabled = true
 
         testInstrumentationRunner "io.rapidpro.surveyor.test.TestRunner"
-        testInstrumentationRunnerArgument 'notAnnotation', 'androidx.test.filters.FlakyTest'
     }
     signingConfigs {
         release {
@@ -49,18 +48,20 @@ android {
         }
     }
     packagingOptions {
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
+        resources {
+            excludes += ['META-INF/LICENSE.txt', 'META-INF/NOTICE.txt']
+        }
     }
     dexOptions {
         javaMaxHeapSize "4g"
     }
-    lintOptions {
-        abortOnError false
-    }
     testOptions {
         unitTests.returnDefaultValues = true
     }
+    lint {
+        abortOnError false
+    }
+    namespace 'io.rapidpro.surveyor'
 }
 
 repositories {
