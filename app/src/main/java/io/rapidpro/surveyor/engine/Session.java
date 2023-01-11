@@ -2,8 +2,6 @@ package io.rapidpro.surveyor.engine;
 
 import com.nyaruka.goflow.mobile.Resume;
 import com.nyaruka.goflow.mobile.SessionAssets;
-import com.nyaruka.goflow.mobile.Trigger;
-import com.nyaruka.goflow.mobile.Wait;
 
 public class Session {
     private com.nyaruka.goflow.mobile.Session target;
@@ -54,10 +52,6 @@ public class Session {
      */
     public boolean isWaiting() {
         return getStatus().equals("waiting");
-    }
-
-    public Wait getWait() {
-        return target.getWait();
     }
 
     /**

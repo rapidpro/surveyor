@@ -107,11 +107,11 @@ public class EngineTest extends BaseApplicationTest {
 
         assertThat(session.getStatus(), is("waiting"));
         assertThat(session.isWaiting(), is(true));
-        assertThat(session.getWait().hint(), is(notNullValue()));
-        assertThat(session.getWait().hint().type(), is("image"));
         assertThat(sprint.getEvents(), hasSize(2));
         assertThat(sprint.getEvents().get(0).type(), is("msg_created"));
         assertThat(sprint.getEvents().get(1).type(), is("msg_wait"));
+        assertThat(sprint.getMsgWaitEvent().hint(), is(notNullValue()));
+        assertThat(sprint.getMsgWaitEvent().hint().type(), is("image"));
 
         MsgIn msg1 = Engine.createMsgIn("", "content://io.rapidpro.surveyor/files/selfie.jpg");
         Resume resume1 = Engine.createMsgResume(null, null, msg1);

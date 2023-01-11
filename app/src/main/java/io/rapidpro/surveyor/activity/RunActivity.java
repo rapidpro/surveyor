@@ -467,7 +467,7 @@ public class RunActivity extends BaseActivity {
             cache.hide(R.id.container_request_media);
             cache.show(R.id.completed_session_actions);
         } else {
-            waitForInput(session.getWait().hint());
+            waitForInput(sprint.getMsgWaitEvent().hint());
         }
 
         submission.saveSession(session);
