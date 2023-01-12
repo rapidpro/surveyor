@@ -4,7 +4,7 @@ jobs:
   test:
     name: Test
     env:
-      jdk_version: '1.11'
+      jdk_version: '11'
       api_level: 21
     runs-on: macos-latest
     steps:
@@ -12,12 +12,16 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
           java-version: ${{ env.jdk_version }}
+          distribution: temurin
 
       - name: Build the app
         run: ./gradlew assembleDebug
+
+      - name: Check with Gradle
+        run: ./gradlew check
 
       - name: Run unit tests
         run: ./gradlew test --stacktrace
