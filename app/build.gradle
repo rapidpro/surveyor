@@ -92,7 +92,7 @@ dependencies {
 
     // apache commons
     implementation 'org.apache.commons:commons-lang3:3.8.1'
-    //noinspection GradleDependency newer versions use java.nio methods not supported on older Android versions
+    //noinspection GradleDependency newer versions throw java.nio.channels.CancelledKeyException in tests for some reason
     implementation 'commons-io:commons-io:2.4'
 
     implementation 'com.vdurmont:semver4j:2.2.0'
