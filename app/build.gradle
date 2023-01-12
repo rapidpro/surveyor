@@ -6,13 +6,13 @@ def keystore = new Properties()
 keystore.load(new FileInputStream(rootProject.file("keystore.properties")))
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
 
     defaultConfig {
         testInstrumentationRunnerArguments notAnnotation: 'androidx.test.filters.FlakyTest'
         applicationId "io.rapidpro.surveyor"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 32
         versionCode 1390
         versionName "13.9.0"
         multiDexEnabled = true
