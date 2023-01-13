@@ -1,8 +1,9 @@
 .idea
+.DS_Store
 build/
 app/rapidpro/
 .gradle
-local.properties
 *.iml
 gradle-app.setting
-.DS_STORE
+
+local.properties
