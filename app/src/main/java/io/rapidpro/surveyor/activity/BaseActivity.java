@@ -114,6 +114,15 @@ public abstract class BaseActivity extends PermisoActivity {
     }
 
     /**
+     * User clicked "Privacy" menu option
+     *
+     * @param item the menu item
+     */
+    public void onActionPrivacy(MenuItem item) {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.privacy_url))));
+    }
+
+    /**
      * User clicked "Bug Report" menu option
      *
      * @param item the menu item
