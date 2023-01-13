@@ -3,6 +3,7 @@ package io.rapidpro.surveyor.activity;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.view.MenuItem;
 
 import org.junit.After;
 import org.junit.Before;
@@ -179,12 +180,33 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
     }
 
     /**
-     * @see BaseActivity#sendBugReport()
+     * @see BaseActivity#onActionPrivacy(MenuItem) ()
      * <p>
      * tested here because we need a IntentsTestRule based test
      */
     @Test
-    public void sendBugReport() throws IOException {
+    public void onActionPrivacy() throws IOException {
+        mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_get, "text/html", 200);
+
+        // mock the intent to pick an app to send the bug report too
+        intending(hasAction(Intent.ACTION_VIEW)).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, null));
+
+        rule.launchActivity(null);
+
+        openOptionsMenu();
+        onView(withText("Privacy")).perform(click());
+
+        // check intent was launched
+        intended(hasAction(Intent.ACTION_VIEW));
+    }
+
+    /**
+     * @see BaseActivity#onActionBugReport(MenuItem) ()
+     * <p>
+     * tested here because we need a IntentsTestRule based test
+     */
+    @Test
+    public void onActionBugReport() throws IOException {
         mockServerResponse(io.rapidpro.surveyor.test.R.raw.org_surveyor_get, "text/html", 200);
 
         // mock the intent to pick an app to send the bug report too
@@ -193,8 +215,7 @@ public class CreateAccountActivityTest extends BaseApplicationTest {
         rule.launchActivity(null);
 
         openOptionsMenu();
-        onView(withText("Bug Report"))
-                .perform(click());
+        onView(withText("Bug Report")).perform(click());
 
         // check intent was launched
         intended(hasAction(Intent.ACTION_CHOOSER));
